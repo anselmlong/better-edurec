@@ -1,6 +1,6 @@
-/* Everything is scoped to html.edr-on so "Classic view" restores EduRec untouched. */
+/* Everything is scoped to html[data-edr-on] so "Classic view" restores EduRec untouched. */
 
-html.edr-on {
+html[data-edr-on] {
   --edr-navy: #123A6B;
   --edr-navy-ink: #0E2E55;
   --edr-ink: #16202E;
@@ -23,61 +23,71 @@ html.edr-on {
 
 /* ---------- PeopleSoft restyle (light touch, class names from Fluid UI) ---------- */
 
-html.edr-on body {
+html[data-edr-on] body {
   background: var(--edr-bg) !important;
   color: var(--edr-ink);
   font-family: var(--edr-font) !important;
 }
-html.edr-on body,
-html.edr-on .ps_box-label, html.edr-on .ps-label, html.edr-on .ps-text,
-html.edr-on .ps_box-value, html.edr-on .ps-link, html.edr-on .ps-button,
-html.edr-on .ps_grid-cell, html.edr-on td, html.edr-on th, html.edr-on input, html.edr-on select {
+html[data-edr-on] body,
+html[data-edr-on] .ps_box-label, html[data-edr-on] .ps-label, html[data-edr-on] .ps-text,
+html[data-edr-on] .ps_box-value, html[data-edr-on] .ps-link, html[data-edr-on] .ps-button,
+html[data-edr-on] .ps_grid-cell, html[data-edr-on] td, html[data-edr-on] th, html[data-edr-on] input, html[data-edr-on] select {
   font-family: var(--edr-font) !important;
 }
-html.edr-on a, html.edr-on .ps-link { color: var(--edr-blue); }
-html.edr-on .ps_header,
-html.edr-on #PT_HEADER {
+html[data-edr-on] a, html[data-edr-on] .ps-link { color: var(--edr-blue); }
+html[data-edr-on] .ps_header,
+html[data-edr-on] #PT_HEADER {
   background: var(--edr-surface) !important;
   border-bottom: 1px solid var(--edr-line) !important;
   box-shadow: none !important;
 }
-html.edr-on .ps_pagetitle,
-html.edr-on .ps_pagetitle * {
+html[data-edr-on] .ps_pagetitle,
+html[data-edr-on] .ps_pagetitle * {
   color: var(--edr-ink) !important;
   font-weight: 700 !important;
 }
-html.edr-on .ps-button,
-html.edr-on input[type="button"],
-html.edr-on input[type="submit"] {
+html[data-edr-on] .ps-button,
+html[data-edr-on] input[type="button"],
+html[data-edr-on] input[type="submit"] {
   border-radius: 6px !important;
   border: 1px solid var(--edr-line) !important;
   background: var(--edr-surface) !important;
   color: var(--edr-ink) !important;
   box-shadow: none !important;
 }
-html.edr-on .ps-button.psc_primary,
-html.edr-on .psc_primary .ps-button {
+html[data-edr-on] .ps-button.psc_primary,
+html[data-edr-on] .psc_primary .ps-button {
   background: var(--edr-navy) !important;
   border-color: var(--edr-navy) !important;
   color: #FFFFFF !important;
 }
-html.edr-on table { border-collapse: collapse; }
-html.edr-on .ps_grid-row:hover > td,
-html.edr-on .ps_grid-row:hover > .ps_grid-cell { background: #F7F9FC; }
-html.edr-on th,
-html.edr-on .ps_grid-col { color: var(--edr-muted); font-weight: 600; }
-html.edr-on td,
-html.edr-on .ps_grid-cell { border-color: var(--edr-line-2) !important; }
+html[data-edr-on] table { border-collapse: collapse; }
+html[data-edr-on] .ps_grid-row:hover > td,
+html[data-edr-on] .ps_grid-row:hover > .ps_grid-cell { background: #F7F9FC; }
+html[data-edr-on] th,
+html[data-edr-on] .ps_grid-col { color: var(--edr-muted); font-weight: 600; }
+html[data-edr-on] td,
+html[data-edr-on] .ps_grid-cell { border-color: var(--edr-line-2) !important; }
 
-/* Shift EduRec right of the sidebar on wide screens. */
+/* Shift EduRec right of the sidebar on wide screens. The sidebar lives on <html>,
+   outside <body>; the transform makes <body> the containing block for EduRec's own
+   fixed/absolute headers and panels, so they move over with it instead of hiding
+   under the sidebar. */
 @media (min-width: 900px) {
-  html.edr-on.edr-top body { padding-left: var(--edr-nav-w) !important; box-sizing: border-box; }
+  html[data-edr-on][data-edr-top] body {
+    margin-left: var(--edr-nav-w) !important;
+    width: calc(100% - var(--edr-nav-w)) !important;
+    max-width: calc(100vw - var(--edr-nav-w)) !important;
+    min-height: 100vh;
+    position: relative !important;
+    transform: translateZ(0);
+    box-sizing: border-box;
+  }
 }
 
-/* Homepage: hide the tile grid; the Overview replaces it. */
-html.edr-home body > form.PSForm,
-html.edr-home body > #pt_envinfo,
-html.edr-home body > #divdobackclassic { display: none !important; }
+/* Homepage: hide everything EduRec renders; the Overview replaces it. */
+html[data-edr-home] body > *:not(.edr-root) { display: none !important; }
+html[data-edr-home] body { overflow: auto !important; height: auto !important; }
 
 /* ---------- Extension components ---------- */
 
@@ -137,7 +147,7 @@ html.edr-home body > #divdobackclassic { display: none !important; }
 .edr-menu-toggle { display: none; }
 @media (max-width: 899px) {
   .edr-shell { transform: translateX(-100%); transition: transform .2s ease; box-shadow: 0 10px 40px rgba(16, 32, 46, .2); }
-  html.edr-nav-open .edr-shell { transform: none; }
+  html[data-edr-nav-open] .edr-shell { transform: none; }
   .edr-menu-toggle {
     display: flex; align-items: center; justify-content: center; position: fixed; z-index: 2147483001;
     left: 12px; bottom: 16px; width: 48px; height: 48px; border-radius: 24px; border: 0;

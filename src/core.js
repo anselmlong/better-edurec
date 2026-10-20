@@ -45,6 +45,23 @@
 
   EDR.isTop = window.top === window;
 
+  // Page-level switches live in data- attributes on <html>: EduRec rewrites the
+  // <html> class list after load, which would silently drop class-based flags.
+  const flags = new Set();
+  EDR.flag = function flag(name, on) {
+    const attr = 'data-edr-' + name;
+    if (on === false) {
+      flags.delete(attr);
+      document.documentElement.removeAttribute(attr);
+      return;
+    }
+    flags.add(attr);
+    document.documentElement.setAttribute(attr, '');
+  };
+  new MutationObserver(() => {
+    for (const attr of flags) if (!document.documentElement.hasAttribute(attr)) document.documentElement.setAttribute(attr, '');
+  }).observe(document.documentElement, { attributes: true });
+
   EDR.icon = function icon(d, size) {
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg');

@@ -28,22 +28,40 @@
         nav,
         h('div', { class: 'edr-shell-foot' },
           h('button', { class: 'edr-link-btn', type: 'button', onclick: classicView }, 'Classic view'),
+          h('button', { class: 'edr-link-btn', type: 'button', onclick: copyReport }, 'Copy layout report'),
           h('a', { class: 'edr-link-btn', href: logoutHref }, 'Sign out'),
           h('p', { class: 'edr-fineprint' }, 'Unofficial personal reskin. Read-only.')))
     );
 
     const toggle = h('button', {
       class: 'edr-root edr-menu-toggle', type: 'button', 'aria-label': 'Menu', 'aria-controls': 'edr-shell',
-      onclick: () => document.documentElement.classList.toggle('edr-nav-open')
+      onclick: () => EDR.flag('nav-open', !document.documentElement.hasAttribute('data-edr-nav-open'))
     }, EDR.icon('M4 7h16M4 12h16M4 17h16', 20));
 
-    document.body.prepend(shell, toggle);
+    // Mounted on <html>, outside <body>, so the body offset in theme.css doesn't move it.
+    document.documentElement.append(shell, toggle);
     document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         openPalette();
       }
     });
+  }
+
+  async function copyReport(e) {
+    const btn = e.currentTarget;
+    const text = EDR.diag.layoutReport();
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      const ta = h('textarea', { style: { position: 'fixed', opacity: '0' } }, text);
+      document.documentElement.append(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    btn.textContent = 'Copied: no text or values included';
+    setTimeout(() => { btn.textContent = 'Copy layout report'; }, 2500);
   }
 
   async function classicView() {
@@ -58,7 +76,7 @@
       id: 'edr-restore', class: 'edr-root edr-restore', type: 'button',
       onclick: async () => { await EDR.store.setEnabled(true); location.reload(); }
     }, 'Use new EduRec view');
-    document.body.append(btn);
+    document.documentElement.append(btn);
   }
 
   let palette = null;
@@ -104,7 +122,7 @@
       else if (e.key === 'Enter' && results[active]) location.href = results[active].href;
     });
 
-    document.body.append(overlay);
+    document.documentElement.append(overlay);
     palette = { input };
     render();
     input.focus();

@@ -17,6 +17,7 @@
         "src/routes.js",
         "src/parsers.js",
         "src/store.js",
+        "src/diag.js",
         "src/shell.js",
         "src/overview.js",
         "src/enhancers.js",

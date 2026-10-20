@@ -10,13 +10,16 @@
     return;
   }
 
-  document.documentElement.classList.add('edr-on');
+  EDR.flag('on');
   const page = EDR.routes.detectPage(location.href);
 
   if (EDR.isTop) {
-    document.documentElement.classList.add('edr-top');
+    EDR.flag('top');
     EDR.shell.mount(page);
-    if (page.key === 'home') EDR.overview.mount();
+    // The signed-in homepage shares its URL with the sign-in page, so confirm it by its form too.
+    const lp = new URLSearchParams(location.search).get('lp');
+    const isHome = page.key === 'home' || (document.getElementById('PT_LANDINGPAGE') && (!lp || lp === 'SA.EMPLOYEE.DEFAULT_LP'));
+    if (isHome) EDR.overview.mount();
   }
   EDR.enhancers.start();
 })();

@@ -7,7 +7,7 @@
   // the student browses (see enhancers.js). Shows how to fill any empty card.
   async function mount() {
     if (document.getElementById('edr-overview')) return;
-    document.documentElement.classList.add('edr-home');
+    EDR.flag('home');
     const root = h('main', { id: 'edr-overview', class: 'edr-root edr-page' });
     document.body.append(root);
     render(root, await EDR.store.getData());
