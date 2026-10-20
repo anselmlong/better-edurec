@@ -32,6 +32,23 @@
     return !same;
   }
 
+  const PREFS = 'edr:prefs';
+
+  async function getPrefs() {
+    const got = await area().get(PREFS);
+    return got[PREFS] || {};
+  }
+
+  // Writes are queued so two quick toggles can't overwrite each other.
+  let prefsQueue = Promise.resolve();
+  function setPrefs(patch) {
+    prefsQueue = prefsQueue.then(async () => {
+      const prefs = { ...(await getPrefs()), ...patch };
+      await area().set({ [PREFS]: prefs });
+    }).catch(() => {});
+    return prefsQueue;
+  }
+
   async function clearData() {
     await area().remove(DATA);
   }
@@ -42,5 +59,5 @@
     });
   }
 
-  EDR.store = { isEnabled, setEnabled, getData, saveSnapshot, clearData, onDataChange };
+  EDR.store = { isEnabled, setEnabled, getData, saveSnapshot, clearData, onDataChange, getPrefs, setPrefs };
 })();

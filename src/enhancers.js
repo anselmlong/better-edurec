@@ -39,8 +39,21 @@
 
   const rendered = {};
 
+  // Tells the student the summary just reached their Overview.
+  function markSaved(card) {
+    const badge = card.querySelector('.edr-badge');
+    if (!badge) return;
+    badge.classList.add('is-saved');
+    badge.replaceChildren(EDR.icon('M5 12.5l4.5 4.5L19 7.5', 14), 'Saved to Overview');
+    setTimeout(() => {
+      badge.classList.remove('is-saved');
+      badge.replaceChildren('Summary');
+    }, 3200);
+  }
+
   function run() {
     if (!document.body) return;
+    if (EDR.shell && EDR.shell.ensureSideToggle) EDR.shell.ensureSideToggle();
     const text = EDR.nodeText(document.body);
     for (const e of ENHANCERS) {
       const existing = document.getElementById('edr-card-' + e.key);
@@ -56,8 +69,8 @@
       const el = e.render(data);
       el.id = 'edr-card-' + e.key;
       if (existing) existing.replaceWith(el);
-      else place(el, e.anchor);
-      EDR.store.saveSnapshot(e.key, data).catch(() => {});
+      else { el.classList.add('is-new'); place(el, e.anchor); }
+      EDR.store.saveSnapshot(e.key, data).then((changed) => { if (changed) markSaved(el); }).catch(() => {});
     }
   }
 

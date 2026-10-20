@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EduRec Reskin harness</title>
 <link rel="stylesheet" href="../../src/theme.css">
 <style>
@@ -57,10 +58,20 @@
       const d = document.createElement('div'); d.className = 'tile nuitile'; d.textContent = t; form.append(d);
     }
   } else {
+    // Mimic EduRec's Fluid frame: header with a back slot, page list, content.
+    header.textContent = '';
+    const slot = document.createElement('div'); slot.id = 'win0hdrdivPT_NAV_CONT'; slot.className = 'ps_back_cont';
+    const back = document.createElement('div'); back.className = 'ps_button_backnav';
+    back.innerHTML = '<a class="ps-button" href="#"><span class="ps-text">Fieldwork Management System</span></a>';
+    slot.append(back); header.append(slot);
+    const mid = document.createElement('div'); mid.id = 'PT_MID_SECTION'; mid.style.display = 'flex';
+    const side = document.createElement('div'); side.id = 'PT_SIDE'; side.style.cssText = 'width:260px;flex:none';
+    side.innerHTML = '<ul class="psa_list-linkmenu"><li class="psc_selected"><a class="ps-link"><span class="ps-text">View Exam Results</span></a></li><li><a class="ps-link"><span class="ps-text">View Exam Schedule</span></a></li></ul>';
+    const content = document.createElement('div'); content.id = 'PT_CONTENT'; content.style.flex = '1';
     const box = document.createElement('div');
     box.className = 'ps_box-group';
     for (const l of page.lines) { const d = document.createElement('div'); d.textContent = l; box.append(d); }
-    form.append(box);
+    content.append(box); mid.append(side, content); form.append(mid);
   }
   document.body.append(form);
 

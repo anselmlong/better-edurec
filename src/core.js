@@ -43,7 +43,7 @@
     return out.join('\n');
   };
 
-  EDR.isTop = window.top === window;
+  EDR.isTop = typeof window !== 'undefined' && window.top === window;
 
   // Page-level switches live in data- attributes on <html>: EduRec rewrites the
   // <html> class list after load, which would silently drop class-based flags.
@@ -58,9 +58,11 @@
     flags.add(attr);
     document.documentElement.setAttribute(attr, '');
   };
-  new MutationObserver(() => {
-    for (const attr of flags) if (!document.documentElement.hasAttribute(attr)) document.documentElement.setAttribute(attr, '');
-  }).observe(document.documentElement, { attributes: true });
+  if (typeof MutationObserver !== 'undefined') {
+    new MutationObserver(() => {
+      for (const attr of flags) if (!document.documentElement.hasAttribute(attr)) document.documentElement.setAttribute(attr, '');
+    }).observe(document.documentElement, { attributes: true });
+  }
 
   EDR.icon = function icon(d, size) {
     const ns = 'http://www.w3.org/2000/svg';
@@ -89,6 +91,19 @@
     sgd(n) {
       return 'S$' + Number(n).toLocaleString('en-SG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
+  };
+
+  // "just now", "12 min ago", "3 days ago": how fresh a saved summary is.
+  EDR.ago = function ago(ts, now) {
+    const s = Math.max(0, Math.round(((now || Date.now()) - ts) / 1000));
+    if (s < 60) return 'just now';
+    const m = Math.round(s / 60);
+    if (m < 60) return m + ' min ago';
+    const hrs = Math.round(m / 60);
+    if (hrs < 24) return hrs + (hrs === 1 ? ' hour ago' : ' hours ago');
+    const d = Math.round(hrs / 24);
+    if (d < 30) return d + (d === 1 ? ' day ago' : ' days ago');
+    return 'on ' + new Date(ts).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   EDR.fmtDate = function fmtDate(ts) {

@@ -11,6 +11,9 @@
   }
 
   EDR.flag('on');
+  const prefs = await EDR.store.getPrefs();
+  if (prefs.navCollapsed) EDR.flag('collapsed');
+  if (prefs.sideCollapsed) EDR.flag('side-collapsed');
   const page = EDR.routes.detectPage(location.href);
 
   if (EDR.isTop) {
