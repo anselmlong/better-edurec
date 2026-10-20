@@ -30,7 +30,8 @@
     const data = lastData;
     const now = new Date();
     const term = termFor(now);
-    rootEl.replaceChildren(
+    // replaceChildren would print a null child as the text "null"; drop empty sections.
+    rootEl.replaceChildren(...[
       h('header', { class: 'edr-page-head' },
         h('p', { class: 'edr-muted' }, now.toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ' · AY' + term.ay + ' ' + term.label),
         h('h1', { class: 'edr-h1' }, 'Overview')),
@@ -38,11 +39,10 @@
       h('section', { class: 'edr-grid', 'aria-label': 'Summary' },
         gpaCard(data.results, byId.exams.path),
         degreeCard(data.audit, byId.degree.path),
-        classesCard(data.classes, byId.coursereg.path),
-        aidCard(data.finaid, byId.finaid.path)),
+        classesCard(data.classes, byId.coursereg.path)),
       shortcuts(),
       h('p', { class: 'edr-fineprint' }, 'Summaries are read from EduRec pages and kept in this browser only. Turn the Overview off from the extension’s toolbar button.')
-    );
+    ].filter(Boolean));
   }
 
   function card(title, href, updated, ...body) {
@@ -62,7 +62,7 @@
         EDR.icon('M12 5v10M7 10l5 5 5-5M5 19h14', 16), 'Collect'));
   }
 
-  const KEYS = ['results', 'audit', 'classes', 'finaid'];
+  const KEYS = ['results', 'audit', 'classes'];
 
   function setupPrompt(data) {
     const missing = KEYS.filter((k) => !data[k]);
@@ -72,7 +72,7 @@
       return h('section', { class: 'edr-setup', 'aria-labelledby': 'edr-setup-title' },
         h('div', { class: 'edr-setup-copy' },
           h('h2', { class: 'edr-h2', id: 'edr-setup-title' }, 'Set up your Overview'),
-          h('p', { class: 'edr-muted' }, 'One click reads your exam results, degree audit, classes and financial aid from EduRec. It takes about 20 seconds and never submits anything.')),
+          h('p', { class: 'edr-muted' }, 'One click reads your exam results, degree audit and classes from EduRec. It takes about 20 seconds and never submits anything.')),
         h('div', { class: 'edr-setup-actions' },
           h('button', { type: 'button', class: 'edr-btn', onclick: () => EDR.wizard.start() }, 'Set up Overview'),
           h('button', { type: 'button', class: 'edr-btn is-ghost', onclick: dismiss }, 'Not now')));
@@ -134,24 +134,14 @@
     if (!c || !c.courses.length) {
       return card('This semester', href, null, empty('classes', 'Your courses and class groups, read from My Classes.'));
     }
+    const classCount = c.courses.reduce((n, m) => n + m.classes.length, 0);
     return card('This semester', href, snap.at,
+      h('p', { class: 'edr-big' }, String(c.courses.length), h('span', { class: 'edr-big-unit' }, (c.courses.length === 1 ? 'course · ' : 'courses · ') + classCount + (classCount === 1 ? ' class' : ' classes'))),
       c.term ? h('p', { class: 'edr-muted' }, c.term) : null,
       h('ul', { class: 'edr-list' }, c.courses.map((m) =>
         h('li', null,
           h('span', { class: 'edr-list-label' }, h('span', { class: 'edr-mono' }, m.code), ' ', m.title),
           h('span', { class: 'edr-muted' }, m.classes.map((k) => k.type + ' ' + k.group).join(' · '))))));
-  }
-
-  function aidCard(snap, href) {
-    const f = snap && snap.value;
-    if (!f || !f.rows.length) {
-      return card('Financial aid', href, null, empty('finaid', 'Scholarship and aid payments, read from Financial aid.'));
-    }
-    const last = f.rows[f.rows.length - 1];
-    return card('Financial aid', href, snap.at,
-      h('p', { class: 'edr-big' }, EDR.ui.sgd(last.amount), h('span', { class: 'edr-big-unit' }, 'latest')),
-      h('p', { class: 'edr-muted' }, last.name + ' · ' + last.term + ' · posted ' + last.posted),
-      h('p', { class: 'edr-muted' }, f.rows.length + ' disbursements · ' + EDR.ui.sgd(f.total) + ' in total'));
   }
 
   function shortcuts() {

@@ -223,8 +223,11 @@ html[data-edr-home] body { overflow: auto !important; height: auto !important; }
 }
 .edr-root a { color: var(--edr-blue); text-decoration: none; }
 .edr-root a:hover { color: var(--edr-navy); text-decoration: underline; }
+/* EduRec's stylesheet draws dotted outlines on hover/focus; only keep a real
+   keyboard focus ring on the reskin's own elements. */
+.edr-root, .edr-root *, .edr-root *:hover, .edr-root *:focus:not(:focus-visible) { outline: none !important; }
 .edr-root a:focus-visible, .edr-root button:focus-visible, .edr-root input:focus-visible {
-  outline: 2px solid var(--edr-blue); outline-offset: 2px;
+  outline: 2px solid var(--edr-blue) !important; outline-offset: 2px;
 }
 
 /* Sidebar: full (248px) or a 64px icon rail. */
@@ -391,16 +394,18 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 .edr-muted { margin: 0; color: var(--edr-muted); font-size: 14px; }
 .edr-small { font-size: 12px; }
 .edr-mono { font-family: var(--edr-mono); font-weight: 500; }
-.edr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+/* Summary cards: three equal columns on wide screens so they line up; one column on narrow. */
+.edr-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: stretch; }
+@media (min-width: 980px) { .edr-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .edr-card {
   background: var(--edr-surface); border: 1px solid var(--edr-line); border-radius: 8px;
   padding: 20px 22px; display: flex; flex-direction: column; gap: 10px;
 }
-.edr-card-head { display: flex; justify-content: space-between; align-items: center; }
+.edr-card-head { display: flex; justify-content: space-between; align-items: center; min-height: 32px; }
 .edr-card-link { font-size: 14px; font-weight: 600; }
-.edr-big { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: 36px; font-weight: 700; letter-spacing: -0.01em; }
+.edr-big { margin: 4px 0 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; min-height: 48px; font-size: 36px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
 .edr-big-unit { font-size: 14px; font-weight: 500; color: var(--edr-muted); }
-.edr-updated { margin: auto 0 0; font-size: 12px; color: var(--edr-muted); }
+.edr-updated { margin: auto 0 0; padding-top: 14px; border-top: 1px solid var(--edr-line-2); font-size: 12px; color: var(--edr-muted); }
 .edr-empty { margin: 0; font-size: 14px; color: var(--edr-ink-2); }
 .edr-bar { height: 8px; border-radius: 4px; background: var(--edr-line-2); overflow: hidden; }
 .edr-bar > span { display: block; height: 100%; background: var(--edr-blue); }
@@ -541,8 +546,6 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 .edr-done-line { margin: 0; font-size: 14px; font-weight: 600; color: var(--edr-blue-ink); }
 .edr-list-label { flex: 1 1 180px; min-width: 0; }
 .edr-list > li .edr-tag { align-self: center; }
-.edr-card { transition: border-color 150ms ease; }
-.edr-card:hover { border-color: #C5CED9; }
 .edr-card-link { display: inline-flex; align-items: center; min-height: 32px; }
 .edr-big, .edr-stat-value, .edr-updated, .edr-tag { font-variant-numeric: tabular-nums; }
 

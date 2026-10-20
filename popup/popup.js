@@ -2,7 +2,7 @@
   'use strict';
   const DATA = 'edr:data';
   const ENABLED = 'edr:enabled';
-  const LABELS = { results: 'Results & GPA', audit: 'Degree audit', classes: 'Classes', finaid: 'Financial aid' };
+  const LABELS = { results: 'Results & GPA', audit: 'Degree audit', classes: 'Classes' };
 
   const toggle = document.getElementById('enabled');
   const list = document.getElementById('saved');

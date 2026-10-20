@@ -7,7 +7,7 @@ Not affiliated with or endorsed by NUS.
 ## What it does
 
 - **Sidebar and search on every page.** It groups EduRec's 21 tiles into 9 sections. Press ⌘K (Ctrl K on Windows) to search every tile and sub-page, e.g. "transcript", "S/U" or "leave".
-- **An Overview page instead of the tile homepage.** It shows your GPA, degree progress, classes this semester and financial aid, plus links to every part of EduRec.
+- **An Overview page instead of the tile homepage.** It shows your GPA, degree progress and classes this semester, plus links to every part of EduRec. One click (Set up Overview) fills it; it's optional and can be turned off from the toolbar popup.
 - **Summary cards on EduRec pages:**
   - **Exam results:** term, cumulative GPA, units and grade chips.
   - **Graduation audit report:** units done out of required, plus each unmet requirement with a progress bar.
@@ -24,11 +24,7 @@ The extension only reads the EduRec page you're looking at. When it recognises o
 
 1. Open `chrome://extensions` and turn on **Developer mode**.
 2. Click **Load unpacked** and pick this folder.
-3. Sign in to EduRec as usual. The Overview cards fill in as you open each page:
-   - Examinations › View exam results › pick a semester
-   - Degree progress › View graduation audit report
-   - Course registration › View my classes
-   - Financial aid
+3. Sign in to EduRec and click **Set up Overview** on the Overview. It reads exam results, your graduation audit and your classes, then returns. Each card also fills on its own whenever you open its page (or click **Collect** on it).
 
 Fonts: it uses Public Sans and IBM Plex Mono if they're installed, and falls back to your system font otherwise.
 

@@ -10,10 +10,9 @@
   const STEPS = {
     results: { label: 'Exam results', tile: 'exams', nav: 'View Exam Results', pickTerm: true },
     audit: { label: 'Graduation audit', tile: 'degree', nav: 'View Graduation Audit Report' },
-    classes: { label: 'My classes', tile: 'coursereg', nav: 'View My Classes@CourseReg' },
-    finaid: { label: 'Financial aid', tile: 'finaid' }
+    classes: { label: 'My classes', tile: 'coursereg', nav: 'View My Classes@CourseReg' }
   };
-  const ORDER = ['results', 'audit', 'classes', 'finaid'];
+  const ORDER = ['results', 'audit', 'classes'];
   const STEP_TIMEOUT = 25000;
   const KEY = 'edr:wizard';
 
