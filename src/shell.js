@@ -10,9 +10,7 @@
     pages: 'M4 5h16v14H4zM9 5v14M5.5 9h2M5.5 12h2M5.5 15h2',
     menu: 'M4 7h16M4 12h16M4 17h16',
     classic: 'M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4',
-    report: 'M8 4h8l3 3v13H5V4h3zM9 12h6M9 16h4',
-    out: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10',
-    check: 'M5 12.5l4.5 4.5L19 7.5'
+    out: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10'
   };
   const isMac = navigator.platform.includes('Mac');
 
@@ -56,7 +54,6 @@
         nav,
         h('div', { class: 'edr-shell-foot' },
           footBtn(I.classic, 'Classic view', classicView),
-          footBtn(I.report, 'Copy layout report', copyReport),
           footBtn(I.out, 'Sign out', null, logoutHref),
           h('p', { class: 'edr-fineprint edr-label' }, 'Unofficial personal reskin. Read-only.')))
     );
@@ -147,29 +144,6 @@
     }
     ensureSideToggle();
     EDR.store.setPrefs({ sideCollapsed: hidden });
-  }
-
-  async function copyReport(e) {
-    const btn = e.currentTarget;
-    const label = btn.querySelector('.edr-label');
-    const text = EDR.diag.layoutReport();
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch (err) {
-      const ta = h('textarea', { style: { position: 'fixed', opacity: '0' } }, text);
-      document.documentElement.append(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-    }
-    btn.classList.add('is-done');
-    btn.firstChild.replaceWith(EDR.icon(I.check, 16));
-    label.textContent = 'Copied, structure only';
-    setTimeout(() => {
-      btn.classList.remove('is-done');
-      btn.firstChild.replaceWith(EDR.icon(I.report, 16));
-      label.textContent = 'Copy layout report';
-    }, 2400);
   }
 
   async function classicView() {

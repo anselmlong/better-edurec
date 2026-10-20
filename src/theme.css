@@ -292,7 +292,6 @@ html[data-edr-collapsed] { --edr-nav-w: 64px; }
 }
 .edr-link-btn svg { flex: none; color: var(--edr-muted); }
 .edr-link-btn:hover { background: #F5F7FA; }
-.edr-link-btn.is-done, .edr-link-btn.is-done svg { color: var(--edr-blue-ink) !important; }
 .edr-fineprint { margin: 6px 12px 0; font-size: 12px; color: var(--edr-muted); }
 .edr-label { transition: opacity 160ms ease; }
 
