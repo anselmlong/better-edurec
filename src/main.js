@@ -22,7 +22,10 @@
     // The signed-in homepage shares its URL with the sign-in page, so confirm it by its form too.
     const lp = new URLSearchParams(location.search).get('lp');
     const isHome = page.key === 'home' || (document.getElementById('PT_LANDINGPAGE') && (!lp || lp === 'SA.EMPLOYEE.DEFAULT_LP'));
-    if (isHome) EDR.overview.mount();
+    // The Overview is optional: it replaces the homepage unless turned off in the
+    // popup, and is always reachable from the sidebar (#overview).
+    if (isHome && (prefs.overviewHome !== false || location.hash === '#overview')) EDR.overview.mount(prefs);
+    EDR.wizard.resume(page);
   }
   EDR.enhancers.start();
 })();

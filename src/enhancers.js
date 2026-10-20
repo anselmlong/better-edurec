@@ -38,6 +38,7 @@
   ];
 
   const rendered = {};
+  const reported = {};
 
   // Tells the student the summary just reached their Overview.
   function markSaved(card) {
@@ -64,6 +65,7 @@
         continue;
       }
       const sig = JSON.stringify(data);
+      if (reported[e.key] !== sig) { reported[e.key] = sig; EDR.store.markSeen(e.key); }
       if (existing && rendered[e.key] === sig) continue;
       rendered[e.key] = sig;
       const el = e.render(data);

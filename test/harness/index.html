@@ -102,7 +102,12 @@
 </script>
 <script src="../../src/parsers.js"></script>
 <script src="../../src/store.js"></script>
+<script>
+  // ?noseen keeps a wizard step waiting so its progress bar can be inspected.
+  if (new URLSearchParams(location.search).has('noseen')) EDR.store.getSeen = async () => ({});
+</script>
 <script src="../../src/diag.js"></script>
+<script src="../../src/wizard.js"></script>
 <script src="../../src/shell.js"></script>
 <script src="../../src/overview.js"></script>
 <script src="../../src/enhancers.js"></script>

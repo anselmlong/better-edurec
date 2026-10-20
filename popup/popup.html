@@ -14,10 +14,17 @@
     <span>New EduRec view</span>
     <input id="enabled" type="checkbox" role="switch">
   </label>
+  <label class="row">
+    <span>Use Overview as homepage</span>
+    <input id="overviewHome" type="checkbox" role="switch">
+  </label>
   <section>
     <h2>Saved in this browser</h2>
     <ul id="saved"></ul>
-    <button id="clear" type="button">Clear saved summaries</button>
+    <div class="btns">
+      <button id="reprompt" type="button">Show setup prompt</button>
+      <button id="clear" type="button">Clear summaries</button>
+    </div>
   </section>
   <p class="fine">Summaries never leave this device. Reload EduRec after changing the view.</p>
   <script src="popup.js"></script>

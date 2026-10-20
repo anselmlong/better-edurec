@@ -32,6 +32,20 @@
     return !same;
   }
 
+  // When each summary was last read from its page (even if unchanged). The setup
+  // wizard waits on this; it's separate from saveSnapshot's change timestamp.
+  const SEEN = 'edr:seen';
+  async function getSeen() {
+    return (await area().get(SEEN))[SEEN] || {};
+  }
+  let seenQueue = Promise.resolve();
+  function markSeen(key) {
+    seenQueue = seenQueue.then(async () => {
+      await area().set({ [SEEN]: { ...(await getSeen()), [key]: Date.now() } });
+    }).catch(() => {});
+    return seenQueue;
+  }
+
   const PREFS = 'edr:prefs';
 
   async function getPrefs() {
@@ -59,5 +73,5 @@
     });
   }
 
-  EDR.store = { isEnabled, setEnabled, getData, saveSnapshot, clearData, onDataChange, getPrefs, setPrefs };
+  EDR.store = { isEnabled, setEnabled, getData, saveSnapshot, clearData, onDataChange, getPrefs, setPrefs, getSeen, markSeen };
 })();

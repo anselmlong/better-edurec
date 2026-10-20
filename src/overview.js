@@ -4,32 +4,44 @@
   const h = (...a) => EDR.h(...a);
 
   // Replaces the tile homepage with a dashboard built from snapshots saved as
-  // the student browses (see enhancers.js). Shows how to fill any empty card.
-  async function mount() {
+  // the student browses (see enhancers.js). Optional: setup never blocks, and the
+  // whole page can be turned off in the popup.
+  let prefs = {};
+  let lastData = {};
+  let rootEl = null;
+
+  async function mount(initialPrefs) {
     if (document.getElementById('edr-overview')) return;
+    prefs = initialPrefs || (await EDR.store.getPrefs());
     EDR.flag('home');
-    const root = h('main', { id: 'edr-overview', class: 'edr-root edr-page' });
-    document.body.append(root);
-    render(root, await EDR.store.getData());
-    EDR.store.onDataChange((data) => render(root, data));
+    rootEl = h('main', { id: 'edr-overview', class: 'edr-root edr-page' });
+    document.body.append(rootEl);
+    lastData = await EDR.store.getData();
+    render();
+    EDR.store.onDataChange((data) => { lastData = data; render(); });
+    if (prefs.wizardJustFinished && Date.now() - prefs.wizardJustFinished < 60000) {
+      showFinished(prefs.lastWizard || {});
+      EDR.store.setPrefs({ wizardJustFinished: 0 });
+    }
   }
 
-  function render(root, data) {
+  function render() {
     const { termFor, byId } = EDR.routes;
+    const data = lastData;
     const now = new Date();
     const term = termFor(now);
-    root.replaceChildren(
+    rootEl.replaceChildren(
       h('header', { class: 'edr-page-head' },
         h('p', { class: 'edr-muted' }, now.toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ' · AY' + term.ay + ' ' + term.label),
         h('h1', { class: 'edr-h1' }, 'Overview')),
-      setupStrip(data),
+      setupPrompt(data),
       h('section', { class: 'edr-grid', 'aria-label': 'Summary' },
         gpaCard(data.results, byId.exams.path),
         degreeCard(data.audit, byId.degree.path),
         classesCard(data.classes, byId.coursereg.path),
         aidCard(data.finaid, byId.finaid.path)),
       shortcuts(),
-      h('p', { class: 'edr-fineprint' }, 'Summaries are saved in this browser only, each time you open the matching EduRec page.')
+      h('p', { class: 'edr-fineprint' }, 'Summaries are read from EduRec pages and kept in this browser only. Turn the Overview off from the extension’s toolbar button.')
     );
   }
 
@@ -42,42 +54,58 @@
       updated ? h('p', { class: 'edr-updated', title: EDR.fmtDate(updated) }, 'Updated ' + EDR.ago(updated)) : null);
   }
 
-  function empty(text, href, linkText) {
+  // Empty card: one click collects just this summary.
+  function empty(key, text) {
     return h('div', { class: 'edr-empty' },
       h('p', null, text),
-      h('a', { href, class: 'edr-empty-link' }, linkText, EDR.icon('M9 6l6 6-6 6', 16)));
+      h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start([key]) },
+        EDR.icon('M12 5v10M7 10l5 5 5-5M5 19h14', 16), 'Collect'));
   }
 
-  // First-use checklist: the Overview fills itself as the student opens four
-  // EduRec pages once. It disappears when all four have been collected.
-  const STEPS = [
-    { key: 'results', label: 'A semester of exam results', tile: 'exams' },
-    { key: 'audit', label: 'Your graduation audit report', tile: 'degree' },
-    { key: 'classes', label: 'My classes in Course registration', tile: 'coursereg' },
-    { key: 'finaid', label: 'Financial aid', tile: 'finaid' }
-  ];
+  const KEYS = ['results', 'audit', 'classes', 'finaid'];
 
-  function setupStrip(data) {
-    const done = STEPS.filter((s) => data[s.key]).length;
-    if (done === STEPS.length) return null;
-    return h('section', { class: 'edr-setup', 'aria-labelledby': 'edr-setup-title' },
-      h('div', { class: 'edr-setup-head' },
-        h('h2', { class: 'edr-h2', id: 'edr-setup-title' }, 'Fill your Overview'),
-        h('span', { class: 'edr-muted' }, done + ' of ' + STEPS.length + ' collected')),
-      h('p', { class: 'edr-muted' }, 'Open each of these pages once. The reskin reads them as you browse and keeps a summary here.'),
-      h('ol', { class: 'edr-steps' }, STEPS.map((s) => {
-        const ok = !!data[s.key];
-        return h('li', { class: 'edr-step' + (ok ? ' is-done' : '') },
-          h('span', { class: 'edr-step-dot', 'aria-hidden': 'true' }, ok ? EDR.icon('M5 12.5l4.5 4.5L19 7.5', 14) : null),
-          ok ? h('span', null, s.label) : h('a', { href: EDR.routes.byId[s.tile].path }, s.label),
-          h('span', { class: 'edr-visually-hidden' }, ok ? ' (collected)' : ' (not yet)'));
-      })));
+  function setupPrompt(data) {
+    const missing = KEYS.filter((k) => !data[k]);
+    if (!missing.length || prefs.setupDismissed) return null;
+    const dismiss = () => { prefs.setupDismissed = true; EDR.store.setPrefs({ setupDismissed: true }); render(); };
+    if (missing.length === KEYS.length) {
+      return h('section', { class: 'edr-setup', 'aria-labelledby': 'edr-setup-title' },
+        h('div', { class: 'edr-setup-copy' },
+          h('h2', { class: 'edr-h2', id: 'edr-setup-title' }, 'Set up your Overview'),
+          h('p', { class: 'edr-muted' }, 'One click reads your exam results, degree audit, classes and financial aid from EduRec. It takes about 20 seconds and never submits anything.')),
+        h('div', { class: 'edr-setup-actions' },
+          h('button', { type: 'button', class: 'edr-btn', onclick: () => EDR.wizard.start() }, 'Set up Overview'),
+          h('button', { type: 'button', class: 'edr-btn is-ghost', onclick: dismiss }, 'Not now')));
+    }
+    return h('section', { class: 'edr-setup is-compact', 'aria-label': 'Overview setup' },
+      h('p', { class: 'edr-setup-line' },
+        h('strong', null, (KEYS.length - missing.length) + ' of ' + KEYS.length + ' summaries ready.'), ' ',
+        missing.map((k) => EDR.wizard.STEPS[k].label).join(', ') + ' still to collect.'),
+      h('div', { class: 'edr-setup-actions' },
+        h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start(missing) }, 'Collect the rest'),
+        h('button', { type: 'button', class: 'edr-icon-btn is-dark', 'aria-label': 'Dismiss', title: 'Dismiss', onclick: dismiss },
+          EDR.icon('M6 6l12 12M18 6L6 18', 16))));
+  }
+
+  // Short, proportional confirmation when the setup run lands back here.
+  function showFinished(outcome) {
+    const keys = Object.keys(outcome);
+    const done = keys.filter((k) => outcome[k] === 'done').length;
+    const skipped = keys.filter((k) => outcome[k] !== 'done').map((k) => EDR.wizard.STEPS[k].label.toLowerCase());
+    const toast = h('div', { class: 'edr-root edr-toast', role: 'status' },
+      EDR.icon('M5 12.5l4.5 4.5L19 7.5', 18),
+      h('span', null, done === keys.length
+        ? 'Overview ready. ' + done + (done === 1 ? ' summary' : ' summaries') + ' collected.'
+        : done + ' of ' + keys.length + ' collected. Couldn’t read ' + skipped.join(', ') + '; try Collect on that card.'));
+    document.documentElement.append(toast);
+    setTimeout(() => toast.classList.add('is-leaving'), 5200);
+    setTimeout(() => toast.remove(), 5600);
   }
 
   function gpaCard(snap, href) {
     const r = snap && snap.value;
     if (!r || r.cumulativeGpa == null) {
-      return card('Results', href, null, empty('Open any semester under Examinations › View exam results to show your GPA here.', href, 'Go to Examinations'));
+      return card('Results', href, null, empty('results', 'Your GPA and latest grades, read from View Exam Results.'));
     }
     return card('Results', href, snap.at,
       h('p', { class: 'edr-big' }, r.cumulativeGpa.toFixed(2), h('span', { class: 'edr-big-unit' }, 'cumulative GPA')),
@@ -89,7 +117,7 @@
   function degreeCard(snap, href) {
     const a = snap && snap.value;
     if (!a || !a.overall) {
-      return card('Degree progress', href, null, empty('Open Degree progress › View graduation audit report to track your units here.', href, 'Go to Degree progress'));
+      return card('Degree progress', href, null, empty('audit', 'Units done and what’s left, read from your graduation audit.'));
     }
     const { required, taken, needed } = a.overall;
     const open = a.requirements.filter((r) => r.needed > 0).slice(0, 3);
@@ -104,7 +132,7 @@
   function classesCard(snap, href) {
     const c = snap && snap.value;
     if (!c || !c.courses.length) {
-      return card('This semester', href, null, empty('Open Course registration › View my classes to list your classes here.', href, 'Go to Course registration'));
+      return card('This semester', href, null, empty('classes', 'Your courses and class groups, read from My Classes.'));
     }
     return card('This semester', href, snap.at,
       c.term ? h('p', { class: 'edr-muted' }, c.term) : null,
@@ -117,7 +145,7 @@
   function aidCard(snap, href) {
     const f = snap && snap.value;
     if (!f || !f.rows.length) {
-      return card('Financial aid', href, null, empty('Open Financial aid to show your disbursements here.', href, 'Go to Financial aid'));
+      return card('Financial aid', href, null, empty('finaid', 'Scholarship and aid payments, read from Financial aid.'));
     }
     const last = f.rows[f.rows.length - 1];
     return card('Financial aid', href, snap.at,

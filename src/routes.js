@@ -59,7 +59,7 @@
   ];
 
   const SECTIONS = [
-    { id: 'home', label: 'Overview', href: HOME, icon: 'M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z' },
+    { id: 'home', label: 'Overview', href: HOME + '#overview', icon: 'M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z' },
     { id: 'timetable', label: 'Courses & records', tile: 'acadrec', icon: 'M4 6h16v14H4zM4 10h16M9 3v4M15 3v4' },
     { id: 'exams', label: 'Results & exams', tile: 'exams', icon: 'M5 20V11M12 20V5M19 20v-6' },
     { id: 'degree', label: 'Degree progress', tile: 'degree', icon: 'M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5' },
