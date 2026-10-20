@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Documents and requests</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.doc{display:flex;flex-direction:column;gap:10px;padding:20px;color:#16202E;text-decoration:none}
+.doc:hover{border-color:#123A6B;color:#16202E}
+.req{display:flex;align-items:center;gap:14px;padding:16px 4px;border-top:1px solid #EDF0F3;color:#16202E;text-decoration:none;min-height:44px}
+.req:hover{color:#16202E;background:#FAFBFC}
+.drawer{width:100%;display:flex;align-items:center;gap:12px;min-height:56px;padding:0 22px;border:0;background:transparent;font:inherit;color:#16202E;cursor:pointer;text-align:left}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px"><dc-import name="Nav" active="documents" hint-size="248px,900px"></dc-import></div>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px">
+      <header style="display: flex; flex-direction: column; gap: 8px">
+        <p class="eyebrow">Letters, transcripts, applications</p>
+        <h1 class="display" style="font-size: 40px; font-weight: 700">Documents &amp; requests</h1>
+      </header>
+
+      <section style="display: flex; flex-direction: column; gap: 14px" aria-labelledby="inst">
+        <div style="display: flex; align-items: baseline; gap: 12px"><h2 id="inst" class="display" style="font-size: 22px; font-weight: 700">Instant documents</h2><span style="font-size: 14px; color: #5B6675">Issued immediately at no charge</span></div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px">
+          <sc-for list="{{docs}}" as="d" hint-placeholder-count="4">
+            <a href="#" class="card doc">
+              <span style="width: 40px; height: 48px; border-radius: 6px 14px 6px 6px; background: #F0F2F5; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; box-sizing: border-box"><span class="mono" style="font-size: 10px; font-weight: 600; color: #475263">PDF</span></span>
+              <span style="font-weight: 600; font-size: 16px">{{d.title}}</span>
+              <span style="font-size: 13px; color: #5B6675; line-height: 1.4">{{d.sub}}</span>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+        <section class="card" style="flex: 3 1 520px; padding: 24px 26px" aria-labelledby="apps">
+          <h2 id="apps" class="display" style="font-size: 22px; font-weight: 700; margin-bottom: 8px">Apply or request</h2>
+          <sc-for list="{{reqs}}" as="r" hint-placeholder-count="7">
+            <a href="#" class="req">
+              <span style="width: 40px; height: 40px; border-radius: 6px; background: #F0F2F5; display: flex; align-items: center; justify-content: center; flex: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16202E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{r.icon}}"></path></svg></span>
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 15px">{{r.title}}</span><span style="font-size: 13px; color: #5B6675">{{r.sub}}</span></span>
+              <span class="pill" style="{{r.stStyle}}">{{r.status}}</span>
+            </a>
+          </sc-for>
+        </section>
+
+        <div style="flex: 2 1 320px; display: flex; flex-direction: column; gap: 16px">
+          <section class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 14px" aria-labelledby="track">
+            <h2 id="track" class="display" style="font-size: 20px; font-weight: 700">Your submissions</h2>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-weight: 600">Official transcript ×2</span>
+              <span style="font-size: 13px; color: #5B6675">Requested 14 Oct · e-transcript</span>
+              <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 4px" aria-label="Step 2 of 3: processing">
+                <span style="height: 6px; border-radius: 3px; background: #1F5AA6"></span><span style="height: 6px; border-radius: 3px; background: #1F5AA6"></span><span style="height: 6px; border-radius: 3px; background: #DCE1E7"></span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 12px; color: #5B6675"><span>Paid</span><span style="font-weight: 600; color: #16202E">Processing</span><span>Sent</span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 1px solid #EDF0F3">
+              <span style="font-weight: 600">Student exchange application</span>
+              <span style="font-size: 13px; color: #5B6675">Accepted by host · 2025</span>
+              <a href="Exchange.dc.html" style="font-size: 14px; font-weight: 600">View →</a>
+            </div>
+          </section>
+          <section class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 10px">
+            <h2 class="display" style="font-size: 20px; font-weight: 700">Workshops &amp; fieldwork</h2>
+            <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center; min-height: 44px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 15px">Respect &amp; Consent workshop</span><span style="font-size: 13px; color: #5B6675">Required · in person · bookings open 5 Jan, 10 am</span></span><a href="#" class="pill" style="background:#123A6B; color: #FFFFFF">Remind me</a></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center; min-height: 44px; border-top: 1px solid #EDF0F3"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 15px">Fieldwork log sheet</span><span style="font-size: 13px; color: #5B6675">Appears when you start an internship course</span></span><span class="pill" style="background: #F0F2F5; color: #475263">None active</span></div>
+          </section>
+        </div>
+      </div>
+
+      <section class="card" style="overflow: hidden">
+        <button class="drawer" aria-expanded="{{naExp}}" onClick="{{toggleNa}}">
+          <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 15px">Not applicable to you ({{naCount}})</span><span style="font-size: 13px; color: #5B6675">Contact the Office of the Registrar if any of these should apply to you.</span></span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475263" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="{{naChev}}"></path></svg>
+        </button>
+        <sc-if value="{{naOpen}}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 0 22px 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px">
+            <sc-for list="{{na}}" as="n" hint-placeholder-count="5">
+              <div style="padding: 14px 16px; border-radius: 6px; background: #F5F7FA; display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 14px">{{n.title}}</span><span style="font-size: 13px; color: #475263">{{n.why}}</span></div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { na: false }; }
+  renderVals() {
+    const docs = [
+      { title: 'Unofficial transcript', sub: 'All semesters, grades and GPA' },
+      { title: 'Student status letter', sub: 'Proof of enrolment for visas, banks, discounts' },
+      { title: 'S/U original grade letter', sub: 'Shows grades behind S/U-declared courses' },
+      { title: 'Student life transcript', sub: 'Co-curricular record: halls, CCAs, awards' }
+    ];
+    const st = (k) => k === 'open' ? 'background:#E5EEF8;color:#174A87' : k === 'soon' ? 'background:#F0F2F5;color:#475263' : 'background:#FDEBE1;color:#9A3F00';
+    const R = [
+      ['Official transcript', 'S$5 per copy · e-transcript in 3 working days', 'Open', 'open', 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6'],
+      ['Leave of absence', 'Semester LOA closed after recess week; short LOA still available', 'Short LOA only', 'warn', 'M8 5v14M16 5v14'],
+      ['Special consideration', 'Illness or bereavement affecting an exam · within 5 working days', 'Open', 'open', 'M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z'],
+      ['Declare a minor or second major', 'Try it first in Degree progress › What if', 'Open', 'open', 'M12 5v14M5 12h14'],
+      ['Apply for graduation', 'For May 2027 commencement', 'Opens 5 Jan', 'soon', 'M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5'],
+      ['Design Your Own Course', 'Group proposals for next semester', 'Opens 5 Jan', 'soon', 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM16.5 13v7M13 16.5h7'],
+      ['Other student request', 'Anything else for the Registrar · tracked here', 'Open', 'open', 'M4 5h16v11H8l-4 4z']
+    ];
+    const reqs = R.map(([title, sub, status, k, icon]) => ({ title, sub, status, icon, stStyle: st(k) }));
+    const na = [
+      { title: 'Employment pass eligibility letter', why: 'For international students only.' },
+      { title: 'Requirement designation', why: 'For double degree programmes only.' },
+      { title: 'QET / DET registration', why: 'You were exempted at admission.' },
+      { title: 'Commencement registration', why: 'Opens after you apply for graduation.' },
+      { title: 'Declaration of subsidy', why: 'For graduate research students only.' }
+    ];
+    const open = this.state.na;
+    return { docs, reqs, na, naCount: na.length, naOpen: open, naExp: open ? 'true' : 'false', naChev: open ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6', toggleNa: () => this.setState({ na: !open }) };
+  }
+}
+</script>
+</body>
+</html>

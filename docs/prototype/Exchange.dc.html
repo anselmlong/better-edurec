@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Exchange and transfer credit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.map{display:grid;grid-template-columns:minmax(0,1.3fr) 28px minmax(0,1.3fr) minmax(0,.7fr);gap:14px;align-items:center;padding:14px 4px;border-top:1px solid #EDF0F3}
+input:focus{outline:2px solid #1F5AA6;outline-offset:1px}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px"><dc-import name="Nav" active="exchange" hint-size="248px,900px"></dc-import></div>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+      <header style="display: flex; flex-direction: column; gap: 8px">
+        <p class="eyebrow">Exchange and transfer credit</p>
+        <h1 class="display" style="font-size: 40px; font-weight: 700">Global education</h1>
+      </header>
+
+      <section class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: flex-end">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span class="pill" style="background:#123A6B; color: #FFFFFF; align-self: flex-start">Complete</span>
+            <span class="display" style="font-size: 30px; font-weight: 700">Student Exchange · Uppsala University</span>
+            <span style="font-size: 15px; color: #475263">Sweden · AY2025/26 Semester 1 · 20 units brought home</span>
+          </div>
+          <span style="font-size: 13px; color: #5B6675">Travel preparedness course ✓</span>
+        </div>
+        <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+            <li style="display: flex; flex-direction: column; gap: 8px">
+              <span style="display: block; height: 6px; border-radius: 3px; background: #1F5AA6"></span>
+              <span style="font-size: 14px; font-weight: 600">{{s.name}}</span>
+              <span class="mono" style="font-size: 12px; color: #5B6675">{{s.date}}</span>
+            </li>
+          </sc-for>
+        </ol>
+      </section>
+
+      <section class="card" style="padding: 24px 26px" aria-labelledby="tc">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px; margin-bottom: 8px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="tc" class="display" style="font-size: 22px; font-weight: 700">Transfer credit</h2>
+            <p style="margin: 0; font-size: 14px; color: #475263">Exchange grades show as <strong>Pass</strong>. They count toward your degree but not your GPA.</p>
+          </div>
+          <span class="pill" style="background: #E5EEF8; color: #174A87">5 posted · 20 units</span>
+        </div>
+        <div class="map" style="border-top: 0; padding-bottom: 6px"><span class="eyebrow">At Uppsala</span><span></span><span class="eyebrow">Counts as</span><span class="eyebrow">Toward</span></div>
+        <sc-for list="{{maps}}" as="m" hint-placeholder-count="5">
+          <div class="map">
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span><span class="mono" style="font-weight: 600">{{m.host}}</span> <span style="font-size: 13px; color: #5B6675">· {{m.hostU}} ECTS · {{m.hostG}}</span></span><span style="font-size: 14px; color: #2C3746">{{m.hostT}}</span></span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6675" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span><span class="mono" style="font-weight: 600">{{m.nus}}</span> <span style="font-size: 13px; color: #5B6675">· 4 units · Pass</span></span><span style="font-size: 14px; color: #2C3746">{{m.nusT}}</span></span>
+            <span style="font-size: 13px; color: #475263">{{m.req}}</span>
+          </div>
+        </sc-for>
+      </section>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px">
+        <section class="card" style="flex: 3 1 480px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <h2 class="display" style="font-size: 20px; font-weight: 700">Course mappings</h2>
+          <p style="margin: 0; font-size: 14px; color: #475263">Search previously approved course mappings by partner university.</p>
+          <label style="display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; border: 1px solid #DCE1E7; border-radius: 6px; background: #FAFBFC">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6675" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+            <span style="position: absolute; left: -9999px">Search mappings</span>
+            <input placeholder="University or NUS course, e.g. ETH Zürich or CS3244" style="flex: 1; border: 0; background: transparent; font: inherit; font-size: 15px; min-height: 40px">
+          </label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap"><span class="pill" style="background: #F0F2F5; color: #2C3746">KTH · 214 mappings</span><span class="pill" style="background: #F0F2F5; color: #2C3746">TU Delft · 188</span><span class="pill" style="background: #F0F2F5; color: #2C3746">UBC · 172</span></div>
+        </section>
+        <section class="card" style="flex: 2 1 300px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <h2 class="display" style="font-size: 20px; font-weight: 700">Short-term programmes</h2>
+          <p style="margin: 0; font-size: 14px; color: #475263; line-height: 1.5">Summer and winter programmes are open to final-year students. Applications for May 2027 close 30 Nov.</p>
+          <a href="#" style="font-size: 14px; font-weight: 600; margin-top: auto">Browse short programmes →</a>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1160}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const steps = [['Applied', '9 Oct 2024'], ['Nominated', '2 Dec 2024'], ['Accepted by host', '14 Mar 2025'], ['Courses mapped', '20 Jun 2025'], ['Credits posted', '19 Feb 2026']].map(([name, date]) => ({ name, date }));
+    const maps = [
+      ['1DL450', 'Human–Computer Interaction', 'CS3249', 'User Interface Development', 'Breadth & Depth'],
+      ['1DL481', 'Theory of Computation', 'CS3231', 'Theory of Computation', 'Breadth & Depth'],
+      ['1RT705', 'Advanced Probabilistic ML', 'CS3263', 'Foundations of AI', 'Focus area · AI'],
+      ['1DT074', 'Computer Networks II', 'CS4226', 'Internet Architecture', 'Electives'],
+      ['1DL620', 'Social Network Analysis', 'CS4242', 'Social Media Computing', 'Electives']
+    ].map(([host, hostT, nus, nusT, req], i) => ({ host, hostT, nus, nusT, req, hostU: '7.5', hostG: ['VG', 'G', 'VG', 'G', 'G'][i] }));
+    return { steps, maps };
+  }
+}
+</script>
+</body>
+</html>

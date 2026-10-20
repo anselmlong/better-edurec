@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Degree progress</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.cchip{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:6px;font-size:13px}
+.reqhead{width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:20px 22px;border:0;background:transparent;font:inherit;color:inherit;text-align:left;cursor:pointer;min-height:44px}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px"><dc-import name="Nav" active="degree" hint-size="248px,900px"></dc-import></div>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+      <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <p class="eyebrow">Bachelor of Computing · CS (Hons) · AI focus area · Residential College</p>
+          <h1 class="display" style="font-size: 40px; font-weight: 700">Degree progress</h1>
+        </div>
+        <span style="font-size: 13px; color: #5B6675">Checked against the 2023 curriculum · last evaluated 21 Oct 2026, 6:40 am</span>
+      </header>
+
+      <section class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-end; justify-content: space-between">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span class="pill" style="background: #E5EEF8; color: #174A87; align-self: flex-start">On track · graduate May 2027</span>
+            <div style="display: flex; align-items: baseline; gap: 10px"><span class="display" style="font-size: 72px; font-weight: 700; line-height: 1">124</span><span style="font-size: 18px; color: #475263">of 160 units done</span></div>
+          </div>
+          <div style="display: flex; gap: 28px; flex-wrap: wrap">
+            <div style="display: flex; flex-direction: column; gap: 2px"><span class="display" style="font-size: 32px; font-weight: 700; color: #1F5AA6">20</span><span style="font-size: 13px; color: #475263">in progress now</span></div>
+            <div style="display: flex; flex-direction: column; gap: 2px"><span class="display" style="font-size: 32px; font-weight: 700; color: #E0620D">16</span><span style="font-size: 13px; color: #475263">still to plan</span></div>
+            <div style="display: flex; flex-direction: column; gap: 2px"><span class="display" style="font-size: 32px; font-weight: 700">2</span><span style="font-size: 13px; color: #475263">semesters left</span></div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 4px; height: 18px" aria-hidden="true">
+          <sc-for list="{{segs}}" as="s" hint-placeholder-count="5"><span style="{{s.style}}"></span></sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 18px; font-size: 13px; color: #475263">
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #1F5AA6"></span>Done</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #A9C3E3"></span>In progress</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: repeating-linear-gradient(45deg, #FDEBE1 0 4px, #F7C9AE 4px 8px)"></span>To plan</span>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 8px; background: #FDEBE1">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A3F00" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3l9 16H3zM12 10v4M12 17v.5"></path></svg>
+          <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #16202E"><strong>To graduate you still need 4 units of CS Breadth &amp; Depth and 12 units of unrestricted electives.</strong> <a href="CourseReg.dc.html" style="font-weight: 600">Plan Semester 2 →</a></p>
+        </div>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 12px" aria-label="Requirements">
+        <sc-for list="{{reqs}}" as="r" hint-placeholder-count="5">
+          <article class="card" style="overflow: hidden">
+            <button class="reqhead" aria-expanded="{{r.exp}}" onClick="{{r.toggle}}">
+              <span style="{{r.icon}}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{r.glyph}}"></path></svg>
+              </span>
+              <span style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-size: 17px; font-weight: 600">{{r.name}}</span>
+                <span style="font-size: 13px; color: #5B6675">{{r.rule}}</span>
+              </span>
+              <span style="flex: 0 1 280px; display: flex; flex-direction: column; gap: 6px; min-width: 180px">
+                <span style="display: flex; height: 8px; border-radius: 4px; background: #EDF0F3; overflow: hidden"><span style="{{r.doneBar}}"></span><span style="{{r.progBar}}"></span></span>
+                <span class="mono" style="font-size: 12px; color: #475263">{{r.counts}}</span>
+              </span>
+              <span class="pill" style="{{r.statusStyle}}">{{r.status}}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475263" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="{{r.chev}}"></path></svg>
+            </button>
+            <sc-if value="{{r.open}}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 0 22px 22px 74px; display: flex; flex-direction: column; gap: 12px">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                  <sc-for list="{{r.courses}}" as="c" hint-placeholder-count="4">
+                    <span class="cchip" style="{{c.style}}"><span class="mono" style="font-weight: 600">{{c.code}}</span><span>{{c.note}}</span></span>
+                  </sc-for>
+                </div>
+                <sc-if value="{{r.hasSuggest}}" hint-placeholder-val="{{ false }}">
+                  <p style="margin: 0; font-size: 14px; color: #475263">{{r.suggest}} <a href="CourseReg.dc.html" style="font-weight: 600">Browse options →</a></p>
+                </sc-if>
+              </div>
+            </sc-if>
+          </article>
+        </sc-for>
+      </section>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px">
+        <section class="card" style="flex: 1 1 340px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <h2 class="display" style="font-size: 20px; font-weight: 700">What-if analysis</h2>
+          <p style="margin: 0; font-size: 14px; color: #475263; line-height: 1.5">Preview how a minor, second major or plan change affects your remaining requirements. Nothing is submitted.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px">
+            <a href="#" class="cchip" style="border: 1px solid #DCE1E7; color: #16202E">+ Minor in Statistics</a>
+            <a href="#" class="cchip" style="border: 1px solid #DCE1E7; color: #16202E">+ Minor in Management</a>
+            <a href="#" class="cchip" style="border: 1px solid #DCE1E7; color: #16202E">Switch focus area</a>
+          </div>
+        </section>
+        <section class="card" style="flex: 1 1 340px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <h2 class="display" style="font-size: 20px; font-weight: 700">Courses not used</h2>
+          <p style="margin: 0; font-size: 14px; color: #475263; line-height: 1.5"><span class="mono" style="font-weight: 600; color: #16202E">CFG1003</span> Financial Wellbeing overlaps with CFG1004, so it doesn't count toward your degree.</p>
+          <p style="margin: 0; font-size: 14px; color: #475263">Apply for graduation opens <strong style="color: #16202E">5 Jan 2027</strong>. <a href="Documents.dc.html" style="font-weight: 600">Remind me</a></p>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1420}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { open: { bd: true, ue: true } }; }
+  renderVals() {
+    const R = [
+      { id: 'cc', name: 'Common Curriculum', rule: 'University pillars, incl. Residential College courses', need: 24, done: 24, prog: 0, courses: [['ES2660', 'B+'], ['GEA1000', 'A'], ['GESS1025', 'S'], ['RVX1000', 'A'], ['+2 more', 'RC']] },
+      { id: 'cf', name: 'CS Foundation', rule: 'All core computing, maths and statistics courses', need: 52, done: 52, prog: 0, courses: [['CS1101S', 'A'], ['CS2030S', 'A-'], ['CS2040S', 'A'], ['CS2103T', 'A-'], ['CS2100', 'B+'], ['+8 more', '']] },
+      { id: 'bd', name: 'CS Breadth & Depth', rule: '32 units of level-3000+ CS courses, incl. one project course', need: 32, done: 20, prog: 8, courses: [['CS3203', 'A- · project'], ['CS3235', 'B+'], ['CS3231', 'exchange'], ['CS3249', 'exchange'], ['CS3223', 'in progress', 1], ['CS3230', 'in progress', 1], ['4 units', 'to plan', 2]], suggest: 'Any level-3000+ CS course works, e.g. CS3236, CS4231 or CS4234.' },
+      { id: 'fa', name: 'Focus area · Artificial Intelligence', rule: '12 units from the AI list, at least one at level 4000', need: 12, done: 8, prog: 4, courses: [['CS3263', 'exchange'], ['CS4244', 'A'], ['CS4248', 'in progress', 1]] },
+      { id: 'ue', name: 'Unrestricted electives', rule: 'Any courses, including S/U and CS-graded', need: 40, done: 20, prog: 8, courses: [['CP2106', 'CS'], ['CS4226', 'exchange'], ['CS4242', 'exchange'], ['CFG ×3', 'CS'], ['DMX1601', 'CS'], ['CS3244', 'in progress', 1], ['PH2202', 'in progress', 1], ['12 units', 'to plan', 2]], suggest: 'Three 4-unit courses of your choice. 12 S/U units remain if you want a lighter grade risk.' }
+    ];
+    const total = 160;
+    const segs = [];
+    R.forEach((r) => {
+      const left = r.need - r.done - r.prog;
+      if (r.done) segs.push({ style: 'display:block;border-radius:4px;background:#1F5AA6;flex:' + r.done });
+      if (r.prog) segs.push({ style: 'display:block;border-radius:4px;background:#A9C3E3;flex:' + r.prog });
+      if (left > 0) segs.push({ style: 'display:block;border-radius:4px;background:repeating-linear-gradient(45deg,#FDEBE1 0 4px,#F7C9AE 4px 8px);flex:' + left });
+    });
+    const chip = (k) => k === 1 ? 'background:#E5EEF8;color:#174A87' : k === 2 ? 'background:#FDEBE1;color:#9A3F00;border:1px dashed #E8A07A' : 'background:#F0F2F5;color:#16202E';
+    const reqs = R.map((r) => {
+      const complete = r.done >= r.need;
+      const covered = r.done + r.prog >= r.need;
+      const open = !!this.state.open[r.id];
+      return {
+        name: r.name, rule: r.rule, open, exp: open ? 'true' : 'false',
+        counts: r.done + ' done · ' + r.prog + ' in progress · ' + r.need + ' required',
+        doneBar: 'display:block;background:#1F5AA6;width:' + (r.done / r.need * 100) + '%',
+        progBar: 'display:block;background:#A9C3E3;width:' + (r.prog / r.need * 100) + '%',
+        status: complete ? 'Complete' : covered ? 'Covered this sem' : (r.need - r.done - r.prog) + ' units to plan',
+        statusStyle: complete ? 'background:#123A6B;color:#FFFFFF' : covered ? 'background:#E5EEF8;color:#174A87' : 'background:#FDEBE1;color:#9A3F00',
+        icon: 'width:36px;height:36px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;' + (complete ? 'background:#123A6B;color:#FFFFFF' : covered ? 'background:#E5EEF8;color:#174A87' : 'background:#FDEBE1;color:#9A3F00'),
+        glyph: complete ? 'M5 12.5l4.5 4.5L19 7.5' : covered ? 'M12 6v6l4 2' : 'M12 6v7M12 17v.5',
+        chev: open ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6',
+        courses: r.courses.map(([code, note, k]) => ({ code, note, style: chip(k) })),
+        hasSuggest: !!r.suggest, suggest: r.suggest || '',
+        toggle: () => this.setState({ open: { ...this.state.open, [r.id]: !open } })
+      };
+    });
+    return { segs, reqs, total };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Exams</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:6px;font-weight:600;font-size:14px}
+.sw{position:relative;width:48px;height:28px;border-radius:14px;border:0;cursor:pointer;flex:none;padding:0}
+.lbl{font-size:12px;color:#5B6675;font-weight:500}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px"><dc-import name="Nav" active="exams" hint-size="248px,900px"></dc-import></div>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+      <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <p class="eyebrow">Semester 1 finals · 28 Nov – 5 Dec</p>
+          <h1 class="display" style="font-size: 40px; font-weight: 700">Examinations</h1>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+          <span style="display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500">
+            <button class="sw" style="{{smsTrack}}" onClick="{{toggleSms}}" aria-pressed="{{smsPressed}}" aria-label="SMS reminders"><span style="{{smsKnob}}"></span></button>SMS reminders
+          </span>
+          <a href="#" class="btn" style="background:#123A6B; color: #FFFFFF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>Add all to calendar</a>
+        </div>
+      </header>
+
+      <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px" aria-label="Exam tickets">
+        <sc-for list="{{exams}}" as="e" hint-placeholder-count="4">
+          <article class="card" style="overflow: hidden; display: flex; flex-direction: column">
+            <div style="{{e.top}}">
+              <div style="display: flex; justify-content: space-between; align-items: center"><span class="mono" style="font-weight: 600; font-size: 15px">{{e.code}}</span><span class="pill" style="{{e.cdStyle}}">{{e.countdown}}</span></div>
+              <span style="font-size: 16px; font-weight: 600; line-height: 1.3; min-height: 42px">{{e.title}}</span>
+            </div>
+            <div style="height: 0; border-top: 2px dashed #DCE1E7; margin: 0 14px"></div>
+            <div style="padding: 16px 20px 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+              <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl">Date</span><span style="font-weight: 600">{{e.date}}</span></div>
+              <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl">Time</span><span style="font-weight: 600">{{e.time}}</span></div>
+              <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl">Venue</span><span style="font-weight: 600">{{e.venue}}</span></div>
+              <div style="display: flex; flex-direction: column; gap: 2px"><span class="lbl">Seat</span><span class="display" style="font-weight: 700; font-size: 22px">{{e.seat}}</span></div>
+            </div>
+          </article>
+        </sc-for>
+      </section>
+      <p style="margin: -8px 0 0; font-size: 14px; color: #475263">CS3223 has no final exam. Seat numbers are released two weeks before exams; bring your student card.</p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+        <section class="card" style="flex: 3 1 520px; padding: 26px; display: flex; flex-direction: column; gap: 16px" aria-labelledby="su">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="su" class="display" style="font-size: 22px; font-weight: 700">S/U planner</h2>
+              <p style="margin: 0; font-size: 14px; color: #475263">Projection only. Declarations open when results are released (~23 Dec). 12 S/U units remaining.</p>
+            </div>
+            <span class="pill" style="background: #F0F2F5; color: #2C3746">Preview only</span>
+          </div>
+          <div style="display: flex; flex-direction: column">
+            <sc-for list="{{su}}" as="s" hint-placeholder-count="4">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid #EDF0F3">
+                <span class="mono" style="font-weight: 600; width: 72px">{{s.code}}</span>
+                <span style="flex: 1; font-size: 14px; color: #2C3746">If you get</span>
+                <span class="pill" style="{{s.gStyle}}">{{s.grade}}</span>
+                <span style="font-size: 13px; color: #475263; width: 64px; text-align: right">{{s.state}}</span>
+                <button class="sw" style="{{s.track}}" onClick="{{s.toggle}}" aria-pressed="{{s.pressed}}" aria-label="{{s.aria}}"><span style="{{s.knob}}"></span></button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 24px; padding: 16px 18px; border-radius: 8px; background: #F5F7FA; align-items: baseline">
+            <span style="display: flex; flex-direction: column; gap: 2px"><span class="lbl">Projected cumulative GPA</span><span class="display" style="font-size: 36px; font-weight: 700">{{proj}}</span></span>
+            <span style="display: flex; flex-direction: column; gap: 2px"><span class="lbl">Without S/U</span><span class="display" style="font-size: 24px; font-weight: 700; color: #475263">{{base}}</span></span>
+            <span style="display: flex; flex-direction: column; gap: 2px"><span class="lbl">S/U units after</span><span class="display" style="font-size: 24px; font-weight: 700; color: #475263">{{left}}</span></span>
+          </div>
+        </section>
+
+        <div style="flex: 2 1 320px; display: flex; flex-direction: column; gap: 16px">
+          <section class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 10px">
+            <h2 class="display" style="font-size: 20px; font-weight: 700">Special consideration</h2>
+            <p style="margin: 0; font-size: 14px; color: #475263; line-height: 1.5">Apply for special consideration within 5 working days. Have your medical certificate ready. You can't edit an application after submitting.</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px">
+              <a href="Documents.dc.html" class="btn" style="background:#123A6B; color: #FFFFFF">Apply</a>
+              <a href="#" class="btn" style="border: 1px solid #DCE1E7; color: #16202E">Guidelines</a>
+            </div>
+          </section>
+          <section class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 12px">
+            <h2 class="display" style="font-size: 20px; font-weight: 700">After results</h2>
+            <a href="Results.dc.html" style="display: flex; justify-content: space-between; min-height: 44px; align-items: center; border-top: 1px solid #EDF0F3; color: #16202E; font-weight: 500">Past results &amp; GPA<span aria-hidden="true">→</span></a>
+            <a href="#" style="display: flex; justify-content: space-between; min-height: 44px; align-items: center; border-top: 1px solid #EDF0F3; color: #16202E; font-weight: 500">Request a result review<span aria-hidden="true">→</span></a>
+            <a href="Documents.dc.html" style="display: flex; justify-content: space-between; min-height: 44px; align-items: center; border-top: 1px solid #EDF0F3; color: #16202E; font-weight: 500">S/U original grade letter<span aria-hidden="true">→</span></a>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { sms: true, su: { CS3230: true } }; }
+  renderVals() {
+    const C = { CS3230: '#E0620D', CS3244: '#0F7B6C', CS4248: '#7A3EC8', PH2202: '#A16207' };
+    const E = [
+      ['CS3230', 'Design & Analysis of Algorithms', 'Fri 28 Nov', '9:00 am', 'MPSH 2A', '112', 39],
+      ['CS3244', 'Machine Learning', 'Mon 1 Dec', '1:00 pm', 'MPSH 1', '048', 42],
+      ['CS4248', 'Natural Language Processing', 'Wed 3 Dec', '5:00 pm', 'COM1 hall', '—', 44],
+      ['PH2202', 'Philosophy of Mind', 'Fri 5 Dec', '9:00 am', 'MPSH 5', '—', 46]
+    ];
+    const exams = E.map(([code, title, date, time, venue, seat, d], i) => ({
+      code, title, date, time, venue, seat, countdown: 'in ' + (d - 1) + ' days',
+      cdStyle: i === 0 ? 'background:#123A6B;color:#FFFFFF' : 'background:#FFFFFFB3;color:#16202E',
+      top: 'padding:18px 20px 16px;display:flex;flex-direction:column;gap:8px;background:' + C[code] + '1F;border-bottom:1px solid ' + C[code] + '40'
+    }));
+    const pts = { 'A': 5, 'A-': 4.5, 'B+': 4, 'B': 3.5 };
+    const S = [['CS3230', 'B'], ['CS3244', 'A-'], ['PH2202', 'B+'], ['CS4248', 'A']];
+    const baseUnits = 96, basePts = 96 * 4.43;
+    const fixed = 4 * 4.5;
+    const calc = (sel) => {
+      let u = baseUnits + 4, p = basePts + fixed;
+      S.forEach(([c, g]) => { if (!sel[c]) { u += 4; p += pts[g] * 4; } });
+      return (p / u).toFixed(2);
+    };
+    const sel = this.state.su;
+    const used = S.filter(([c]) => sel[c]).length * 4;
+    const track = (on) => 'background:' + (on ? '#1F5AA6' : '#CDD3DB');
+    const knob = (on) => 'position:absolute;top:3px;left:' + (on ? '23px' : '3px') + ';width:22px;height:22px;border-radius:11px;background:#FFFFFF;box-shadow:0 1px 2px rgba(0,0,0,.2)';
+    const su = S.map(([code, grade]) => {
+      const on = !!sel[code];
+      return {
+        code, grade, state: on ? 'S/U' : 'Graded', pressed: on ? 'true' : 'false', aria: 'S/U ' + code,
+        gStyle: grade.startsWith('A') ? 'background:#123A6B;color:#FFFFFF' : 'background:#FDEBE1;color:#9A3F00',
+        track: track(on), knob: knob(on),
+        toggle: () => { if (!on && used >= 12) return; this.setState({ su: { ...sel, [code]: !on } }); }
+      };
+    });
+    const sms = this.state.sms;
+    return {
+      exams, su, proj: calc(sel), base: calc({}), left: String(12 - used),
+      smsTrack: track(sms), smsKnob: knob(sms), smsPressed: sms ? 'true' : 'false',
+      toggleSms: () => this.setState({ sms: !sms })
+    };
+  }
+}
+</script>
+</body>
+</html>

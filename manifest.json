@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "EduRec Reskin (unofficial)",
+  "version": "0.1.0",
+  "description": "A personal, read-only reskin of NUS EduRec: overview dashboard, sidebar, search and readable summaries.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://myedurec.nus.edu.sg/*"],
+  "action": {
+    "default_title": "EduRec Reskin",
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://myedurec.nus.edu.sg/psc/*"],
+      "js": [
+        "src/core.js",
+        "src/routes.js",
+        "src/parsers.js",
+        "src/store.js",
+        "src/shell.js",
+        "src/overview.js",
+        "src/enhancers.js",
+        "src/main.js"
+      ],
+      "css": ["src/theme.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}

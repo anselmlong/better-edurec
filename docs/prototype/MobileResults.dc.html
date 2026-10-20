@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mobile results</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1F5AA6;text-decoration:none}
+.m-card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.m-eyebrow{font-size:12px;color:#5B6675;font-weight:500;margin:0}
+.m-display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.m-mono{font-family:'IBM Plex Mono',monospace}
+.m-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;justify-content:center;font-size:11px;font-weight:600;text-decoration:none}
+.m-chip{flex:none;min-height:40px;padding:0 14px;border-radius:4px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F6F9; color: #16202E; font-family: 'Public Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="flex: 1; overflow-y: auto; padding: 56px 18px 18px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h1 class="m-display" style="font-size: 30px; font-weight: 700">Results</h1>
+      <a href="Documents.dc.html" style="display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 4px; background:#123A6B; color: #FFFFFF; font-size: 13px; font-weight: 600">Transcript</a>
+    </div>
+    <div class="m-card" style="padding: 18px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end">
+        <span style="display: flex; flex-direction: column; gap: 2px"><span class="m-eyebrow">Cumulative GPA</span><span class="m-display" style="font-size: 48px; font-weight: 700; line-height: 1">4.43</span></span>
+        <svg width="140" height="56" viewBox="0 0 140 56" role="img" aria-label="Semester GPA trend">
+          <rect x="2" y="18" width="20" height="38" rx="5" fill="#A9C3E3"></rect><rect x="30" y="11" width="20" height="45" rx="5" fill="#A9C3E3"></rect><rect x="58" y="26" width="20" height="30" rx="5" fill="#A9C3E3"></rect><rect x="86" y="6" width="20" height="50" rx="5" fill="#A9C3E3"></rect><rect x="114" y="13" width="20" height="43" rx="5" fill="#1F5AA6"></rect>
+        </svg>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap"><span style="font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 4px; background: #E5EEF8; color: #174A87">Passed · proceed</span><span style="font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 4px; background: #F0F2F5; color: #2C3746">12 S/U units left</span></div>
+    </div>
+    <div style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -18px; padding: 0 18px" role="tablist" aria-label="Semesters">
+      <sc-for list="{{terms}}" as="t" hint-placeholder-count="4"><button class="m-chip" role="tab" aria-selected="{{t.sel}}" style="{{t.style}}" onClick="{{t.pick}}">{{t.name}}</button></sc-for>
+    </div>
+    <div class="m-card" style="padding: 4px 16px">
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+        <div style="display: flex; align-items: center; gap: 12px; min-height: 60px; border-bottom: 1px solid #EDF0F3">
+          <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span class="m-mono" style="font-weight: 600; font-size: 14px">{{r.code}}</span><span style="font-size: 13px; color: #475263; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.title}}</span></span>
+          <span style="{{r.gStyle}}">{{r.grade}}</span>
+        </div>
+      </sc-for>
+      <div style="display: flex; justify-content: space-between; padding: 14px 0; font-size: 14px"><span style="color: #475263">Semester GPA</span><strong class="m-mono">{{gpa}}</strong></div>
+    </div>
+  </div>
+  <nav aria-label="Tabs" style="display: flex; padding: 6px 10px 26px; background: #FFFFFF; border-top: 1px solid #DCE1E7">
+    <a href="Mobile.dc.html" class="m-tab" style="color: #5B6675"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>Today</a>
+    <a href="Timetable.dc.html" class="m-tab" style="color: #5B6675"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+    <a href="MobileResults.dc.html" class="m-tab" aria-current="page" style="color: #16202E"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6"></path></svg>Results</a>
+    <a href="Degree.dc.html" class="m-tab" style="color: #5B6675"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5"></path></svg>Degree</a>
+    <a href="Documents.dc.html" class="m-tab" style="color: #5B6675"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"></path></svg>More</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { t: 0 }; }
+  renderVals() {
+    const T = [
+      { name: 'Y3 Sem 2', gpa: '4.50', rows: [['CS2102', 'Database Systems', 'A-'], ['CS3210', 'Parallel Computing', 'A-'], ['CS3235', 'Computer Security', 'B+'], ['CS4244', 'Knowledge Representation & Reasoning', 'A'], ['CFG2002', 'Career Creation', 'CS']] },
+      { name: 'Y3 Sem 1 · exchange', gpa: '—', rows: [['CS3249', 'User Interface Development', 'Pass'], ['CS3231', 'Theory of Computation', 'Pass'], ['CS3263', 'Foundations of AI', 'Pass'], ['CS4226', 'Internet Architecture', 'Pass'], ['CS4242', 'Social Media Computing', 'Pass']] },
+      { name: 'Y2 Sem 2', gpa: '4.60', rows: [['CS2101', 'Effective Communication', 'A'], ['CS2109S', 'Intro to AI & ML', 'A'], ['CS3203', 'Software Engineering Project', 'A-'], ['CFG1004', 'Financial Wellbeing', 'CS'], ['DMX1601', 'Design Your Own Course', 'CS']] },
+      { name: 'Y2 Sem 1', gpa: '4.21', rows: [['CS2100', 'Computer Organisation', 'B+'], ['CS2103T', 'Software Engineering', 'A-'], ['ST2334', 'Probability & Statistics', 'B'], ['CP2106', 'Independent Software Dev', 'CS'], ['RVX1000', 'Residential College seminar', 'A']] }
+    ];
+    const sel = this.state.t;
+    const g = (x) => {
+      const base = 'min-width:44px;text-align:center;font-size:13px;font-weight:700;padding:6px 10px;border-radius:4px;';
+      if (x === 'CS' || x === 'Pass') return base + 'background:#E5EEF8;color:#174A87';
+      if (x.startsWith('A')) return base + 'background:#123A6B;color:#FFFFFF';
+      return base + 'background:#FDEBE1;color:#9A3F00';
+    };
+    const terms = T.map((t, i) => ({ name: t.name, sel: i === sel ? 'true' : 'false', pick: () => this.setState({ t: i }), style: i === sel ? 'background:#123A6B;color:#FFFFFF;border:1px solid #123A6B' : 'background:#FFFFFF;color:#16202E;border:1px solid #DCE1E7' }));
+    const rows = T[sel].rows.map(([code, title, grade]) => ({ code, title, grade, gStyle: g(grade) }));
+    return { terms, rows, gpa: T[sel].gpa };
+  }
+}
+</script>
+</body>
+</html>

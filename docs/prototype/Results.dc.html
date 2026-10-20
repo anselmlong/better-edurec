@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Results and GPA</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.chip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:56px;padding:8px 14px;border-radius:6px;font:inherit;cursor:pointer;text-align:left}
+table{border-collapse:collapse;width:100%}
+th{font-size:13px;color:#5B6675;font-weight:600;text-align:left;padding:10px 12px;border-bottom:1px solid #DCE1E7}
+td{padding:14px 12px;border-bottom:1px solid #EDF0F3;font-size:15px}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px"><dc-import name="Nav" active="results" hint-size="248px,900px"></dc-import></div>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+      <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <p class="eyebrow">Bachelor of Computing · Computer Science (Hons)</p>
+          <h1 class="display" style="font-size: 40px; font-weight: 700">Results</h1>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <a href="Exams.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 6px; border: 1px solid #DCE1E7; background: #FFFFFF; color: #16202E; font-weight: 600; font-size: 14px">S/U options</a>
+          <a href="Documents.dc.html" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 6px; background:#123A6B; color: #FFFFFF; font-weight: 600; font-size: 14px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>Unofficial transcript</a>
+        </div>
+      </header>
+
+      <section style="display: flex; flex-wrap: wrap; gap: 16px">
+        <div class="card" style="flex: 1 1 260px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+          <div style="display: flex; flex-direction: column; gap: 4px"><p class="eyebrow">Cumulative GPA</p><div style="display: flex; align-items: baseline; gap: 8px"><span class="display" style="font-size: 64px; font-weight: 700; line-height: 1">4.43</span><span style="color: #5B6675">/ 5.00</span></div></div>
+          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+            <div style="display: flex; justify-content: space-between"><span style="color: #475263">Honours standing</span><strong>Highest Distinction track</strong></div>
+            <div style="display: flex; justify-content: space-between"><span style="color: #475263">Graded units in GPA</span><strong class="mono">96</strong></div>
+            <div style="display: flex; justify-content: space-between"><span style="color: #475263">Units not in GPA (S/U, CS, exchange)</span><strong class="mono">28</strong></div>
+            <div style="display: flex; justify-content: space-between"><span style="color: #475263">Academic standing</span><span class="pill" style="background: #E5EEF8; color: #174A87">Passed · proceed</span></div>
+          </div>
+        </div>
+        <figure class="card" style="flex: 2 1 520px; margin: 0; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <figcaption style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px">
+            <span style="font-weight: 600; font-size: 15px">GPA by semester</span>
+            <span style="display: flex; gap: 16px; font-size: 13px; color: #475263"><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #A9C3E3"></span>Semester</span><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 14px; height: 3px; border-radius: 2px; background:#123A6B"></span>Cumulative</span></span>
+          </figcaption>
+          <svg viewBox="0 0 640 220" width="100%" role="img" aria-label="Semester GPA: 4.38, 4.52, 4.21, 4.60, 4.50. Cumulative now 4.43.">
+            <line x1="40" y1="20" x2="630" y2="20" stroke="#EDF0F3"></line><line x1="40" y1="80" x2="630" y2="80" stroke="#EDF0F3"></line><line x1="40" y1="140" x2="630" y2="140" stroke="#EDF0F3"></line><line x1="40" y1="190" x2="630" y2="190" stroke="#CDD3DB"></line>
+            <text x="30" y="24" text-anchor="end" font-size="11" fill="#5B6675" font-family="IBM Plex Mono">5.0</text><text x="30" y="84" text-anchor="end" font-size="11" fill="#5B6675" font-family="IBM Plex Mono">4.5</text><text x="30" y="144" text-anchor="end" font-size="11" fill="#5B6675" font-family="IBM Plex Mono">4.0</text>
+            <sc-for list="{{bars}}" as="b" hint-placeholder-count="5">
+              <rect x="{{b.x}}" y="{{b.y}}" width="64" height="{{b.h}}" rx="8" fill="{{b.fill}}"></rect>
+              <text x="{{b.cx}}" y="{{b.ty}}" text-anchor="middle" font-size="13" font-weight="600" fill="#16202E" font-family="IBM Plex Mono">{{b.v}}</text>
+              <text x="{{b.cx}}" y="210" text-anchor="middle" font-size="11" fill="#5B6675" font-family="Public Sans">{{b.label}}</text>
+            </sc-for>
+            <polyline points="{{cumPts}}" fill="none" stroke="#16202E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+          </svg>
+        </figure>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 14px" aria-label="Semester results">
+        <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px" role="tablist" aria-label="Semesters">
+          <sc-for list="{{terms}}" as="t" hint-placeholder-count="7">
+            <button class="chip" role="tab" aria-selected="{{t.sel}}" style="{{t.style}}" onClick="{{t.pick}}">
+              <span style="font-size: 14px; font-weight: 600; white-space: nowrap">{{t.name}}</span>
+              <span class="mono" style="font-size: 12px; opacity: .8; white-space: nowrap">{{t.meta}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div class="card" style="padding: 8px 12px 12px; overflow-x: auto">
+          <table>
+            <thead><tr><th>Course</th><th>Title</th><th style="text-align: right">Units</th><th>Grade</th><th>Counts toward</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+                <tr>
+                  <td class="mono" style="font-weight: 600; white-space: nowrap">{{r.code}}</td>
+                  <td>{{r.title}}</td>
+                  <td class="mono" style="text-align: right">{{r.units}}</td>
+                  <td><span class="pill" style="{{r.gStyle}}">{{r.grade}}</span></td>
+                  <td style="font-size: 14px; color: #475263">{{r.req}}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <div style="display: flex; flex-wrap: wrap; gap: 24px; padding: 16px 12px 4px; font-size: 14px; color: #475263">
+            <span>Semester GPA <strong class="mono" style="color: #16202E">{{cur.gpa}}</strong></span>
+            <span>Units <strong class="mono" style="color: #16202E">{{cur.units}}</strong></span>
+            <span>Cumulative after <strong class="mono" style="color: #16202E">{{cur.cum}}</strong></span>
+            <span style="flex: 1"></span>
+            <a href="Exams.dc.html" style="font-weight: 600">Request a result review</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { t: 5 }; }
+  renderVals() {
+    const T = [
+      { name: 'Y1 · Sem 1', meta: 'GPA 4.38', gpa: '4.38', cum: '4.38', units: '20', rows: [
+        ['CS1101S', 'Programming Methodology', 4, 'A', 'CS Foundation'], ['MA1521', 'Calculus for Computing', 4, 'A-', 'CS Foundation'], ['ES2660', 'Communicating in the Information Age', 4, 'B+', 'Common Curriculum'], ['GEA1000', 'Quantitative Reasoning with Data', 4, 'A', 'Common Curriculum'], ['CFG1002', 'Career Catalyst', 2, 'CS', 'Unrestricted electives'] ] },
+      { name: 'Y1 · Sem 2', meta: 'GPA 4.52', gpa: '4.52', cum: '4.45', units: '20', rows: [
+        ['CS1231S', 'Discrete Structures', 4, 'A', 'CS Foundation'], ['CS2030S', 'Programming Methodology II', 4, 'A-', 'CS Foundation'], ['CS2040S', 'Data Structures & Algorithms', 4, 'A', 'CS Foundation'], ['MA1522', 'Linear Algebra for Computing', 4, 'B+', 'CS Foundation'], ['GESS1025', 'Singapore: Imagining the Next 50', 4, 'S', 'Common Curriculum'] ] },
+      { name: 'Y2 · Sem 1', meta: 'GPA 4.21', gpa: '4.21', cum: '4.37', units: '20', rows: [
+        ['CS2100', 'Computer Organisation', 4, 'B+', 'CS Foundation'], ['CS2103T', 'Software Engineering', 4, 'A-', 'CS Foundation'], ['ST2334', 'Probability & Statistics', 4, 'B', 'CS Foundation'], ['CP2106', 'Independent Software Development', 4, 'CS', 'Unrestricted electives'], ['RVX1000', 'Residential College seminar', 4, 'A', 'Common Curriculum'] ] },
+      { name: 'Y2 · Sem 2', meta: 'GPA 4.60', gpa: '4.60', cum: '4.43', units: '20', rows: [
+        ['CS2101', 'Effective Communication for Computing', 4, 'A', 'CS Foundation'], ['CS2109S', 'Intro to AI & Machine Learning', 4, 'A', 'CS Foundation'], ['CS3203', 'Software Engineering Project', 8, 'A-', 'CS Breadth & Depth'], ['CFG1004', 'Financial Wellbeing', 2, 'CS', 'Unrestricted electives'], ['DMX1601', 'Design Your Own Course', 2, 'CS', 'Unrestricted electives'] ] },
+      { name: 'Y3 · Sem 1', meta: 'Exchange', gpa: '—', cum: '4.43', units: '20 transfer', rows: [
+        ['CS3249', 'User Interface Development (via exchange)', 4, 'Pass', 'CS Breadth & Depth'], ['CS3231', 'Theory of Computation (via exchange)', 4, 'Pass', 'CS Breadth & Depth'], ['CS3263', 'Foundations of AI (via exchange)', 4, 'Pass', 'Focus area · AI'], ['CS4226', 'Internet Architecture (via exchange)', 4, 'Pass', 'Unrestricted electives'], ['CS4242', 'Social Media Computing (via exchange)', 4, 'Pass', 'Unrestricted electives'] ] },
+      { name: 'Y3 · Sem 2', meta: 'GPA 4.50', gpa: '4.50', cum: '4.43', units: '20', rows: [
+        ['CS2102', 'Database Systems', 4, 'A-', 'CS Foundation'], ['CS3210', 'Parallel Computing', 4, 'A-', 'CS Foundation'], ['CS3235', 'Computer Security', 4, 'B+', 'CS Breadth & Depth'], ['CS4244', 'Knowledge Representation & Reasoning', 4, 'A', 'Focus area · AI'], ['CFG2002', 'Career Creation', 2, 'CS', 'Unrestricted electives'] ] },
+      { name: 'Y4 · Sem 1', meta: 'In progress', gpa: '—', cum: '4.43', units: '20 enrolled', rows: [
+        ['CS3223', 'Database Systems Implementation', 4, 'In progress', 'CS Breadth & Depth'], ['CS3230', 'Design & Analysis of Algorithms', 4, 'In progress', 'CS Breadth & Depth'], ['CS3244', 'Machine Learning', 4, 'In progress', 'Unrestricted electives'], ['CS4248', 'Natural Language Processing', 4, 'In progress', 'Focus area · AI'], ['PH2202', 'Philosophy of Mind', 4, 'In progress', 'Unrestricted electives'] ] }
+    ];
+    const sel = this.state.t;
+    const gStyle = (g) => {
+      if (g === 'In progress') return 'background:#F0F2F5;color:#475263';
+      if (g === 'CS' || g === 'S' || g === 'Pass') return 'background:#E5EEF8;color:#174A87';
+      if (g.startsWith('A')) return 'background:#123A6B;color:#FFFFFF';
+      return 'background:#FDEBE1;color:#9A3F00';
+    };
+    const terms = T.map((t, i) => ({
+      name: t.name, meta: t.meta, sel: i === sel ? 'true' : 'false',
+      style: i === sel ? 'background:#123A6B;color:#FFFFFF;border:1px solid #123A6B' : 'background:#FFFFFF;color:#16202E;border:1px solid #DCE1E7',
+      pick: () => this.setState({ t: i })
+    }));
+    const cur = T[sel];
+    const rows = cur.rows.map(([code, title, units, grade, req]) => ({ code, title, units: units.toFixed(1), grade, req, gStyle: gStyle(grade) }));
+    const series = [['Y1S1', 4.38, 4.38], ['Y1S2', 4.52, 4.45], ['Y2S1', 4.21, 4.37], ['Y2S2', 4.60, 4.43], ['Y3S2', 4.50, 4.43]];
+    const y = (v) => 190 - (v - 3.75) / 1.25 * 170;
+    const bars = series.map(([label, v], i) => {
+      const x = 70 + i * 116;
+      return { label, v: v.toFixed(2), x, cx: x + 32, y: y(v), h: 190 - y(v), ty: y(v) - 8, fill: i === series.length - 1 ? '#1F5AA6' : '#A9C3E3' };
+    });
+    const cumPts = series.map(([, , c], i) => (70 + i * 116 + 32) + ',' + y(c)).join(' ');
+    return { terms, rows, cur, bars, cumPts };
+  }
+}
+</script>
+</body>
+</html>

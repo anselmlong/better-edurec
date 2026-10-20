@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Search and jump</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.res{display:flex;align-items:center;gap:14px;min-height:56px;padding:8px 14px;border-radius:6px;color:#16202E;text-decoration:none}
+.res:hover,.res.on{background:#F0F2F5;color:#16202E}
+.kbd{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:2px 6px;border:1px solid #CDD3DB;border-radius:6px;color:#475263;background:#FFFFFF}
+input:focus{outline:none}
+</style>
+</helmet>
+<div style="position: relative; display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px"><dc-import name="Nav" active="today" hint-size="248px,900px"></dc-import></div>
+  <div style="flex: 999 1 560px; min-width: 0; padding: 40px 48px; box-sizing: border-box" aria-hidden="true">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+      <div style="height: 16px; width: 240px; background: #DCE1E7; border-radius: 8px"></div>
+      <div style="height: 48px; width: 520px; max-width: 100%; background: #DCE1E7; border-radius: 6px"></div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px"><div style="height: 170px; background: #FFFFFF; border-radius: 8px"></div><div style="height: 170px; background: #FFFFFF; border-radius: 8px"></div><div style="height: 170px; background: #FFFFFF; border-radius: 8px"></div><div style="height: 170px; background: #FFFFFF; border-radius: 8px"></div></div>
+      <div style="height: 320px; background: #FFFFFF; border-radius: 8px"></div>
+    </div>
+  </div>
+
+  <div style="position: absolute; inset: 0; background: rgba(18, 22, 26, 0.42); display: flex; justify-content: center; align-items: flex-start; padding: 96px 16px 40px; box-sizing: border-box">
+    <div role="dialog" aria-modal="true" aria-label="Search EduRec" style="width: 100%; max-width: 680px; background: #FFFFFF; border-radius: 8px; box-shadow: 0 30px 80px rgba(18,22,26,0.35); overflow: hidden">
+      <label style="display: flex; align-items: center; gap: 14px; padding: 18px 22px; border-bottom: 1px solid #EDF0F3">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16202E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <span style="position: absolute; left: -9999px">Search</span>
+        <input value="{{q}}" onInput="{{onQ}}" placeholder="Search pages, forms and documents" style="flex: 1; border: 0; font: inherit; font-size: 20px; color: #16202E; background: transparent; min-height: 32px">
+        <a href="Main.dc.html" class="kbd" style="text-decoration: none">esc</a>
+      </label>
+      <div style="padding: 10px; display: flex; flex-direction: column; gap: 2px; max-height: 520px; overflow: auto">
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+          <p class="eyebrow" style="padding: 10px 14px 4px">{{g.name}}</p>
+          <sc-for list="{{g.items}}" as="r" hint-placeholder-count="3">
+            <a href="{{r.href}}" class="{{r.cls}}">
+              <span style="width: 36px; height: 36px; border-radius: 6px; background: #F0F2F5; display: flex; align-items: center; justify-content: center; flex: none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16202E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{r.icon}}"></path></svg>
+              </span>
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+                <span style="font-weight: 600; font-size: 15px">{{r.title}}</span>
+                <span style="font-size: 13px; color: #5B6675">{{r.sub}}</span>
+              </span>
+              <span style="font-size: 12px; color: #5B6675">{{r.hint}}</span>
+            </a>
+          </sc-for>
+        </sc-for>
+        <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 32px; text-align: center; color: #475263; font-size: 15px">Nothing matches “{{q}}”. Try “exam”, “GPA”, “leave” or a course code.</div>
+        </sc-if>
+      </div>
+      <div style="display: flex; gap: 18px; padding: 12px 22px; border-top: 1px solid #EDF0F3; font-size: 12px; color: #5B6675; flex-wrap: wrap">
+        <span><span class="kbd">↑</span> <span class="kbd">↓</span> move</span>
+        <span><span class="kbd">↵</span> open</span>
+        <span><span class="kbd">⌘</span> <span class="kbd">K</span> anywhere</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { q: 'transcript' }; }
+  renderVals() {
+    const q = (this.state.q || '').toLowerCase().trim();
+    const I = {
+      doc: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6',
+      chart: 'M5 20V11M12 20V5M19 20v-6',
+      cal: 'M4 6h16v14H4zM4 10h16M9 3v4M15 3v4',
+      globe: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18',
+      cap: 'M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5',
+      money: 'M3 7h18v12H3zM3 11h18M7 15h3',
+      pause: 'M8 5v14M16 5v14',
+      user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1-4 4-6 8-6s7 2 8 6',
+      grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM16.5 13v7M13 16.5h7'
+    };
+    const all = [
+      { g: 'Actions', title: 'Download unofficial transcript', sub: 'PDF · ready instantly · all terms', hint: 'PDF', href: 'Documents.dc.html', icon: I.doc, k: 'transcript unofficial download pdf grades' },
+      { g: 'Actions', title: 'Request official transcript', sub: 'S$5 per copy · e-transcript in 3 working days', hint: 'Form', href: 'Documents.dc.html', icon: I.doc, k: 'transcript official request' },
+      { g: 'Pages', title: 'Transfer credit report', sub: 'Exchange · 5 courses mapped, 20 units', hint: 'Exchange', href: 'Exchange.dc.html', icon: I.globe, k: 'transcript transfer credit exchange sep ovs' },
+      { g: 'Pages', title: 'Results & GPA', sub: 'All semesters · cumulative 4.43', hint: 'Results', href: 'Results.dc.html', icon: I.chart, k: 'results grades gpa cap transcript' },
+      { g: 'Pages', title: 'Exam schedule', sub: 'Next: CS3230 · Fri 28 Nov 9:00', hint: 'Exams', href: 'Exams.dc.html', icon: I.cal, k: 'exam schedule venue seat' },
+      { g: 'Actions', title: 'Declare S/U', sub: 'Opens with results release · 12 units left', hint: 'Exams', href: 'Exams.dc.html', icon: I.chart, k: 'su s/u declare satisfactory exam' },
+      { g: 'Actions', title: 'Apply for leave of absence', sub: 'Term LOA by last day of recess week', hint: 'Form', href: 'Documents.dc.html', icon: I.pause, k: 'leave absence loa' },
+      { g: 'Pages', title: 'Degree progress', sub: '124 of 160 units · 16 to plan', hint: 'Degree', href: 'Degree.dc.html', icon: I.cap, k: 'degree audit graduation requirement progress' },
+      { g: 'Pages', title: 'Course registration', sub: 'Round 1 opens 17 Nov', hint: 'CourseReg', href: 'CourseReg.dc.html', icon: I.grid, k: 'coursereg register module course tutorial' },
+      { g: 'Pages', title: 'Money', sub: 'Fees, scholarship, refunds', hint: 'Money', href: 'Money.dc.html', icon: I.money, k: 'money fee bill pay scholarship financial aid' },
+      { g: 'Pages', title: 'Profile & contact details', sub: 'Address, emergency contacts, bank for refunds', hint: 'Profile', href: 'Profile.dc.html', icon: I.user, k: 'profile address contact personal emergency bank' }
+    ];
+    const hits = q ? all.filter((r) => (r.k + ' ' + r.title.toLowerCase()).includes(q)) : all.slice(0, 6);
+    const byG = {};
+    hits.forEach((r, i) => { (byG[r.g] = byG[r.g] || []).push({ ...r, cls: i === 0 ? 'res on' : 'res' }); });
+    const groups = Object.keys(byG).sort().map((name) => ({ name, items: byG[name] }));
+    let answer = '';
+    if (q.includes('gpa') || q.includes('cap')) answer = 'Your cumulative GPA is 4.43 (last semester 4.50).';
+    else if (q.includes('transcript')) answer = 'Unofficial transcripts are free and instant. Official copies take 3 working days.';
+    else if (q.includes('exam')) answer = 'Next exam: CS3230, Fri 28 Nov 9:00 am, MPSH 2A, seat 112.';
+    return { q: this.state.q, onQ: (e) => this.setState({ q: e.target.value }), groups, empty: hits.length === 0, hasAnswer: !!answer, answer };
+  }
+}
+</script>
+</body>
+</html>

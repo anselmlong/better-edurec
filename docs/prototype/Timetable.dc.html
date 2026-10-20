@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Courses and timetable</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.seg{min-height:40px;padding:0 16px;border-radius:6px;border:0;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.iconbtn{width:44px;height:44px;border-radius:6px;border:1px solid #DCE1E7;background:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px"><dc-import name="Nav" active="timetable" hint-size="248px,900px"></dc-import></div>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+      <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <p class="eyebrow">AY2026/27 · Semester 1 · 5 courses · 20 units</p>
+          <h1 class="display" style="font-size: 40px; font-weight: 700">Courses &amp; timetable</h1>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+          <button class="iconbtn" aria-label="Previous week"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16202E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+          <span style="font-weight: 600; font-size: 15px; min-width: 170px; text-align: center">Week 10 · 19–23 Oct</span>
+          <button class="iconbtn" aria-label="Next week"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16202E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+          <div style="display: flex; gap: 4px; padding: 4px; background: #E6EAEF; border-radius: 6px" role="group" aria-label="View">
+            <button class="seg" style="{{weekBtn}}" onClick="{{showWeek}}">Week</button>
+            <button class="seg" style="{{listBtn}}" onClick="{{showList}}">By course</button>
+          </div>
+          <a href="#" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 6px; background:#123A6B; color: #FFFFFF; font-weight: 600; font-size: 14px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>Add to calendar</a>
+        </div>
+      </header>
+
+      <sc-if value="{{isWeek}}" hint-placeholder-val="{{ true }}">
+        <section class="card" style="padding: 20px 20px 24px; overflow-x: auto" aria-label="Week timetable">
+          <div style="min-width: 760px; display: grid; grid-template-columns: 56px repeat(5, minmax(0, 1fr)); gap: 8px">
+            <span></span>
+            <sc-for list="{{days}}" as="d" hint-placeholder-count="5">
+              <div style="{{d.headStyle}}"><span style="font-size: 13px; font-weight: 600">{{d.name}}</span><span class="mono" style="font-size: 12px; color: #5B6675">{{d.date}}</span></div>
+            </sc-for>
+            <div style="position: relative; height: 616px">
+              <sc-for list="{{hours}}" as="h" hint-placeholder-count="11"><span class="mono" style="{{h.style}}">{{h.label}}</span></sc-for>
+            </div>
+            <sc-for list="{{days}}" as="d" hint-placeholder-count="5">
+              <div style="{{d.colStyle}}">
+                <sc-for list="{{d.blocks}}" as="b" hint-placeholder-count="2">
+                  <div style="{{b.style}}">
+                    <span class="mono" style="font-size: 12px; font-weight: 600">{{b.code}} · {{b.kind}}</span>
+                    <span style="font-size: 12px; opacity: .85">{{b.time}}</span>
+                    <span style="font-size: 12px; opacity: .85">{{b.venue}}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{d.isToday}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: -4px; right: 0; top: 566px; height: 2px; background: #E0620D"></span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isList}}" hint-placeholder-val="{{ false }}">
+        <section style="display: flex; flex-direction: column; gap: 12px" aria-label="Courses">
+          <sc-for list="{{courses}}" as="c" hint-placeholder-count="5">
+            <article class="card" style="padding: 20px 22px; display: flex; flex-wrap: wrap; gap: 18px; align-items: center">
+              <span style="{{c.swatch}}"></span>
+              <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 4px">
+                <span class="mono" style="font-weight: 600; font-size: 14px">{{c.code}}</span>
+                <span style="font-size: 17px; font-weight: 600">{{c.title}}</span>
+                <span style="font-size: 13px; color: #5B6675">{{c.slots}}</span>
+              </div>
+              <span class="pill" style="background: #F0F2F5; color: #2C3746">4 units</span>
+              <span class="pill" style="background: #E5EEF8; color: #174A87">{{c.exam}}</span>
+              <a href="https://canvas.nus.edu.sg" style="font-size: 14px; font-weight: 600">Canvas ↗</a>
+            </article>
+          </sc-for>
+        </section>
+      </sc-if>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px">
+        <section class="card" style="flex: 1 1 340px; padding: 22px; display: flex; gap: 14px; align-items: flex-start">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F5AA6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16v.5"></path></svg>
+          <div style="display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: #2C3746; line-height: 1.5"><strong style="font-size: 15px">Synced from CourseReg</strong>Allocations appear here instantly and reach Canvas by 5 am the next day. No classes on public holidays; instructors announce make-ups.</div>
+        </section>
+        <section class="card" style="flex: 1 1 340px; padding: 22px; display: flex; gap: 14px; align-items: flex-start">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E0620D" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M9 3v4M15 3v4"></path></svg>
+          <div style="display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: #2C3746; line-height: 1.5"><strong style="font-size: 15px">Workload this week: 18 contact hours</strong>Heaviest day is Tuesday (6 h). Thursday is free from 2 pm.</div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { view: 'week' }; }
+  renderVals() {
+    const H = 56, start = 8;
+    const C = { CS3223: '#1F5AA6', CS3230: '#E0620D', CS3244: '#0F7B6C', CS4248: '#7A3EC8', PH2202: '#A16207' };
+    const raw = {
+      Mon: [['CS3223', 'Lecture', 10, 12, 'LT27'], ['PH2202', 'Lecture', 14, 16, 'AS4-0109']],
+      Tue: [['CS3244', 'Lecture', 9, 11, 'I3-AUD'], ['CS4248', 'Lecture', 12, 14, 'LT15'], ['CS3223', 'Tutorial', 15, 17, 'COM1-0113']],
+      Wed: [['CS3230', 'Lecture', 10, 12, 'LT19'], ['CS4248', 'Tutorial', 14, 15, 'COM1-0208'], ['CS3244', 'Lab', 16, 18, 'COM3-01-22']],
+      Thu: [['CS3244', 'Tutorial', 9, 10, 'COM1-0210'], ['CS3230', 'Tutorial', 11, 12, 'COM1-0206'], ['PH2202', 'Tutorial', 13, 14, 'AS3-0215']],
+      Fri: [['CS3230', 'Lecture', 10, 11, 'LT19']]
+    };
+    const fmt = (h) => (h > 12 ? h - 12 : h) + (h >= 12 ? 'pm' : 'am');
+    const dates = { Mon: '19', Tue: '20', Wed: '21', Thu: '22', Fri: '23' };
+    const days = Object.keys(raw).map((name) => {
+      const today = name === 'Wed';
+      return {
+        name, date: dates[name] + ' Oct', isToday: today,
+        headStyle: 'display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:6px;' + (today ? 'background:#123A6B;color:#FFFFFF' : 'background:#F5F7FA'),
+        colStyle: 'position:relative;height:616px;border-radius:6px;background:repeating-linear-gradient(to bottom,#F5F7FA 0,#F5F7FA 1px,transparent 1px,transparent 56px)',
+        blocks: raw[name].map(([code, kind, s, e, venue]) => {
+          const c = C[code];
+          return {
+            code, kind, venue, time: fmt(s) + '–' + fmt(e),
+            style: 'position:absolute;left:3px;right:3px;top:' + ((s - start) * H + 2) + 'px;height:' + ((e - s) * H - 4) + 'px;box-sizing:border-box;padding:8px 10px;border-radius:6px;display:flex;flex-direction:column;gap:2px;overflow:hidden;background:' + c + '1A;color:#16202E;border:1px solid ' + c + '59'
+          };
+        })
+      };
+    });
+    const hours = Array.from({ length: 11 }, (_, i) => ({ label: fmt(start + i), style: 'position:absolute;top:' + (i * H - 6) + 'px;right:8px;font-size:11px;color:#5B6675' }));
+    const sw = (c) => 'width:12px;height:56px;border-radius:6px;flex:none;background:' + c;
+    const courses = [
+      { code: 'CS3223', title: 'Database Systems Implementation', slots: 'Lec Mon 10–12 · Tut Tue 3–5pm', exam: 'No final exam', swatch: sw(C.CS3223) },
+      { code: 'CS3230', title: 'Design & Analysis of Algorithms', slots: 'Lec Wed 10–12, Fri 10–11 · Tut Thu 11–12', exam: 'Exam Fri 28 Nov', swatch: sw(C.CS3230) },
+      { code: 'CS3244', title: 'Machine Learning', slots: 'Lec Tue 9–11 · Tut Thu 9–10 · Lab Wed 4–6pm', exam: 'Exam Mon 1 Dec', swatch: sw(C.CS3244) },
+      { code: 'CS4248', title: 'Natural Language Processing', slots: 'Lec Tue 12–2pm · Tut Wed 2–3pm', exam: 'Exam Wed 3 Dec', swatch: sw(C.CS4248) },
+      { code: 'PH2202', title: 'Philosophy of Mind', slots: 'Lec Mon 2–4pm · Tut Thu 1–2pm', exam: 'Exam Fri 5 Dec', swatch: sw(C.PH2202) }
+    ];
+    const on = 'background:#FFFFFF;color:#16202E;box-shadow:0 1px 2px rgba(0,0,0,.08)';
+    const off = 'background:transparent;color:#475263';
+    const v = this.state.view;
+    return {
+      days, hours, courses, isWeek: v === 'week', isList: v === 'list',
+      weekBtn: v === 'week' ? on : off, listBtn: v === 'list' ? on : off,
+      showWeek: () => this.setState({ view: 'week' }), showList: () => this.setState({ view: 'list' })
+    };
+  }
+}
+</script>
+</body>
+</html>

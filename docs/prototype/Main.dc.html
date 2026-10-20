@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.tile{display:flex;flex-direction:column;gap:10px;padding:22px;color:#16202E;text-decoration:none}
+.tile:hover{border-color:#123A6B;color:#16202E}
+.row{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid #EDF0F3}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px; min-height: 100%"><dc-import name="Nav" active="today" hint-size="248px,900px"></dc-import></div>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px">
+
+      <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <p class="eyebrow">Wednesday 21 October 2026 · AY2026/27 Semester 1</p>
+          <h1 class="display" style="font-size: 30px; font-weight: 700; line-height: 1.15">Overview</h1>
+          <p style="margin: 0; font-size: 15px; color: #475263">Rachel Tan · Bachelor of Computing, Computer Science (Hons) · Year 4</p>
+        </div>
+        <div class="card" style="padding: 16px 18px; min-width: 300px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; justify-content: space-between; font-size: 13px"><span style="font-weight: 600">Semester</span><span style="color: #5B6675">Week 10 / 13 · then reading &amp; exams</span></div>
+          <div style="display: grid; grid-template-columns: repeat(17, minmax(0, 1fr)); gap: 3px" aria-hidden="true">
+            <sc-for list="{{weeks}}" as="w" hint-placeholder-count="17"><span style="{{w.style}}"></span></sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: #5B6675" class="mono"><span>AUG 11</span><span>RECESS</span><span>READING</span><span>EXAMS · DEC 6</span></div>
+        </div>
+      </header>
+
+      <section aria-label="At a glance" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+        <a href="Results.dc.html" class="card tile">
+          <p class="eyebrow">Cumulative GPA</p>
+          <div style="display: flex; align-items: baseline; gap: 10px"><span class="display" style="font-size: 44px; font-weight: 700">4.43</span><span style="color: #5B6675; font-size: 14px">/ 5.00</span></div>
+          <svg viewBox="0 0 200 40" width="100%" height="40" role="img" aria-label="GPA by semester: 4.38, 4.52, 4.21, 4.60, 4.50"><polyline points="4,26 52,16 100,34 148,8 196,17" fill="none" stroke="#1F5AA6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="196" cy="17" r="4" fill="#1F5AA6"></circle></svg>
+          <span style="font-size: 13px; color: #475263">Previous semester: 4.50</span>
+        </a>
+        <a href="Degree.dc.html" class="card tile">
+          <p class="eyebrow">Degree progress</p>
+          <div style="display: flex; align-items: baseline; gap: 10px"><span class="display" style="font-size: 44px; font-weight: 700">124</span><span style="color: #5B6675; font-size: 14px">of 160 units</span></div>
+          <div style="display: flex; height: 10px; border-radius: 6px; overflow: hidden; background: #EDF0F3" aria-hidden="true"><span style="width: 77.5%; background: #1F5AA6"></span><span style="width: 12.5%; background: #A9C3E3"></span></div>
+          <span style="font-size: 13px; color: #475263">20 in progress · 16 left to plan</span>
+        </a>
+        <a href="Exams.dc.html" class="card tile">
+          <p class="eyebrow">Next exam</p>
+          <div style="display: flex; align-items: baseline; gap: 10px"><span class="display" style="font-size: 44px; font-weight: 700">38</span><span style="color: #5B6675; font-size: 14px">days</span></div>
+          <span style="font-weight: 600; font-size: 15px"><span class="mono">CS3230</span> · Algorithms</span>
+          <span style="font-size: 13px; color: #475263">Fri 28 Nov, 9:00 am · MPSH 2A · seat 112</span>
+        </a>
+        <a href="Money.dc.html" class="card tile">
+          <p class="eyebrow">Money</p>
+          <div style="display: flex; align-items: baseline; gap: 10px"><span class="display" style="font-size: 44px; font-weight: 700">S$220</span><span style="color: #5B6675; font-size: 14px">.50 due</span></div>
+          <span style="font-weight: 600; font-size: 15px">Student services fee</span>
+          <span style="font-size: 13px; color: #475263">Due 15 Nov · tuition covered by scholarship</span>
+        </a>
+      </section>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
+        <section class="card" style="flex: 3 1 520px; padding: 24px; display: flex; flex-direction: column; gap: 4px" aria-labelledby="heads">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
+            <h2 id="heads" class="display" style="font-size: 22px; font-weight: 700">Action items</h2>
+            <span class="pill" style="background: #FDEBE1; color: #9A3F00">4</span>
+          </div>
+          <sc-for list="{{todos}}" as="t" hint-placeholder-count="4">
+            <a href="{{t.href}}" class="row" style="color: #16202E">
+              <span style="{{t.dot}}"></span>
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-weight: 600; font-size: 15px">{{t.title}}</span>
+                <span style="font-size: 13px; color: #5B6675">{{t.sub}}</span>
+              </span>
+              <span class="pill" style="{{t.whenStyle}}">{{t.when}}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6675" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+            </a>
+          </sc-for>
+        </section>
+
+        <section class="card" style="flex: 2 1 340px; padding: 24px; display: flex; flex-direction: column; gap: 14px" aria-labelledby="tmrw">
+          <div style="display: flex; justify-content: space-between; align-items: center">
+            <h2 id="tmrw" class="display" style="font-size: 22px; font-weight: 700">Today's classes</h2>
+            <a href="Timetable.dc.html" style="font-size: 14px; font-weight: 600">Week view</a>
+          </div>
+          <sc-for list="{{classes}}" as="c" hint-placeholder-count="3">
+            <div style="display: flex; gap: 14px; align-items: stretch">
+              <span class="mono" style="width: 48px; font-size: 13px; color: #5B6675; padding-top: 12px">{{c.time}}</span>
+              <div style="{{c.box}}">
+                <span style="font-weight: 600; font-size: 15px"><span class="mono">{{c.code}}</span> · {{c.kind}}</span>
+                <span style="font-size: 13px; color: #475263">{{c.title}} · {{c.venue}}</span>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+
+      <section aria-labelledby="sem" style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline">
+          <h2 id="sem" class="display" style="font-size: 22px; font-weight: 700">This semester · 20 units</h2>
+          <a href="Timetable.dc.html" style="font-size: 14px; font-weight: 600">All courses</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+          <sc-for list="{{courses}}" as="m" hint-placeholder-count="5">
+            <a href="Timetable.dc.html" class="card tile" style="padding: 18px; gap: 8px">
+              <span style="{{m.bar}}"></span>
+              <span class="mono" style="font-weight: 600; font-size: 14px">{{m.code}}</span>
+              <span style="font-size: 14px; line-height: 1.35; color: #2C3746">{{m.title}}</span>
+              <span style="font-size: 12px; color: #5B6675">{{m.meta}}</span>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1260}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const weeks = Array.from({ length: 17 }, (_, i) => {
+      let bg = '#EDF0F3';
+      if (i < 10) bg = '#16202E';
+      if (i === 10) bg = '#E0620D';
+      if (i === 6) bg = i < 10 ? '#8792A2' : '#EDF0F3';
+      if (i === 14) bg = '#D5DBE3';
+      if (i > 14) bg = '#FDEBE1';
+      return { style: 'display:block;height:10px;border-radius:3px;background:' + bg };
+    });
+    const pill = (bg, fg) => 'background:' + bg + ';color:' + fg;
+    const dot = (c) => 'width:10px;height:10px;border-radius:5px;flex:none;background:' + c;
+    const todos = [
+      { title: 'Plan Semester 2 courses', sub: 'CourseReg Round 1 opens Mon 17 Nov, 9:00 am. 1 timetable clash in your draft plan.', when: 'in 27 days', href: 'CourseReg.dc.html', dot: dot('#E0620D'), whenStyle: pill('#FDEBE1', '#9A3F00') },
+      { title: 'Pay student services fee', sub: 'S$220.50 · PayNow or card', when: 'Due 15 Nov', href: 'Money.dc.html', dot: dot('#E0620D'), whenStyle: pill('#FDEBE1', '#9A3F00') },
+      { title: 'Book a Respect & Consent workshop', sub: 'Required for Semester 2 · bookings open 5 Jan, first come first served', when: 'Jan 5', href: 'Documents.dc.html', dot: dot('#1F5AA6'), whenStyle: pill('#E5EEF8', '#174A87') },
+      { title: 'S/U decisions after results', sub: 'You have 12 S/U units left. The window opens when results release.', when: '~23 Dec', href: 'Exams.dc.html', dot: dot('#1F5AA6'), whenStyle: pill('#E5EEF8', '#174A87') }
+    ];
+    const box = (c) => 'flex:1;display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:6px;background:' + c + '14;border:1px solid ' + c + '59';
+    const classes = [
+      { time: '10:00', code: 'CS3230', kind: 'Lecture', title: 'Design & Analysis of Algorithms', venue: 'LT19', box: box('#E0620D') },
+      { time: '14:00', code: 'CS4248', kind: 'Tutorial', title: 'Natural Language Processing', venue: 'COM1-0208', box: box('#7A3EC8') },
+      { time: '16:00', code: 'CS3244', kind: 'Lab', title: 'Machine Learning', venue: 'COM3-01-22', box: box('#0F7B6C') }
+    ];
+    const bar = (c) => 'display:block;width:32px;height:6px;border-radius:3px;background:' + c;
+    const courses = [
+      { code: 'CS3223', title: 'Database Systems Implementation', meta: '4 units · Lec + Tut · no final', bar: bar('#1F5AA6') },
+      { code: 'CS3230', title: 'Design & Analysis of Algorithms', meta: '4 units · exam 28 Nov', bar: bar('#E0620D') },
+      { code: 'CS3244', title: 'Machine Learning', meta: '4 units · exam 1 Dec', bar: bar('#0F7B6C') },
+      { code: 'CS4248', title: 'Natural Language Processing', meta: '4 units · exam 3 Dec', bar: bar('#7A3EC8') },
+      { code: 'PH2202', title: 'Philosophy of Mind', meta: '4 units · exam 5 Dec', bar: bar('#A16207') }
+    ];
+    return { weeks, todos, classes, courses };
+  }
+}
+</script>
+</body>
+</html>

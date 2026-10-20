@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EduRec Reskin harness</title>
+<link rel="stylesheet" href="../../src/theme.css">
+<style>
+  .fake { font: 13px Arial, sans-serif; padding: 16px; }
+  .fake .ps_header { background: #fff; padding: 12px; }
+  .fake .tile { display: inline-block; width: 160px; height: 120px; margin: 4px; background: #f0a060; color: #fff; padding: 8px; }
+</style>
+</head>
+<body>
+<!-- Fake EduRec pages with invented data, laid out like PeopleSoft (one text node per element). -->
+<script>
+  const PAGES = {
+    home: { url: '/psc/cs90prd_2/EMPLOYEE/SA/c/NUI_FRAMEWORK.PT_LANDINGPAGE.GBL?lp=SA.EMPLOYEE.DEFAULT_LP', lines: [] },
+    results: {
+      url: '/psc/cs90prd_17/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_AD_REG_NAVCOL_FL.GBL?GComp=N_SS_EXAMINATNS_FL',
+      lines: ['My Exam Results', '2025/2026 Semester 2', 'National University of Singapore', 'Undergraduate', 'Course Grades', 'Course', 'Description', 'Units Taken', 'Grade',
+        'CS2102', 'DATABASE SYSTEMS', '4.00', 'A-', 'CS3210', 'PARALLEL COMPUTING', '4.00', 'A-', 'CS3235', 'COMPUTER SECURITY', '4.00', 'B+', 'CS4244', 'KNOWLEDGE REPRESENTATION AND REASONING', '4.00', 'A', 'CFG2002', 'CAREER CREATION', '2.00', 'CS',
+        'Program - Bachelor of Computing', 'Earned graded units in GPA', '16.00', '96.00', 'Earned graded units not in GPA', '2.00', '28.00', 'GPA', '4.43', 'Academic Standing Status', 'Passed/Proceed', 'Important Notes:']
+    },
+    audit: {
+      url: '/psc/cs90prd_11/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_AD_REG_NAVCOL_FL.GBL?GComp=N_CC_ACAD_ADVIS_FL',
+      lines: ['My Academics', 'My Graduation Audit Report', 'NUS | Undergraduate', 'Graduation check outcome:', 'Not Satisfied',
+        'CS Breadth & Depth', 'Not Satisfied:   Pass 32 Units of level-3000+ CS courses.', 'Units: 32.00 required, 28.00 taken, 4.00 needed',
+        'UE Requirements', 'Not Satisfied:   Pass 40 Units of Unrestricted Elective Courses.', 'Units: 40.00 required, 28.00 taken, 12.00 needed',
+        'Pass 40 UTs of UEs.', 'Not Satisfied:   >', 'Units: 40.00 required, 28.00 taken, 12.00 needed',
+        'Overall Requirements', 'Not Satisfied:   >', 'Overall UT Requirement', 'Not Satisfied:   Verify overall minimum 160 Units for the degree.', 'Units: 160.00 required, 144.00 taken, 16.00 needed']
+    },
+    classes: {
+      url: '/psc/cs90prd_52/EMPLOYEE/SA/c/N_STUDENT_RECORDS.N_MRS_START_MD_FL.GBL?GComp=N_MRS_START_NAV_FL',
+      lines: ['View My Classes@CourseReg', 'Undergraduate', '2026/2027 Semester 1', 'CS3223 Database Systems Implementation', 'Class', 'Class Type', 'Session', 'Units', 'Status',
+        'L - L1 - 13001', 'Lecture', 'Regular', '4.00', 'Enrolled', 'T - T04 - 13002', 'Tutorial', 'Regular', 'Enrolled',
+        'PH2202 Philosophy of Mind', 'Class', 'Class Type', 'L - L1 - 22001', 'Lecture', 'Regular', '4.00', 'Enrolled']
+    },
+    finaid: {
+      url: '/psc/cs90prd_41/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_SF_FA_DISB_FL.GBL',
+      lines: ['View Financial Aid Disbursed', 'GO', '2 rows', 'FA Code', 'FA Type', 'Item Type', 'Term', 'Posted Date', 'Amount',
+        '1', 'Example Merit Award', 'Third Party Contracts', 'Example Merit Award', '2025/2026 Semester 2', '13/01/2026', '3850.00',
+        '2', 'Example Merit Award', 'Third Party Contracts', 'Example Merit Award', '2026/2027 Semester 1', '11/08/2026', '3850.00']
+    }
+  };
+  const key = new URLSearchParams(location.search).get('page') || 'home';
+  const page = PAGES[key];
+
+  const form = document.createElement('form');
+  form.className = 'PSForm fake';
+  const header = document.createElement('div');
+  header.id = 'PT_HEADER';
+  header.className = 'ps_header';
+  header.textContent = 'PeopleSoft header';
+  form.append(header);
+  if (key === 'home') {
+    for (const t of ['Announcements', 'Personal Info', 'Academics', 'Financials']) {
+      const d = document.createElement('div'); d.className = 'tile nuitile'; d.textContent = t; form.append(d);
+    }
+  } else {
+    const box = document.createElement('div');
+    box.className = 'ps_box-group';
+    for (const l of page.lines) { const d = document.createElement('div'); d.textContent = l; box.append(d); }
+    form.append(box);
+  }
+  document.body.append(form);
+
+  // In-memory chrome.storage stub that persists across harness pages via localStorage.
+  const mem = JSON.parse(localStorage.getItem('edr-harness') || '{}');
+  const listeners = [];
+  window.chrome = { storage: {
+    local: {
+      async get(keys) { const ks = [].concat(keys); return Object.fromEntries(ks.filter((k) => k in mem).map((k) => [k, mem[k]])); },
+      async set(obj) {
+        const changes = {};
+        for (const [k, v] of Object.entries(obj)) { changes[k] = { newValue: v }; mem[k] = v; }
+        localStorage.setItem('edr-harness', JSON.stringify(mem));
+        listeners.forEach((fn) => fn(changes, 'local'));
+      },
+      async remove(k) { delete mem[k]; localStorage.setItem('edr-harness', JSON.stringify(mem)); }
+    },
+    onChanged: { addListener(fn) { listeners.push(fn); } }
+  } };
+  window.HARNESS_URL = 'https://myedurec.nus.edu.sg' + page.url;
+</script>
+<script src="../../src/core.js"></script>
+<script src="../../src/routes.js"></script>
+<script>
+  // Pretend to be on the EduRec page under test.
+  const realDetect = EDR.routes.detectPage;
+  EDR.routes.detectPage = () => realDetect(window.HARNESS_URL);
+</script>
+<script src="../../src/parsers.js"></script>
+<script src="../../src/store.js"></script>
+<script src="../../src/shell.js"></script>
+<script src="../../src/overview.js"></script>
+<script src="../../src/enhancers.js"></script>
+<script src="../../src/main.js"></script>
+</body>
+</html>

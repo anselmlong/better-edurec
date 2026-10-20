@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Course registration</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4F6F9;color:#16202E;font-family:'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#1F5AA6;text-decoration:none}a:hover{color:#123A6B}
+.card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.eyebrow{font-size:13px;color:#5B6675;font-weight:500;margin:0}
+.display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:6px;font-weight:600;font-size:14px}
+.mv{width:36px;height:36px;border-radius:6px;border:1px solid #DCE1E7;background:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.mv:disabled{opacity:.35;cursor:default}
+input:focus{outline:2px solid #1F5AA6;outline-offset:1px}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 100vh; background: #F4F6F9">
+  <div style="flex: 1 0 248px"><dc-import name="Nav" active="coursereg" hint-size="248px,900px"></dc-import></div>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+      <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <p class="eyebrow">AY2026/27 Semester 2 · planning period</p>
+          <h1 class="display" style="font-size: 40px; font-weight: 700">Course registration</h1>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <a href="Timetable.dc.html" class="btn" style="border: 1px solid #DCE1E7; background: #FFFFFF; color: #16202E">Current classes</a>
+          <a href="#" class="btn" style="border: 1px solid #DCE1E7; background: #FFFFFF; color: #16202E">Appeals &amp; enquiries</a>
+        </div>
+      </header>
+
+      <section class="card" style="padding: 22px 24px; overflow-x: auto" aria-label="Registration rounds">
+        <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(130px, 1fr)); gap: 8px; min-width: 780px">
+          <sc-for list="{{rounds}}" as="r" hint-placeholder-count="6">
+            <li style="display: flex; flex-direction: column; gap: 8px">
+              <span style="{{r.bar}}"></span>
+              <span style="font-size: 14px; font-weight: 600">{{r.name}}</span>
+              <span class="mono" style="font-size: 12px; color: #475263">{{r.date}}</span>
+              <span style="font-size: 12px; color: #5B6675">{{r.what}}</span>
+            </li>
+          </sc-for>
+        </ol>
+      </section>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+        <section class="card" style="flex: 3 1 560px; padding: 24px; display: flex; flex-direction: column; gap: 14px" aria-labelledby="plan">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="plan" class="display" style="font-size: 22px; font-weight: 700">Draft plan · ranked</h2>
+              <p style="margin: 0; font-size: 14px; color: #475263">Order matters: when seats are tight, higher-ranked courses win.</p>
+            </div>
+            <span class="pill" style="background: #F0F2F5; color: #2C3746">{{units}} / 23 units</span>
+          </div>
+          <label style="display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; border: 1px solid #DCE1E7; border-radius: 6px; background: #FAFBFC">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6675" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+            <span style="position: absolute; left: -9999px">Add a course</span>
+            <input placeholder="Add a course: code, title or what counts toward Breadth &amp; Depth" style="flex: 1; border: 0; background: transparent; font: inherit; font-size: 15px; min-height: 40px">
+          </label>
+          <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+            <sc-for list="{{plan}}" as="p" hint-placeholder-count="5">
+              <li style="{{p.rowStyle}}">
+                <span class="display" style="width: 28px; font-size: 22px; font-weight: 700; color: #5B6675">{{p.rank}}</span>
+                <span style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 3px; min-width: 0">
+                  <span><span class="mono" style="font-weight: 600">{{p.code}}</span> · <span style="font-weight: 500">{{p.title}}</span></span>
+                  <span style="font-size: 13px; color: #5B6675">{{p.meta}}</span>
+                </span>
+                <span class="pill" style="{{p.demandStyle}}">{{p.demand}}</span>
+                <sc-if value="{{p.clash}}" hint-placeholder-val="{{ false }}"><span class="pill" style="background: #FDEBE1; color: #9A3F00">Clash · {{p.clashWith}}</span></sc-if>
+                <span style="display: flex; gap: 6px">
+                  <button class="mv" onClick="{{p.up}}" disabled="{{p.first}}" aria-label="{{p.upLabel}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16202E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
+                  <button class="mv" onClick="{{p.down}}" disabled="{{p.last}}" aria-label="{{p.downLabel}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16202E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+                </span>
+              </li>
+            </sc-for>
+          </ol>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding-top: 6px">
+            <a href="#" class="btn" style="background:#123A6B; color: #FFFFFF">Save plan</a>
+            <span style="font-size: 13px; color: #5B6675">Submitting unlocks 17 Nov, 9:00 am. We'll remind you.</span>
+          </div>
+        </section>
+
+        <div style="flex: 2 1 320px; display: flex; flex-direction: column; gap: 16px">
+          <section class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 12px">
+            <h2 class="display" style="font-size: 20px; font-weight: 700">Checks</h2>
+            <div style="display: flex; gap: 12px; align-items: flex-start"><span style="width: 22px; height: 22px; border-radius: 6px; background:#123A6B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span style="font-size: 14px; line-height: 1.45">Covers your last <strong>4 Breadth &amp; Depth</strong> and <strong>12 elective</strong> units. You'd graduate on time.</span></div>
+            <div style="display: flex; gap: 12px; align-items: flex-start"><span style="width: 22px; height: 22px; border-radius: 6px; background: #FDEBE1; color: #9A3F00; display: flex; align-items: center; justify-content: center; flex: none; font-weight: 700; font-size: 13px">!</span><span style="font-size: 14px; line-height: 1.45">CS3233 and IS3103 lectures both sit on <strong>Wed 2–4 pm</strong>. Pick another lecture group or swap a course.</span></div>
+            <div style="display: flex; gap: 12px; align-items: flex-start"><span style="width: 22px; height: 22px; border-radius: 6px; background: #E5EEF8; color: #174A87; display: flex; align-items: center; justify-content: center; flex: none; font-weight: 700; font-size: 13px">i</span><span style="font-size: 14px; line-height: 1.45">Seats go by curriculum need, then seniority, then your ranking. As a Year 4 you have high priority.</span></div>
+          </section>
+          <section class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 10px">
+            <h2 class="display" style="font-size: 20px; font-weight: 700">Later rounds</h2>
+            <a href="#" style="display: flex; justify-content: space-between; min-height: 44px; align-items: center; border-top: 1px solid #EDF0F3; color: #16202E">Choose tutorials &amp; labs<span class="mono" style="font-size: 12px; color: #5B6675">8 Dec</span></a>
+            <a href="#" style="display: flex; justify-content: space-between; min-height: 44px; align-items: center; border-top: 1px solid #EDF0F3; color: #16202E">Add or swap tutorials<span class="mono" style="font-size: 12px; color: #5B6675">12 Jan</span></a>
+            <a href="#" style="display: flex; justify-content: space-between; min-height: 44px; align-items: center; border-top: 1px solid #EDF0F3; color: #16202E">Drop a class<span class="mono" style="font-size: 12px; color: #5B6675">until wk 2</span></a>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { order: ['CS3233', 'CS4246', 'IS3103', 'GEC1015', 'CS4222'] }; }
+  renderVals() {
+    const rounds = [
+      ['Planning', 'now – 16 Nov', 'Shortlist & rank', 'now'],
+      ['Round 1', '17–19 Nov', 'Courses · priority', 'next'],
+      ['Round 2', '24–26 Nov', 'Remaining seats', ''],
+      ['Round 3', '1–3 Dec', 'Last call', ''],
+      ['Tutorials', '8–10 Dec', 'Pick class slots', ''],
+      ['Add / swap', '12–23 Jan', 'Fine-tune', '']
+    ].map(([name, date, what, s]) => ({ name, date, what, bar: 'display:block;height:6px;border-radius:3px;background:' + (s === 'now' ? '#E0620D' : s === 'next' ? '#16202E' : '#DCE1E7') }));
+    const info = {
+      CS3233: { title: 'Competitive Programming', meta: '4 units · Breadth & Depth · Lec Wed 2–4pm', demand: '1.8 per seat', hot: true, clash: 'IS3103' },
+      CS4246: { title: 'AI Planning & Decision Making', meta: '4 units · Elective · Lec Mon 10–12', demand: 'Seats likely', hot: false },
+      IS3103: { title: 'Information Systems Leadership', meta: '4 units · Elective · Lec Wed 2–4pm', demand: '1.1 per seat', hot: false, clash: 'CS3233' },
+      GEC1015: { title: 'Cultures & Connections', meta: '4 units · Elective · S/U-able', demand: 'Seats likely', hot: false },
+      CS4222: { title: 'Wireless Networking', meta: '4 units · Elective · Lec Fri 12–2pm', demand: '2.4 per seat', hot: true }
+    };
+    const o = this.state.order;
+    const move = (i, d) => () => { const n = o.slice(); const j = i + d; if (j < 0 || j >= n.length) return; [n[i], n[j]] = [n[j], n[i]]; this.setState({ order: n }); };
+    const plan = o.map((code, i) => {
+      const x = info[code];
+      return {
+        rank: i + 1, code, title: x.title, meta: x.meta, demand: x.demand, clash: !!x.clash, clashWith: x.clash || '',
+        demandStyle: x.hot ? 'background:#123A6B;color:#FFFFFF' : 'background:#E5EEF8;color:#174A87',
+        rowStyle: 'display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px;border-radius:8px;border:1px solid ' + (x.clash ? '#F2C2A6' : '#EDF0F3') + ';background:' + (x.clash ? '#FFF8F4' : '#FFFFFF'),
+        first: i === 0, last: i === o.length - 1,
+        up: move(i, -1), down: move(i, 1), upLabel: 'Move ' + code + ' up', downLabel: 'Move ' + code + ' down'
+      };
+    });
+    return { rounds, plan, units: o.length * 4 };
+  }
+}
+</script>
+</body>
+</html>

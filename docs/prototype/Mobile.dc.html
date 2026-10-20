@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mobile today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1F5AA6;text-decoration:none}
+.m-card{background:#FFFFFF;border:1px solid #DCE1E7;border-radius:8px;box-sizing:border-box}
+.m-eyebrow{font-size:12px;color:#5B6675;font-weight:500;margin:0}
+.m-display{font-family:'Public Sans',sans-serif;letter-spacing:-.01em;margin:0}
+.m-mono{font-family:'IBM Plex Mono',monospace}
+.m-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;justify-content:center;font-size:11px;font-weight:600;text-decoration:none}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F6F9; color: #16202E; font-family: 'Public Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="flex: 1; overflow-y: auto; padding: 56px 18px 18px; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <span style="display: flex; align-items: center; gap: 10px"><span style="font-weight: 700; font-size: 18px; color: #123A6B">EduRec</span></span>
+      <a href="Search.dc.html" aria-label="Search" style="width: 44px; height: 44px; border-radius: 8px; background: #FFFFFF; border: 1px solid #DCE1E7; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16202E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <p class="m-eyebrow">Wed 21 Oct · Semester 1, Week 10</p>
+      <h1 class="m-display" style="font-size: 26px; font-weight: 700; line-height: 1.15">Overview</h1>
+    </div>
+
+    <a href="Timetable.dc.html" class="m-card" style="padding: 16px; display: flex; gap: 14px; align-items: center; color: #16202E; background:#123A6B; border-color: #123A6B">
+      <span style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 8px; background: #E0620D; color: #FFFFFF; flex: none"><span class="m-mono" style="font-size: 11px">TODAY</span><span class="m-display" style="font-size: 20px; font-weight: 700">10:00</span></span>
+      <span style="display: flex; flex-direction: column; gap: 3px; color: #FFFFFF"><span style="font-size: 12px; color: #B9BEC4">Next class</span><span style="font-weight: 600; font-size: 16px">CS3230 Lecture</span><span style="font-size: 13px; color: #D5D9DD">LT19 · then CS4248 Tut 2 pm</span></span>
+    </a>
+
+    <div style="display: flex; gap: 10px; overflow-x: auto; margin: 0 -18px; padding: 0 18px">
+      <a href="MobileResults.dc.html" class="m-card" style="flex: none; width: 150px; padding: 14px; display: flex; flex-direction: column; gap: 4px; color: #16202E"><span class="m-eyebrow">GPA</span><span class="m-display" style="font-size: 30px; font-weight: 700">4.43</span><span style="font-size: 12px; color: #475263">last sem 4.50</span></a>
+      <a href="Degree.dc.html" class="m-card" style="flex: none; width: 150px; padding: 14px; display: flex; flex-direction: column; gap: 4px; color: #16202E"><span class="m-eyebrow">Degree</span><span class="m-display" style="font-size: 30px; font-weight: 700">124<span style="font-size: 15px; color: #5B6675">/160</span></span><span style="display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: #EDF0F3"><span style="width: 77%; background: #1F5AA6"></span><span style="width: 13%; background: #A9C3E3"></span></span></a>
+      <a href="Exams.dc.html" class="m-card" style="flex: none; width: 150px; padding: 14px; display: flex; flex-direction: column; gap: 4px; color: #16202E"><span class="m-eyebrow">First exam</span><span class="m-display" style="font-size: 30px; font-weight: 700">38<span style="font-size: 15px; color: #5B6675"> days</span></span><span style="font-size: 12px; color: #475263">CS3230 · 28 Nov</span></a>
+    </div>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 class="m-display" style="font-size: 18px; font-weight: 700">Action items</h2>
+      <a href="CourseReg.dc.html" class="m-card" style="padding: 14px 16px; display: flex; gap: 12px; align-items: center; color: #16202E"><span style="width: 10px; height: 10px; border-radius: 5px; background: #E0620D; flex: none"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 15px">Plan Semester 2</span><span style="font-size: 12px; color: #5B6675">Round 1 opens 17 Nov · 1 clash</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6675" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+      <a href="Money.dc.html" class="m-card" style="padding: 14px 16px; display: flex; gap: 12px; align-items: center; color: #16202E"><span style="width: 10px; height: 10px; border-radius: 5px; background: #E0620D; flex: none"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 15px">Pay S$220.50</span><span style="font-size: 12px; color: #5B6675">Student services fee · due 15 Nov</span></span><span style="font-size: 12px; font-weight: 700; color: #FFFFFF; background:#123A6B; padding: 6px 10px; border-radius: 4px">PayNow</span></a>
+      <a href="Documents.dc.html" class="m-card" style="padding: 14px 16px; display: flex; gap: 12px; align-items: center; color: #16202E"><span style="width: 10px; height: 10px; border-radius: 5px; background: #1F5AA6; flex: none"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 15px">Workshop booking</span><span style="font-size: 12px; color: #5B6675">Respect &amp; Consent · opens 5 Jan</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6675" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+    </section>
+  </div>
+  <nav aria-label="Tabs" style="display: flex; padding: 6px 10px 26px; background: #FFFFFF; border-top: 1px solid #DCE1E7">
+    <a href="Mobile.dc.html" class="m-tab" aria-current="page" style="color: #16202E"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>Today</a>
+    <a href="Timetable.dc.html" class="m-tab" style="color: #5B6675"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+    <a href="MobileResults.dc.html" class="m-tab" style="color: #5B6675"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6"></path></svg>Results</a>
+    <a href="Degree.dc.html" class="m-tab" style="color: #5B6675"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5"></path></svg>Degree</a>
+    <a href="Documents.dc.html" class="m-tab" style="color: #5B6675"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"></path></svg>More</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
