@@ -69,6 +69,129 @@ html[data-edr-on] .ps_grid-col { color: var(--edr-muted); font-weight: 600; }
 html[data-edr-on] td,
 html[data-edr-on] .ps_grid-cell { border-color: var(--edr-line-2) !important; }
 
+/* ---------- EduRec Fluid page frame ----------
+   Every component page shares: #PT_WRAPPER > #PT_HEADER (back · title · icons)
+   and #PT_MID_SECTION > #PT_SIDE (page list) + #PT_CONTENT > #PT_MAIN > .ps_apps_content. */
+
+html[data-edr-on] #PT_WRAPPER *:not(img) { font-family: var(--edr-font) !important; }
+html[data-edr-on] #PT_WRAPPER,
+html[data-edr-on] #PT_MID_SECTION,
+html[data-edr-on] #PT_CONTENT,
+html[data-edr-on] #PT_MAIN,
+html[data-edr-on] .ps_pagecontainer,
+html[data-edr-on] .ps_pspagecontainer,
+html[data-edr-on] .ps_apps_content { background: var(--edr-bg) !important; }
+
+/* Header: white bar, left-aligned title, our sidebar replaces Home and NavBar. */
+html[data-edr-on] .ps_header_bar,
+html[data-edr-on] .ps_header_bar_cont,
+html[data-edr-on] .ps_pagetitle_cont { background: var(--edr-surface) !important; background-image: none !important; }
+html[data-edr-on] [id$="hdrdivPT_HOME"],
+html[data-edr-on] [id$="hdrdivPT_NAVBAR"] { display: none !important; }
+html[data-edr-on] #PT_HEADER .ps_header_button img,
+html[data-edr-on] #PT_HEADER .ps_button_backnav img { filter: brightness(0) saturate(100%) invert(18%) sepia(43%) saturate(1500%) hue-rotate(195deg); }
+html[data-edr-on] .ps_button_backnav .ps-button {
+  background: transparent !important; border: 1px solid var(--edr-line) !important; border-radius: 6px !important;
+  box-shadow: none !important; color: var(--edr-navy) !important;
+}
+/* EduRec labels Back with whichever app you came from; just say Back. */
+html[data-edr-on] .ps_button_backnav .ps-text { font-size: 0 !important; }
+html[data-edr-on] .ps_button_backnav .ps-text::after { content: "Back"; font-size: 14px; font-weight: 600; color: var(--edr-navy); }
+html[data-edr-on] #PT_HEADER .ps_pagetitle,
+html[data-edr-on] #PT_HEADER .ps_pagetitle .ps-text { font-size: 15px !important; font-weight: 600 !important; color: var(--edr-muted) !important; }
+
+/* Page list (master list in the side panel). */
+html[data-edr-on] #PT_SIDE,
+html[data-edr-on] #PT_SIDE .pst_panel-content,
+html[data-edr-on] #PT_SIDE .ps_box-grouplet,
+html[data-edr-on] #PT_SIDE .ps_scrollable { background: var(--edr-surface) !important; }
+html[data-edr-on] #PT_SIDE { border-right: 1px solid var(--edr-line) !important; box-shadow: none !important; }
+html[data-edr-on] ul.psa_list-linkmenu { padding: 12px 10px !important; background: var(--edr-surface) !important; }
+html[data-edr-on] ul.psa_list-linkmenu > li {
+  border: 0 !important; border-radius: 6px !important; margin: 1px 0 !important; background: transparent !important;
+}
+html[data-edr-on] ul.psa_list-linkmenu > li:hover { background: #F5F7FA !important; }
+html[data-edr-on] ul.psa_list-linkmenu > li.psc_selected { background: var(--edr-tint) !important; }
+html[data-edr-on] ul.psa_list-linkmenu .psa_list-linkitem,
+html[data-edr-on] ul.psa_list-linkmenu .ps-link { background: transparent !important; border: 0 !important; }
+html[data-edr-on] ul.psa_list-linkmenu .ps-link {
+  display: flex !important; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px !important;
+  color: var(--edr-ink-2) !important; text-decoration: none !important;
+}
+html[data-edr-on] ul.psa_list-linkmenu > li.psc_selected .ps-link { color: var(--edr-navy) !important; }
+html[data-edr-on] ul.psa_list-linkmenu .ps-link .ps-text { font-size: 14px !important; font-weight: 500 !important; color: inherit !important; }
+html[data-edr-on] ul.psa_list-linkmenu > li.psc_selected .ps-text { font-weight: 600 !important; }
+html[data-edr-on] ul.psa_list-linkmenu .ps-link img { display: none !important; }
+
+/* Content column. */
+html[data-edr-on] .ps_apps_content { padding: 28px 32px 48px !important; box-sizing: border-box; }
+html[data-edr-on] .ps_apps_content > * { max-width: 1100px; }
+html[data-edr-on] .psa_pagetitle .ps_pagetitle,
+html[data-edr-on] .psa_pagetitle .ps_pagetitle .ps-text,
+html[data-edr-on] h1#PANEL_TITLE,
+html[data-edr-on] h1#PANEL_TITLE .ps-text { font-size: 26px !important; font-weight: 700 !important; color: var(--edr-ink) !important; letter-spacing: -0.01em; }
+
+/* Grids become cards with calm tables. */
+html[data-edr-on] .ps_box-grid-flex {
+  background: var(--edr-surface) !important; border: 1px solid var(--edr-line) !important; border-radius: 8px !important;
+  overflow: hidden; margin: 0 0 20px !important; max-width: 100% !important; box-shadow: none !important;
+}
+html[data-edr-on] .ps_box-grid-header { background: var(--edr-surface) !important; border: 0 !important; padding: 14px 18px 6px !important; }
+html[data-edr-on] .ps_grid-title,
+html[data-edr-on] .ps_grid-title .ps-text { font-size: 16px !important; font-weight: 700 !important; color: var(--edr-ink) !important; }
+html[data-edr-on] .psc_rowcount .ps-text { font-size: 13px !important; color: var(--edr-muted) !important; }
+html[data-edr-on] .ps_box-gridc, html[data-edr-on] .ps_box-gridc-right, html[data-edr-on] .ps_box-grid { overflow-x: auto; }
+html[data-edr-on] table.ps_grid-flex { width: 100% !important; border-collapse: collapse !important; background: var(--edr-surface) !important; }
+html[data-edr-on] .ps_grid-head-row th.ps_grid-col {
+  background: #F5F7FA !important; border: 0 !important; border-bottom: 1px solid var(--edr-line) !important;
+  padding: 10px 18px !important; text-align: left;
+}
+html[data-edr-on] .ps_grid-col-label,
+html[data-edr-on] .ps_grid-col-label * { font-size: 13px !important; font-weight: 600 !important; color: var(--edr-muted) !important; text-decoration: none !important; }
+html[data-edr-on] tr.ps_grid-row > td.ps_grid-cell {
+  background: var(--edr-surface) !important; border: 0 !important; border-bottom: 1px solid var(--edr-line-2) !important;
+  padding: 12px 18px !important; vertical-align: middle;
+}
+html[data-edr-on] tr.ps_grid-row:last-child > td.ps_grid-cell { border-bottom: 0 !important; }
+html[data-edr-on] tr.ps_grid-row:hover > td.ps_grid-cell { background: #F7F9FC !important; }
+html[data-edr-on] td.ps_grid-cell .ps_box-value,
+html[data-edr-on] td.ps_grid-cell .ps-link,
+html[data-edr-on] td.ps_grid-cell .ps-text { font-size: 14px !important; color: var(--edr-ink) !important; }
+html[data-edr-on] td.ps_grid-cell .ps-link { color: var(--edr-blue) !important; }
+html[data-edr-on] td.psc_num, html[data-edr-on] th.psc_num { text-align: right !important; font-variant-numeric: tabular-nums; }
+
+/* List grids (term pickers, programme pickers) become a grid of cards. */
+html[data-edr-on] #PT_MAIN .ps_box-grid-list { padding: 24px 32px !important; box-sizing: border-box; }
+html[data-edr-on] .ps_apps_content .ps_box-grid-list { padding: 0 !important; }
+html[data-edr-on] .ps_box-grid-list,
+html[data-edr-on] .ps_box-grid-list .ps_box-grid,
+html[data-edr-on] .ps_box-grid-list .ps_grid-list { background: transparent !important; border: 0 !important; box-shadow: none !important; max-height: none !important; }
+html[data-edr-on] .ps_box-grid-list ul.ps_grid-body {
+  display: grid !important; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;
+  padding: 0 !important; margin: 0 !important; background: transparent !important;
+}
+html[data-edr-on] .ps_box-grid-list li.ps_grid-row {
+  display: flex !important; flex-direction: column; gap: 4px; padding: 16px 18px !important; margin: 0 !important;
+  background: var(--edr-surface) !important; border: 1px solid var(--edr-line) !important; border-radius: 8px !important;
+  box-shadow: none !important; cursor: pointer;
+}
+html[data-edr-on] .ps_box-grid-list li.ps_grid-row:hover { border-color: var(--edr-navy) !important; background: #FAFBFD !important; }
+html[data-edr-on] .ps_box-grid-list li.ps_grid-row .ps-link,
+html[data-edr-on] .ps_box-grid-list li.ps_grid-row .ps-link .ps-text { font-size: 15px !important; font-weight: 600 !important; color: var(--edr-ink) !important; text-decoration: none !important; }
+html[data-edr-on] .ps_box-grid-list li.ps_grid-row .ps_box-value { font-size: 13px !important; color: var(--edr-muted) !important; }
+html[data-edr-on] .ps_box-grid-list li.ps_grid-row [id*="divINST"] { display: none !important; }
+
+/* Notes and long text blocks: read as body copy, not bold banners. */
+html[data-edr-on] #PT_MAIN .psc_label-none > .ps_box-value,
+html[data-edr-on] #PT_MAIN .ps_box-longedit > .ps_box-value {
+  font-weight: 400 !important; text-align: left !important; color: var(--edr-ink-2) !important; font-size: 14px !important; line-height: 1.5;
+}
+
+/* Label/value fields outside grids. */
+html[data-edr-on] .ps_apps_content .ps_box-edit > .ps_box-label,
+html[data-edr-on] .ps_apps_content .ps_box-label .ps-label { font-size: 13px !important; color: var(--edr-muted) !important; font-weight: 500 !important; }
+html[data-edr-on] .ps_apps_content .ps_box-edit > .ps_box-value { font-size: 15px !important; color: var(--edr-ink) !important; }
+
 /* Shift EduRec right of the sidebar on wide screens. The sidebar lives on <html>,
    outside <body>; the transform makes <body> the containing block for EduRec's own
    fixed/absolute headers and panels, so they move over with it instead of hiding
