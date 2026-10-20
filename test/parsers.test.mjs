@@ -92,6 +92,62 @@ test('parseResults returns term and cumulative GPA when both appear', () => {
   assert.equal(r.cumulativeGpa, 4.21);
 });
 
+test('parseResults copes with EduRec repeating column labels inside every cell', () => {
+  // Real EduRec layout when hidden labels leak into the text (values invented).
+  const leaky = `
+2024/2025 Semester 2
+Course Grades
+5 rows
+Course
+Description
+Units Taken
+Grade
+Course
+CS1234
+Description
+DATA STRUCTURES AND ALGORITHMS
+Units Taken
+4.00
+Grade
+A-
+Course
+CFG1010
+Description
+CAREER STARTER
+Units Taken
+2.00
+Grade
+CS
+Program - Bachelor of Computing
+3 rows
+From Enrollment
+From Transfer Credit
+Combined Term Total
+Cumulative Total
+Earned graded units in GPA
+From Enrollment
+16.00
+Combined Term Total
+16.00
+Cumulative Total
+80.00
+GPA
+From Enrollment
+From Transfer Credit
+Combined Term Total
+Cumulative Total
+4.37
+1 row
+Academic Standing Status
+Passed/Proceed
+1 row
+`;
+  const r = parseResults(leaky);
+  assert.equal(r.cumulativeGpa, 4.37);
+  assert.equal(r.standing, 'Passed/Proceed');
+  assert.deepEqual(r.courses.map((c) => [c.code, c.units, c.grade]), [['CS1234', 4, 'A-'], ['CFG1010', 2, 'CS']]);
+});
+
 test('parseResults ignores pages without a grades table', () => {
   assert.equal(parseResults('Select A Term\n2024/2025 Semester 1'), null);
 });

@@ -52,8 +52,16 @@
   }
 
   // Exam results page: course grades table, then the GPA row and academic standing.
+  // Column names EduRec repeats inside every results cell (normally hidden).
+  const RESULT_LABELS = new Set(['Course', 'Description', 'Units Taken', 'Grade', 'From Enrollment',
+    'From Transfer Credit', 'Combined Term Total', 'Cumulative Total']);
+
   function parseResults(text) {
-    const all = flat(text);
+    const ls = lines(text);
+    const head = ls.indexOf('Course Grades');
+    // Keep the table's own header row; drop label lines repeated inside cells.
+    const cleaned = ls.filter((l, i) => !/^\d+ rows?$/.test(l) && !(RESULT_LABELS.has(l) && i > head + 4 && head >= 0));
+    const all = flat(cleaned.join('\n'));
     const start = all.indexOf('Course Grades');
     if (start < 0 || !/\bGPA\b/.test(all)) return null;
     const endIdx = all.search(/Program - |Earned graded units/);

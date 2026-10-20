@@ -27,16 +27,27 @@
     };
   };
 
-  // Text of a subtree with one line per text node. Works on detached documents
-  // (fetched pages) where innerText is unavailable.
+  // Rendered text of a subtree, one line per text node. Hidden text is skipped:
+  // EduRec repeats each column name as a display:none label inside every grid
+  // cell ("Units Taken 4.00 Grade B+"), which would otherwise break parsing.
   EDR.nodeText = function nodeText(root) {
     const out = [];
+    const live = !!root.ownerDocument.defaultView;
+    const seen = new Map();
+    const visible = (el) => {
+      if (!live) return true;
+      if (!seen.has(el)) {
+        seen.set(el, el.checkVisibility ? el.checkVisibility({ visibilityProperty: true }) : el.getClientRects().length > 0);
+      }
+      return seen.get(el);
+    };
     const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
-        const p = node.parentNode;
-        if (p && /^(SCRIPT|STYLE|NOSCRIPT)$/.test(p.nodeName)) return NodeFilter.FILTER_REJECT;
-        if (p && p.closest && p.closest('.edr-root')) return NodeFilter.FILTER_REJECT;
-        return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        const p = node.parentElement;
+        if (!p || /^(SCRIPT|STYLE|NOSCRIPT)$/.test(p.nodeName)) return NodeFilter.FILTER_REJECT;
+        if (p.closest('.edr-root')) return NodeFilter.FILTER_REJECT;
+        if (!node.nodeValue.trim()) return NodeFilter.FILTER_SKIP;
+        return visible(p) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
       }
     });
     while (walker.nextNode()) out.push(walker.currentNode.nodeValue.trim());
