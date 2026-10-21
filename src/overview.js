@@ -37,9 +37,9 @@
         h('h1', { class: 'edr-h1' }, 'Overview')),
       setupPrompt(data),
       h('section', { class: 'edr-grid', 'aria-label': 'Summary' },
-        gpaCard(data.results, byId.exams.path),
-        degreeCard(data.audit, byId.degree.path),
-        classesCard(data.classes, byId.coursereg.path)),
+        safe('Results', gpaCard, data.results, byId.exams.path),
+        safe('Degree progress', degreeCard, data.audit, byId.degree.path),
+        safe('This semester', classesCard, data.classes, byId.coursereg.path)),
       shortcuts(),
       h('p', { class: 'edr-fineprint' }, 'Summaries are read from EduRec pages and kept in this browser only. Turn the Overview off from the extension’s toolbar button.')
     ].filter(Boolean));
@@ -52,6 +52,16 @@
         h('a', { href, class: 'edr-card-link' }, 'Open')),
       ...body,
       updated ? h('p', { class: 'edr-updated', title: EDR.fmtDate(updated) }, 'Updated ' + EDR.ago(updated)) : null);
+  }
+
+  // A malformed saved summary (older version, partial data) shows a recoverable
+  // card instead of breaking the whole Overview.
+  function safe(title, fn, snap, href) {
+    try { return fn(snap, href); } catch (err) {
+      console.warn('[EduRec Reskin] could not show', title, err);
+      return card(title, href, null, h('div', { class: 'edr-empty' },
+        h('p', null, 'This summary couldn’t be shown. Collecting it again usually fixes it.')));
+    }
   }
 
   // Empty card: one click collects just this summary.

@@ -14,6 +14,7 @@
   };
   const ORDER = ['results', 'audit', 'classes'];
   const STEP_TIMEOUT = 25000;
+  const RUN_TTL = 10 * 60 * 1000; // a run left over from a closed tab or expired session is dropped
   const KEY = 'edr:wizard';
 
   const area = () => chrome.storage.local;
@@ -22,7 +23,7 @@
 
   async function start(keys) {
     const queue = (keys && keys.length ? keys : ORDER).filter((k) => STEPS[k]);
-    const state = { queue, i: 0, outcome: {}, stepAt: Date.now(), origin: location.href };
+    const state = { id: Date.now(), queue, i: 0, outcome: {}, stepAt: Date.now() };
     await setState(state);
     go(state);
   }
@@ -58,6 +59,7 @@
   async function resume(page) {
     const state = await getState();
     if (!state || !EDR.isTop) return;
+    if (!state.id || Date.now() - state.stepAt > RUN_TTL) { await setState(null); return; }
     const key = state.queue[state.i];
     const step = STEPS[key];
     if (!step) { await stop(); return; }
@@ -65,8 +67,9 @@
 
     if (page.key !== step.tile) {
       // Landed somewhere else (EduRec redirected): head to the step's page once.
-      if (!sessionStorage.getItem('edr-wizard-redirected-' + key)) {
-        sessionStorage.setItem('edr-wizard-redirected-' + key, '1');
+      const guard = 'edr-wizard-redirected-' + state.id + '-' + key;
+      if (!sessionStorage.getItem(guard)) {
+        sessionStorage.setItem(guard, '1');
         go(state);
       }
       return;

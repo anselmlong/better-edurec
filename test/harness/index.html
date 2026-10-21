@@ -78,7 +78,7 @@
   // In-memory chrome.storage stub that persists across harness pages via localStorage.
   const mem = JSON.parse(localStorage.getItem('edr-harness') || '{}');
   const listeners = [];
-  window.chrome = { storage: {
+  window.chrome = { runtime: { id: 'harness' }, storage: {
     local: {
       async get(keys) { const ks = [].concat(keys); return Object.fromEntries(ks.filter((k) => k in mem).map((k) => [k, mem[k]])); },
       async set(obj) {
@@ -106,6 +106,8 @@
   // ?noseen keeps a wizard step waiting so its progress bar can be inspected.
   if (new URLSearchParams(location.search).has('noseen')) EDR.store.getSeen = async () => ({});
 </script>
+<script src="../../src/themes.js"></script>
+<script src="../../src/keys.js"></script>
 <script src="../../src/wizard.js"></script>
 <script src="../../src/shell.js"></script>
 <script src="../../src/overview.js"></script>

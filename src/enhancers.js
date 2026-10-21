@@ -53,27 +53,34 @@
   }
 
   function run() {
-    if (!document.body) return;
+    if (!document.body || !EDR.store.alive()) return;
     if (EDR.shell && EDR.shell.ensureSideToggle) EDR.shell.ensureSideToggle();
+    // Cheap gate: only walk rendered text when some enhancer's anchor is on the page.
+    const raw = document.body.textContent;
+    if (!ENHANCERS.some((e) => raw.includes(e.anchor)) && !ENHANCERS.some((e) => document.getElementById('edr-card-' + e.key))) return;
     const text = EDR.nodeText(document.body);
     for (const e of ENHANCERS) {
-      const existing = document.getElementById('edr-card-' + e.key);
-      const data = e.test(text) ? e.parse(text) : null;
-      if (!e.useful(data)) {
-        if (existing) existing.remove();
-        rendered[e.key] = null;
-        continue;
-      }
-      const sig = JSON.stringify(data);
-      if (reported[e.key] !== sig) { reported[e.key] = sig; EDR.store.markSeen(e.key); }
-      if (existing && rendered[e.key] === sig) continue;
-      rendered[e.key] = sig;
-      const el = e.render(data);
-      el.id = 'edr-card-' + e.key;
-      if (existing) existing.replaceWith(el);
-      else { el.classList.add('is-new'); place(el, e.anchor); }
-      EDR.store.saveSnapshot(e.key, data).then((changed) => { if (changed) markSaved(el); }).catch(() => {});
+      try { runOne(e, text); } catch (err) { console.warn('[EduRec Reskin] summary failed', e.key, err); }
     }
+  }
+
+  function runOne(e, text) {
+    const existing = document.getElementById('edr-card-' + e.key);
+    const data = e.test(text) ? e.parse(text) : null;
+    if (!e.useful(data)) {
+      if (existing) existing.remove();
+      rendered[e.key] = null;
+      return;
+    }
+    const sig = JSON.stringify(data);
+    if (reported[e.key] !== sig) { reported[e.key] = sig; EDR.store.markSeen(e.key); }
+    if (existing && rendered[e.key] === sig) return;
+    rendered[e.key] = sig;
+    const el = e.render(data);
+    el.id = 'edr-card-' + e.key;
+    if (existing) existing.replaceWith(el);
+    else { el.classList.add('is-new'); place(el, e.anchor); }
+    EDR.store.saveSnapshot(e.key, data).then((changed) => { if (changed) markSaved(el); }).catch(() => {});
   }
 
   // Inserts the card just before the block that holds the anchor text.

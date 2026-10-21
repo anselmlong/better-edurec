@@ -17,6 +17,8 @@
         "src/routes.js",
         "src/parsers.js",
         "src/store.js",
+        "src/themes.js",
+        "src/keys.js",
         "src/wizard.js",
         "src/shell.js",
         "src/overview.js",

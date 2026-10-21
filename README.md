@@ -14,6 +14,8 @@ Not affiliated with or endorsed by NUS.
   - **View My Classes (CourseReg):** each course with its lecture and tutorial groups.
   - **Financial aid:** the total disbursed and the latest payment.
 - **A light restyle of EduRec itself:** type, colours, buttons and tables.
+- **12 themes:** Campus (default), Dark, Girlypop, Terminal, Monokai, Dracula, Nord, Solarized Light, Gruvbox, Catppuccin, Rosé Pine and Tokyo Night. Pick one from the sidebar's Theme button, `t`, `:theme <name>`, or the toolbar popup. Arrowing through the picker previews each theme; Esc reverts. Every theme passes WCAG AA contrast for body text (checked by `test/themes.test.mjs`).
+- **Vim-style keyboard control:** `j`/`k` move, `h`/`l` switch panes (sidebar, EduRec's page list, content), `gg`/`G` first and last, `d`/`u` half-page scroll, `/` search, `:` command line, `H`/`L` back and forward, `1`–`9` sidebar sections, `[`/`]` collapse the sidebar or page list, `?` shows every shortcut.
 - **Classic view.** One click turns everything off. The toolbar popup also has the switch.
 
 ## How data is handled
@@ -41,8 +43,8 @@ npm run pack    # zip for sharing
 To try the UI without EduRec, open the local harness. It runs the real scripts against fake PeopleSoft-style pages with invented data:
 
 ```
-python3 -m http.server 8765
-# then open http://localhost:8765/test/harness/index.html?page=results
+npm run harness
+# then open http://127.0.0.1:8765/test/harness/index.html?page=results
 # pages: results, audit, classes, finaid, home
 ```
 
@@ -52,7 +54,10 @@ python3 -m http.server 8765
 | `src/parsers.js` | Pure text parsers for the audit, results, classes and financial aid pages |
 | `src/enhancers.js` | Recognises pages, inserts summary cards, saves snapshots |
 | `src/overview.js` | Overview dashboard on the homepage |
-| `src/shell.js` | Sidebar, search palette, classic-view toggle |
+| `src/shell.js` | Sidebar, palette (search, `:` commands, theme picker), cheat sheet |
+| `src/themes.js` | Theme registry; generates one CSS rule per theme |
+| `src/keys.js` | Vim-style key table, resolver and actions |
+| `src/wizard.js` | One-click Overview setup |
 | `src/theme.css` | Restyle and component styles, all scoped to `html.edr-on` |
 
 The parsers read page text rather than PeopleSoft markup, so small layout changes usually don't break them. If NUS changes a page's wording, update the matching parser and its test.
@@ -60,6 +65,14 @@ The parsers read page text rather than PeopleSoft markup, so small layout change
 ## Background
 
 `docs/research` has the crawl inventory, comparable designs and the design critique (10/40) that motivated this. `docs/prototype` has the Claude Design prototype source, with invented data.
+
+## Robustness
+
+- Does nothing on sign-in, sign-out and session-expired pages.
+- Survives an extension reload in already-open tabs (old scripts go quiet instead of throwing).
+- Each summary card and parser runs in isolation; one failure can't blank the rest.
+- A setup run left behind by a closed tab or expired session is dropped after 10 minutes.
+- Hides itself when printing; respects reduced motion and Windows high-contrast mode.
 
 ## Limitations
 

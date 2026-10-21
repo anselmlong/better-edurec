@@ -17,6 +17,10 @@
   const home = document.getElementById('overviewHome');
   home.checked = prefs.overviewHome !== false;
   home.addEventListener('change', () => savePrefs({ overviewHome: home.checked }));
+  const themeSel = document.getElementById('theme');
+  for (const t of EDR.themes.THEMES) themeSel.append(new Option(t.label + (t.dark ? ' (dark)' : ''), t.id));
+  themeSel.value = prefs.theme || EDR.themes.DEFAULT;
+  themeSel.addEventListener('change', () => savePrefs({ theme: themeSel.value }));
   const reprompt = document.getElementById('reprompt');
   reprompt.disabled = !prefs.setupDismissed;
   reprompt.addEventListener('click', () => { savePrefs({ setupDismissed: false }); reprompt.disabled = true; });

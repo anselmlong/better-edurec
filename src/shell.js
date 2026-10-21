@@ -10,7 +10,9 @@
     pages: 'M4 5h16v14H4zM9 5v14M5.5 9h2M5.5 12h2M5.5 15h2',
     menu: 'M4 7h16M4 12h16M4 17h16',
     classic: 'M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4',
-    out: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10'
+    out: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10',
+    theme: 'M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3A4.7 4.7 0 0 0 21 9.7C21 5.9 17 3 12 3zM7.5 12.5h.01M9 8h.01M14 7h.01M17 10.5h.01',
+    keys: 'M3 7h18v11H3zM7 11h.01M11 11h.01M15 11h.01M8 15h8'
   };
   const isMac = navigator.platform.includes('Mac');
 
@@ -53,6 +55,8 @@
           h('kbd', { class: 'edr-label' }, isMac ? '⌘K' : 'Ctrl K')),
         nav,
         h('div', { class: 'edr-shell-foot' },
+          footBtn(I.theme, 'Theme', () => openPalette({ mode: 'theme' })),
+          footBtn(I.keys, 'Keyboard shortcuts', openHelp),
           footBtn(I.classic, 'Classic view', classicView),
           footBtn(I.out, 'Sign out', null, logoutHref),
           h('p', { class: 'edr-fineprint edr-label' }, 'Unofficial personal reskin. Read-only.')))
@@ -73,14 +77,7 @@
         openPalette();
         return;
       }
-      if (e.metaKey || e.ctrlKey || e.altKey || isTyping(e.target)) return;
-      if (e.key === '[') { e.preventDefault(); toggleNav(); }
-      else if (e.key === ']' && document.getElementById('PT_SIDE')) { e.preventDefault(); toggleSide(); }
     });
-  }
-
-  function isTyping(el) {
-    return el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
   }
 
   const has = (name) => document.documentElement.hasAttribute('data-edr-' + name);
@@ -161,41 +158,102 @@
     document.documentElement.append(btn);
   }
 
+  // ---- Palette: search, ':' commands, and the theme picker share one component ----
+
+  function setTheme(id) {
+    EDR.themes.apply(id);
+    EDR.store.setPrefs({ theme: id });
+  }
+
+  function commands() {
+    const t = EDR.themes;
+    return [
+      { label: 'Set up Overview', hint: 'Command', keys: 'setup overview wizard collect', run: () => EDR.wizard.start() },
+      { label: 'Open Overview', hint: 'Command', keys: 'overview home dashboard', href: EDR.routes.HOME + '#overview' },
+      { label: 'Pick a theme', hint: 'Command', keys: 'theme themes colour color picker', run: () => openPalette({ mode: 'theme' }) },
+      ...t.THEMES.map((th) => ({ label: 'Theme: ' + th.label, hint: 'Command', keys: 'theme ' + th.id + ' ' + th.label.toLowerCase(), run: () => setTheme(th.id) })),
+      { label: 'Toggle sidebar', hint: 'Command', keys: 'sidebar collapse expand nav rail', run: toggleNav },
+      { label: 'Toggle page list', hint: 'Command', keys: 'pages page list side panel', run: () => { if (document.getElementById('PT_SIDE')) toggleSide(); } },
+      { label: 'Keyboard shortcuts', hint: 'Command', keys: 'help keys keyboard shortcuts vim', run: openHelp },
+      { label: 'Classic view', hint: 'Command', keys: 'classic off disable original', run: classicView }
+    ];
+  }
+
+  const words = (q) => q.toLowerCase().replace(/^:/, '').trim().split(/\s+/).filter(Boolean);
+  const matches = (item, ws) => ws.every((w) => (item.keys + ' ' + item.label.toLowerCase()).includes(w));
+
+  const MODES = {
+    search: {
+      placeholder: 'Search pages, forms and commands',
+      items: (q, index) => {
+        const pages = EDR.routes.search(q, index);
+        const cmds = q.trim() ? commands().filter((c) => matches(c, words(q))) : [];
+        return pages.slice(0, 9).concat(cmds.slice(0, 4));
+      }
+    },
+    command: {
+      placeholder: 'Command, e.g. theme nord, setup, sidebar',
+      prefix: ':',
+      items: (q) => commands().filter((c) => matches(c, words(q)))
+    },
+    theme: {
+      placeholder: 'Theme',
+      items: (q) => EDR.themes.THEMES
+        .filter((th) => !q.trim() || th.label.toLowerCase().includes(q.trim().toLowerCase()))
+        .map((th) => ({ label: th.label, hint: th.dark ? 'Dark' : 'Light', theme: th.id, swatch: [th.tokens.bg, th.tokens.surface, th.tokens.navy, th.tokens.ink] }))
+    }
+  };
+
   let palette = null;
 
-  function openPalette() {
-    if (palette) { palette.input.focus(); return; }
+  function openPalette(opts) {
+    const mode = (opts && opts.mode) || 'search';
+    if (palette) { palette.close(true); }
+    const spec = MODES[mode];
     const index = EDR.routes.searchIndex();
     const returnFocus = document.activeElement;
+    const originalTheme = document.documentElement.getAttribute('data-edr-theme');
     let results = [];
     let active = 0;
+    let picked = false;
 
     const list = h('ul', { class: 'edr-pal-list', role: 'listbox', id: 'edr-pal-list', 'aria-label': 'Results' });
     const input = h('input', {
-      class: 'edr-pal-input', type: 'search', placeholder: 'Search pages, forms and documents',
+      class: 'edr-pal-input', type: 'text', placeholder: spec.placeholder,
       role: 'combobox', 'aria-expanded': 'true', 'aria-autocomplete': 'list',
-      'aria-label': 'Search EduRec', 'aria-controls': 'edr-pal-list', autocomplete: 'off', spellcheck: 'false'
+      'aria-label': spec.placeholder, 'aria-controls': 'edr-pal-list', autocomplete: 'off', spellcheck: 'false'
     });
     const kbd = (k) => h('kbd', null, k);
     const overlay = h('div', { class: 'edr-root edr-pal-overlay', onmousedown: (e) => { if (e.target === overlay) close(); } },
-      h('div', { class: 'edr-pal', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Search EduRec' },
-        h('div', { class: 'edr-pal-head' }, EDR.icon(I.search, 18), input, kbd('Esc')),
+      h('div', { class: 'edr-pal', role: 'dialog', 'aria-modal': 'true', 'aria-label': spec.placeholder },
+        h('div', { class: 'edr-pal-head' },
+          spec.prefix ? h('span', { class: 'edr-pal-prefix', 'aria-hidden': 'true' }, spec.prefix) : EDR.icon(mode === 'theme' ? I.theme : I.search, 18),
+          input, kbd('Esc')),
         list,
         h('div', { class: 'edr-pal-foot' },
           h('span', null, kbd('↑'), kbd('↓'), ' move'),
-          h('span', null, kbd('Enter'), ' open'),
-          h('span', null, kbd('['), ' sidebar'),
-          h('span', null, kbd(']'), ' page list'))));
+          h('span', null, kbd('Enter'), mode === 'theme' ? ' keep' : ' open'),
+          mode === 'theme' ? h('span', null, kbd('Esc'), ' revert') : h('span', null, kbd('?'), ' all shortcuts'))));
+
+    function preview() {
+      const r = results[active];
+      if (mode === 'theme' && r) EDR.themes.apply(r.theme);
+    }
 
     function render() {
-      results = EDR.routes.search(input.value, index).slice(0, 12);
+      results = spec.items(input.value, index).slice(0, 14);
       active = Math.min(active, Math.max(results.length - 1, 0));
       list.replaceChildren(...(results.length ? results.map((r, i) =>
         h('li', { role: 'option', id: 'edr-opt-' + i, 'aria-selected': i === active ? 'true' : 'false' },
-          h('a', { class: 'edr-pal-item' + (i === active ? ' is-active' : ''), href: r.href, tabindex: '-1', onmousemove: () => { if (active !== i) { active = i; render(); } } },
+          h(r.href ? 'a' : 'button', {
+            class: 'edr-pal-item' + (i === active ? ' is-active' : ''), href: r.href || null, type: r.href ? null : 'button', tabindex: '-1',
+            onmousemove: () => { if (active !== i) { active = i; render(); preview(); } },
+            onclick: (e) => { if (!r.href) { e.preventDefault(); pick(r); } }
+          },
+            r.swatch ? h('span', { class: 'edr-swatch', 'aria-hidden': 'true' }, r.swatch.map((c) => h('span', { style: { background: c } }))) : null,
             h('span', { class: 'edr-pal-label' }, r.label),
-            h('span', { class: 'edr-pal-hint' }, r.hint)))
-      ) : [h('li', { class: 'edr-pal-empty' }, 'Nothing matches “' + input.value.trim() + '”. Try a course code, “transcript” or “leave”.')]));
+            h('span', { class: 'edr-pal-hint' }, r.theme === originalTheme ? 'Current' : r.hint)))
+      ) : [h('li', { class: 'edr-pal-empty' }, 'Nothing matches “' + input.value.trim() + '”.')]));
       if (results.length) {
         input.setAttribute('aria-activedescendant', 'edr-opt-' + active);
         const el = document.getElementById('edr-opt-' + active);
@@ -203,26 +261,78 @@
       } else input.removeAttribute('aria-activedescendant');
     }
 
-    function close() {
-      overlay.remove();
-      palette = null;
-      if (returnFocus && returnFocus.focus) returnFocus.focus();
+    function pick(r) {
+      if (!r) return;
+      picked = true;
+      if (r.theme) { setTheme(r.theme); close(); return; }
+      close();
+      if (r.run) r.run();
+      else if (r.href) location.href = r.href;
     }
 
-    input.addEventListener('input', () => { active = 0; render(); });
+    function close(silent) {
+      if (mode === 'theme' && !picked) EDR.themes.apply(originalTheme);
+      overlay.remove();
+      palette = null;
+      if (!silent && returnFocus && returnFocus.focus) returnFocus.focus();
+    }
+
+    input.addEventListener('input', () => { active = 0; render(); preview(); });
     input.addEventListener('keydown', (e) => {
+      const down = e.key === 'ArrowDown' || (e.ctrlKey && (e.key === 'n' || e.key === 'j'));
+      const up = e.key === 'ArrowUp' || (e.ctrlKey && (e.key === 'p' || e.key === 'k'));
       if (e.key === 'Escape') { e.preventDefault(); close(); }
-      else if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(active + 1, results.length - 1); render(); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(active - 1, 0); render(); }
-      else if (e.key === 'Enter' && results[active]) location.href = results[active].href;
+      else if (down) { e.preventDefault(); active = Math.min(active + 1, results.length - 1); render(); preview(); }
+      else if (up) { e.preventDefault(); active = Math.max(active - 1, 0); render(); preview(); }
+      else if (e.key === 'Enter') { e.preventDefault(); pick(results[active]); }
       else if (e.key === 'Tab') e.preventDefault();
     });
 
     document.documentElement.append(overlay);
-    palette = { input };
+    palette = { input, close };
+    if (mode === 'theme') active = Math.max(0, EDR.themes.THEMES.findIndex((th) => th.id === originalTheme));
     render();
     input.focus();
   }
 
-  EDR.shell = { mount, mountRestoreButton, openPalette, ensureSideToggle, toggleNav, toggleSide };
+  // ---- ? cheat sheet, generated from the key table ----
+
+  function openHelp() {
+    if (document.querySelector('.edr-help-overlay')) return;
+    const returnFocus = document.activeElement;
+    const groups = {};
+    for (const b of EDR.keys.BINDINGS) {
+      if (b.hidden) continue;
+      (groups[b.group] = groups[b.group] || []).push(b);
+    }
+    const close = () => { overlay.remove(); if (returnFocus && returnFocus.focus) returnFocus.focus(); };
+    const closeBtn = h('button', { type: 'button', class: 'edr-icon-btn is-dark', 'aria-label': 'Close', onclick: close }, EDR.icon('M6 6l12 12M18 6L6 18', 16));
+    const overlay = h('div', {
+      class: 'edr-root edr-help-overlay', onmousedown: (e) => { if (e.target === overlay) close(); },
+      onkeydown: (e) => { if (e.key === 'Escape' || e.key === '?') { e.preventDefault(); close(); } }
+    },
+      h('div', { class: 'edr-help', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'edr-help-title' },
+        h('div', { class: 'edr-help-head' }, h('h2', { class: 'edr-h2', id: 'edr-help-title' }, 'Keyboard shortcuts'), closeBtn),
+        h('div', { class: 'edr-help-grid' },
+          Object.keys(groups).map((g) => h('section', null,
+            h('h3', { class: 'edr-h3' }, g),
+            h('dl', { class: 'edr-help-list' }, groups[g].flatMap((b) => [
+              h('dt', null, (b.help ? [b.help] : b.seq).map((k) => h('kbd', null, k))),
+              h('dd', null, b.label)
+            ])))),
+          h('section', null,
+            h('h3', { class: 'edr-h3' }, 'Anywhere'),
+            h('dl', { class: 'edr-help-list' },
+              h('dt', null, h('kbd', null, isMac ? '⌘' : 'Ctrl'), h('kbd', null, 'K')), h('dd', null, 'Search'),
+              h('dt', null, h('kbd', null, 'Esc')), h('dd', null, 'Close a panel'))))));
+    document.documentElement.append(overlay);
+    closeBtn.focus();
+  }
+
+  // h moves focus into the sidebar; on narrow screens that means opening the drawer.
+  function revealNav() {
+    if (innerWidth < 900) EDR.flag('nav-open', true);
+  }
+
+  EDR.shell = { mount, mountRestoreButton, openPalette, openHelp, revealNav, ensureSideToggle, toggleNav, toggleSide, setTheme };
 })();

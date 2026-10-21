@@ -6,7 +6,11 @@
   const DATA = 'edr:data';
   const ENABLED = 'edr:enabled';
 
-  const area = () => chrome.storage.local;
+  // After the extension reloads, already-open tabs keep running old content
+  // scripts whose chrome.* APIs throw. Treat that as 'no data' instead of crashing.
+  const alive = () => { try { return !!(chrome.runtime && chrome.runtime.id); } catch (e) { return false; } };
+  const NOOP = { get: async () => ({}), set: async () => {}, remove: async () => {} };
+  const area = () => (alive() ? chrome.storage.local : NOOP);
 
   async function isEnabled() {
     const got = await area().get(ENABLED);
@@ -67,11 +71,14 @@
     await area().remove(DATA);
   }
 
-  function onDataChange(fn) {
+  function onChange(key, fn) {
+    if (!alive()) return;
     chrome.storage.onChanged.addListener((changes, name) => {
-      if (name === 'local' && changes[DATA]) fn(changes[DATA].newValue || {});
+      if (name === 'local' && changes[key]) fn(changes[key].newValue || {});
     });
   }
+  const onDataChange = (fn) => onChange(DATA, fn);
+  const onPrefsChange = (fn) => onChange(PREFS, fn);
 
-  EDR.store = { isEnabled, setEnabled, getData, saveSnapshot, clearData, onDataChange, getPrefs, setPrefs, getSeen, markSeen };
+  EDR.store = { alive, isEnabled, setEnabled, getData, saveSnapshot, clearData, onDataChange, onPrefsChange, getPrefs, setPrefs, getSeen, markSeen };
 })();
