@@ -133,7 +133,7 @@
     buffer = [];
     if (!r.binding) return;
     e.preventDefault();
-    try { ACTIONS[r.binding.action](r.binding); } catch (err) { console.warn('[EduRec Reskin] key action failed', r.binding.action, err); }
+    try { ACTIONS[r.binding.action](r.binding); } catch (err) { console.warn('[Better EduRec] key action failed', r.binding.action, err); }
   }
 
   function start() {

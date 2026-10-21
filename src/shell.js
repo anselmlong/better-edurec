@@ -12,7 +12,8 @@
     classic: 'M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4',
     out: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10',
     theme: 'M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3A4.7 4.7 0 0 0 21 9.7C21 5.9 17 3 12 3zM7.5 12.5h.01M9 8h.01M14 7h.01M17 10.5h.01',
-    keys: 'M3 7h18v11H3zM7 11h.01M11 11h.01M15 11h.01M8 15h8'
+    keys: 'M3 7h18v11H3zM7 11h.01M11 11h.01M15 11h.01M8 15h8',
+    help: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01'
   };
   const isMac = navigator.platform.includes('Mac');
 
@@ -20,6 +21,7 @@
   function mount(page) {
     if (document.getElementById('edr-shell')) return;
     const { SECTIONS, sectionHref, logoutHref } = EDR.routes;
+    const faqHref = chrome.runtime.getURL ? chrome.runtime.getURL('faq/faq.html') : null;
 
     const nav = h('nav', { class: 'edr-nav', 'aria-label': 'EduRec' },
       SECTIONS.map((s) => h('a', {
@@ -42,11 +44,11 @@
 
     const shell = h('aside', { id: 'edr-shell', class: 'edr-root edr-shell' },
       h('div', { class: 'edr-brand' },
-        h('a', { class: 'edr-brand-link', href: EDR.routes.HOME, 'aria-label': 'EduRec overview' },
-          h('span', { class: 'edr-brand-mark', 'aria-hidden': 'true' }, 'E'),
+        h('a', { class: 'edr-brand-link', href: EDR.routes.HOME, 'aria-label': 'Better EduRec overview' },
+          h('span', { class: 'edr-brand-mark', 'aria-hidden': 'true' }, 'B'),
           h('span', { class: 'edr-brand-text' },
-            h('span', { class: 'edr-brand-name' }, 'EduRec'),
-            h('span', { class: 'edr-brand-sub' }, 'Education Records System'))),
+            h('span', { class: 'edr-brand-name' }, 'Better EduRec'),
+            h('span', { class: 'edr-brand-sub' }, 'Unofficial · not by NUS'))),
         collapseBtn),
       h('div', { class: 'edr-shell-body' },
         h('button', { class: 'edr-search-btn', type: 'button', onclick: () => openPalette(), 'data-tip': 'Search', 'aria-label': 'Search EduRec' },
@@ -58,8 +60,9 @@
           footBtn(I.theme, 'Theme', () => openPalette({ mode: 'theme' })),
           footBtn(I.keys, 'Keyboard shortcuts', openHelp),
           footBtn(I.classic, 'Classic view', classicView),
+          faqHref ? footBtn(I.help, 'FAQ & disclaimer', null, faqHref) : null,
           footBtn(I.out, 'Sign out', null, logoutHref),
-          h('p', { class: 'edr-fineprint edr-label' }, 'Unofficial personal reskin. Read-only.')))
+          h('p', { class: 'edr-fineprint edr-label' }, 'Unofficial. Not affiliated with NUS.')))
     );
 
     const toggle = h('button', {

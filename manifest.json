@@ -1,17 +1,28 @@
 {
   "manifest_version": 3,
-  "name": "EduRec Reskin (unofficial)",
-  "version": "0.1.0",
-  "description": "A personal, read-only reskin of NUS EduRec: overview dashboard, sidebar, search and readable summaries.",
-  "permissions": ["storage"],
-  "host_permissions": ["https://myedurec.nus.edu.sg/*", "https://api.nusmods.com/*"],
+  "name": "Better EduRec (unofficial)",
+  "version": "0.2.0",
+  "description": "Unofficial, read-only redesign of NUS EduRec: a clean sidebar, search, live timetable, themes and keyboard controls.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://myedurec.nus.edu.sg/*",
+    "https://api.nusmods.com/*"
+  ],
   "action": {
-    "default_title": "EduRec Reskin",
-    "default_popup": "popup/popup.html"
+    "default_title": "Better EduRec",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
   },
   "content_scripts": [
     {
-      "matches": ["https://myedurec.nus.edu.sg/psc/*"],
+      "matches": [
+        "https://myedurec.nus.edu.sg/psc/*"
+      ],
       "js": [
         "src/core.js",
         "src/routes.js",
@@ -26,9 +37,29 @@
         "src/enhancers.js",
         "src/main.js"
       ],
-      "css": ["src/theme.css"],
+      "css": [
+        "src/theme.css"
+      ],
       "run_at": "document_idle",
       "all_frames": true
     }
-  ]
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "faq/faq.html",
+        "faq/faq.css"
+      ],
+      "matches": [
+        "https://myedurec.nus.edu.sg/*"
+      ]
+    }
+  ],
+  "homepage_url": "https://github.com/anselmlong/edurec-reskin"
 }

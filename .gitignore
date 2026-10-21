@@ -5,3 +5,4 @@ node_modules/
 # Local-only: crawl notes and screenshots with personal data
 edurec-research/
 codedb.snapshot
+dist/

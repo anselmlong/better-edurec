@@ -74,7 +74,7 @@
     if (!ENHANCERS.some((e) => raw.includes(e.anchor)) && !ENHANCERS.some((e) => document.getElementById('edr-card-' + e.key))) return;
     const text = EDR.nodeText(document.body);
     for (const e of ENHANCERS) {
-      try { runOne(e, text); } catch (err) { console.warn('[EduRec Reskin] summary failed', e.key, err); }
+      try { runOne(e, text); } catch (err) { console.warn('[Better EduRec] summary failed', e.key, err); }
     }
   }
 

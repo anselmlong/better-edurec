@@ -1,13 +1,14 @@
 {
-  "name": "edurec-reskin",
-  "version": "0.1.0",
+  "name": "better-edurec",
+  "version": "0.2.0",
   "private": true,
-  "description": "Personal, read-only reskin of NUS EduRec as a Chrome extension.",
+  "description": "Unofficial, read-only redesign of NUS EduRec as a Chrome extension.",
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check": "node --check src/core.js && node --check src/routes.js && node --check src/parsers.js && node --check src/store.js && node --check src/themes.js && node --check src/keys.js && node --check src/timetable.js && node --check src/wizard.js && node --check src/shell.js && node --check src/overview.js && node --check src/enhancers.js && node --check src/main.js && node --check popup/popup.js",
-    "pack": "rm -f edurec-reskin.zip && zip -qr edurec-reskin.zip manifest.json src popup",
-    "harness": "node scripts/serve.mjs"
+    "check": "node --check src/core.js && node --check src/routes.js && node --check src/parsers.js && node --check src/store.js && node --check src/themes.js && node --check src/keys.js && node --check src/timetable.js && node --check src/wizard.js && node --check src/shell.js && node --check src/overview.js && node --check src/enhancers.js && node --check src/main.js && node --check popup/popup.js && node --check scripts/serve.mjs",
+    "pack": "npm run check && npm test && rm -rf dist && mkdir dist && zip -qr dist/better-edurec-$npm_package_version.zip manifest.json src popup faq icons/icon-16.png icons/icon-32.png icons/icon-48.png icons/icon-128.png -x '*.DS_Store'",
+    "harness": "node scripts/serve.mjs",
+    "icons": "python3 scripts/icons.py"
   },
   "license": "MIT"
 }

@@ -36,6 +36,6 @@
     }
     EDR.enhancers.start();
   } catch (err) {
-    console.warn('[EduRec Reskin] failed to start; EduRec is unchanged.', err);
+    console.warn('[Better EduRec] failed to start; EduRec is unchanged.', err);
   }
 })();

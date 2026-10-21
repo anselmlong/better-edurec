@@ -62,7 +62,7 @@
   // card instead of breaking the whole Overview.
   function safe(title, fn, snap, href) {
     try { return fn(snap, href); } catch (err) {
-      console.warn('[EduRec Reskin] could not show', title, err);
+      console.warn('[Better EduRec] could not show', title, err);
       return card(title, href, null, h('div', { class: 'edr-empty' },
         h('p', null, 'This summary couldn’t be shown. Collecting it again usually fixes it.')));
     }
@@ -169,8 +169,8 @@
     const week = document.getElementById('edr-week-slot');
     if (!up || !week) return;
     const sch = schedule();
-    try { up.replaceChildren(...[upNextCard(sch)].filter(Boolean)); } catch (err) { console.warn('[EduRec Reskin] up next failed', err); }
-    try { week.replaceChildren(...[weekSection(sch)].filter(Boolean)); } catch (err) { console.warn('[EduRec Reskin] timetable failed', err); }
+    try { up.replaceChildren(...[upNextCard(sch)].filter(Boolean)); } catch (err) { console.warn('[Better EduRec] up next failed', err); }
+    try { week.replaceChildren(...[weekSection(sch)].filter(Boolean)); } catch (err) { console.warn('[Better EduRec] timetable failed', err); }
   }
 
   const fmtTime = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return ((h + 11) % 12 + 1) + (m ? ':' + String(m).padStart(2, '0') : '') + (h < 12 ? ' am' : ' pm'); };

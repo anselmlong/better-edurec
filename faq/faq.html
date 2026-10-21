@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Better EduRec · FAQ and disclaimer</title>
+<link rel="stylesheet" href="faq.css">
+</head>
+<body>
+<main>
+  <header>
+    <span class="mark" aria-hidden="true">B</span>
+    <div>
+      <h1>Better EduRec</h1>
+      <p class="sub">FAQ, privacy and disclaimer</p>
+    </div>
+  </header>
+
+  <aside class="notice" role="note">
+    <strong>Unofficial.</strong> Better EduRec is a student-made browser extension. It is not made, endorsed or supported by the National University of Singapore. EduRec itself, and your official records in it, are unchanged.
+  </aside>
+
+  <nav aria-label="On this page">
+    <a href="#faq">Questions</a>
+    <a href="#privacy">Privacy policy</a>
+    <a href="#disclaimer">Disclaimer</a>
+  </nav>
+
+  <section id="faq">
+    <h2>Questions</h2>
+
+    <details open>
+      <summary>What does Better EduRec do?</summary>
+      <p>It restyles EduRec pages in your own browser: a sidebar with search, a cleaner page list, readable tables, themes, vim-style keyboard controls, and an Overview page with your GPA, degree progress and a live timetable. It only changes how pages look on your screen.</p>
+    </details>
+
+    <details>
+      <summary>Is it official? Is it affiliated with NUS?</summary>
+      <p>No. It is an independent, unofficial project with no connection to NUS, NUS IT or the Office of the Registrar. Don’t contact NUS about it; use the project’s GitHub page instead.</p>
+    </details>
+
+    <details>
+      <summary>Can it change or submit anything in EduRec?</summary>
+      <p>Better EduRec never submits forms, registers courses, declares S/U or changes your records. Forms you fill in still go to EduRec exactly as before, and only when you press EduRec’s own buttons.</p>
+      <p>The one thing it does on your behalf is <strong>Set up Overview</strong>, which you start yourself. It opens view-only pages (exam results, graduation audit, View Classes, My Classes) by clicking the same page links and term choices you would, then reads what they show. You can stop or skip it at any time.</p>
+    </details>
+
+    <details>
+      <summary>What does it read, and where does that go?</summary>
+      <p>It reads the text of EduRec pages you open (or that Set up Overview opens) to build summaries: grades and GPA, degree audit units, your class timetable and class groups. These summaries are saved in your browser’s extension storage on this device only. They are never uploaded anywhere. See the <a href="#privacy">privacy policy</a>.</p>
+    </details>
+
+    <details>
+      <summary>What is sent over the internet?</summary>
+      <p>Nothing, unless you click <strong>Open in NUSMods</strong>. Then the extension asks the public NUSMods API (api.nusmods.com) for the class lists of your course codes, and opens a NUSMods share link containing your course codes and class groups. No name, student number, grades or other personal details are sent.</p>
+    </details>
+
+    <details>
+      <summary>The numbers look wrong, or a page looks broken.</summary>
+      <p>Summaries are a convenience and can be out of date or misread, especially after NUS changes EduRec. The page it came from always wins. Re-open that page to refresh a summary, or use <strong>Classic view</strong> (sidebar footer, or the toolbar button) to see EduRec exactly as NUS ships it.</p>
+    </details>
+
+    <details>
+      <summary>How do I turn it off or delete my data?</summary>
+      <p>Click the toolbar button and switch off <strong>New EduRec view</strong>, or choose <strong>Classic view</strong> in the sidebar. <strong>Clear summaries</strong> in the toolbar popup deletes everything saved. Removing the extension from Chrome deletes all its data too.</p>
+    </details>
+
+    <details>
+      <summary>What are the keyboard shortcuts?</summary>
+      <p>Press <kbd>?</kbd> on any EduRec page for the full list. The basics: <kbd>j</kbd>/<kbd>k</kbd> to move, <kbd>h</kbd>/<kbd>l</kbd> to switch panes, <kbd>o</kbd> to open, <kbd>/</kbd> or <kbd>⌘K</kbd> to search, <kbd>:</kbd> for commands, <kbd>t</kbd> for themes.</p>
+    </details>
+
+    <details>
+      <summary>Can I install it without the Chrome Web Store?</summary>
+      <p>Yes. Download and unzip the release, open <code>chrome://extensions</code>, turn on <strong>Developer mode</strong>, click <strong>Load unpacked</strong> and choose the unzipped folder. It won’t update by itself; download the new release and press reload on the extension card.</p>
+    </details>
+
+    <details>
+      <summary>Am I allowed to use it?</summary>
+      <p>You are responsible for following NUS’s IT and acceptable-use policies. Better EduRec only works inside your own signed-in session and never bypasses sign-in or access controls. If you are unsure, use Classic view or remove the extension.</p>
+    </details>
+  </section>
+
+  <section id="privacy">
+    <h2>Privacy policy</h2>
+    <p class="meta">Last updated 22 October 2026</p>
+    <h3>Data the extension handles</h3>
+    <ul>
+      <li><strong>Academic information</strong> shown on EduRec pages you open: course codes and titles, grades, GPA, academic standing, degree audit units, class timetable, rooms and class groups.</li>
+      <li><strong>Settings</strong>: theme, sidebar state and similar preferences.</li>
+    </ul>
+    <h3>How it is used and stored</h3>
+    <ul>
+      <li>Used only to show the Overview, summaries and timetable to you.</li>
+      <li>Stored with <code>chrome.storage.local</code> on your device. It is not synced, uploaded, sold, shared or used for advertising, analytics or profiling.</li>
+      <li>The developer never receives any of your data.</li>
+    </ul>
+    <h3>Network requests</h3>
+    <ul>
+      <li>Only when you click <strong>Open in NUSMods</strong>: course codes are sent to the public NUSMods API, and a nusmods.com link with your course codes and class groups opens in a new tab. NUSMods’ own privacy policy applies there.</li>
+      <li>No other requests are made. The extension loads no remote code.</li>
+    </ul>
+    <h3>Your control</h3>
+    <ul>
+      <li>Delete saved data any time with <strong>Clear summaries</strong>, or by removing the extension.</li>
+    </ul>
+  </section>
+
+  <section id="disclaimer">
+    <h2>Disclaimer</h2>
+    <ul>
+      <li>Better EduRec is not affiliated with, endorsed by or sponsored by the National University of Singapore. “NUS” and “EduRec” are used only to say which website this extension works with; they belong to their owners.</li>
+      <li>Your official records are the ones in EduRec. Always confirm grades, requirements, timetables, deadlines and registration details there before acting on them.</li>
+      <li>The extension is provided “as is”, without warranty of any kind, under the MIT licence. The authors are not liable for any loss or harm from using it, including missed deadlines, registration outcomes or decisions based on its summaries.</li>
+      <li>EduRec can change at any time, which may break parts of the extension until it is updated.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

@@ -1,34 +1,37 @@
-# EduRec Reskin
+# Better EduRec
 
-A personal, unofficial Chrome extension that reskins NUS EduRec in your own browser. It is read-only: it never submits forms or changes anything in EduRec. Anything that writes, such as course registration, leave of absence or payments, still happens on the original EduRec pages.
+An unofficial Chrome extension that redesigns NUS EduRec in your own browser. It is read-only: it never submits forms or changes anything in EduRec. Anything that writes, such as course registration, leave of absence or payments, still happens on the original EduRec pages.
 
-Not affiliated with or endorsed by NUS.
+Not affiliated with or endorsed by NUS. See the [FAQ and disclaimer](faq/faq.html) (also inside the extension: sidebar › FAQ & disclaimer) and the [privacy policy](PRIVACY.md).
 
 ## What it does
 
 - **Sidebar and search on every page.** It groups EduRec's 21 tiles into 9 sections. Press ⌘K (Ctrl K on Windows) to search every tile and sub-page, e.g. "transcript", "S/U" or "leave".
-- **An Overview page instead of the tile homepage.** It shows your GPA, degree progress and classes this semester, plus links to every part of EduRec. One click (Set up Overview) fills it; it's optional and can be turned off from the toolbar popup.
+- **An Overview page instead of the tile homepage.** It shows your GPA, degree progress, what's up next and this week's timetable. One click (Set up Overview) fills it; it's optional and can be turned off from the toolbar popup.
 - **Summary cards on EduRec pages:**
   - **Exam results:** term, cumulative GPA, units and grade chips.
   - **Graduation audit report:** units done out of required, plus each unmet requirement with a progress bar.
   - **View My Classes (CourseReg):** each course with its lecture and tutorial groups.
   - **Financial aid:** the total disbursed and the latest payment.
 - **A light restyle of EduRec itself:** type, colours, buttons and tables.
-- **Live timetable:** an Up next card (what's on now or next, room, countdown) and a NUSMods-style week grid with a moving now-line, built from Academic Records › View Classes. **Open in NUSMods** exports your class groups as a NUSMods share link; only course codes are sent to NUSMods' public API, and only when you click it.
-- **Quick links:** one click to the exact sub-page for the unofficial transcript, exam results and schedule, course registration, timetable, degree audit, S/U declarations, status letter and leave of absence. Search shows them first.
+- **Live timetable:** an Up next card (what's on now or next, room, countdown) and a NUSMods-style week grid with a moving now-line and a card per course, built from Academic Records › View Classes. **Open in NUSMods** exports your class groups as a NUSMods share link; only course codes are sent to NUSMods' public API, and only when you click it.
+- **Quick links:** one click to the exact sub-page for the unofficial transcript, exam results, exam schedule, course registration and S/U declarations. Search shows them first.
 - **12 themes:** Campus (default), Dark, Girlypop, Terminal, Monokai, Dracula, Nord, Solarized Light, Gruvbox, Catppuccin, Rosé Pine and Tokyo Night. Pick one from the sidebar's Theme button, `t`, `:theme <name>`, or the toolbar popup. Arrowing through the picker previews each theme; Esc reverts. Every theme passes WCAG AA contrast for body text (checked by `test/themes.test.mjs`).
 - **Vim-style keyboard control:** `j`/`k` move, `h`/`l` switch panes (sidebar, EduRec's page list, content), `gg`/`G` first and last, `d`/`u` half-page scroll, `/` search, `:` command line, `H`/`L` back and forward, `1`–`9` sidebar sections, `[`/`]` collapse the sidebar or page list, `?` shows every shortcut.
 - **Classic view.** One click turns everything off. The toolbar popup also has the switch.
 
 ## How data is handled
 
-The extension only reads the EduRec page you're looking at. When it recognises one of the four pages above, it saves a small summary in `chrome.storage.local` so the Overview can show it. Nothing is sent anywhere, and the extension makes no network requests of its own. You can clear the saved summaries from the toolbar popup.
+The extension only reads the EduRec page you're looking at. When it recognises one of the four pages above, it saves a small summary in `chrome.storage.local` so the Overview can show it. Nothing is uploaded. The only network request is to the public NUSMods API, with course codes only, when you click **Open in NUSMods**. You can clear the saved summaries from the toolbar popup.
 
 ## Install
 
-1. Open `chrome://extensions` and turn on **Developer mode**.
-2. Click **Load unpacked** and pick this folder.
-3. Sign in to EduRec and click **Set up Overview** on the Overview. It reads exam results, your graduation audit and your classes, then returns. Each card also fills on its own whenever you open its page (or click **Collect** on it).
+From a release zip (no Chrome Web Store needed):
+
+1. Download `better-edurec-<version>.zip` and unzip it.
+2. Open `chrome://extensions` and turn on **Developer mode**.
+3. Click **Load unpacked** and pick the unzipped folder (or this repo's folder).
+4. Sign in to EduRec and click **Set up Overview** on the Overview. It reads exam results, your graduation audit and your classes, then returns. Each card also fills on its own whenever you open its page (or click **Collect** on it).
 
 Fonts: it uses Public Sans and IBM Plex Mono if they're installed, and falls back to your system font otherwise.
 
@@ -39,7 +42,8 @@ No build step. The content scripts are plain JavaScript loaded in the order list
 ```
 npm test        # parser and routing unit tests (node:test)
 npm run check   # syntax check every script
-npm run pack    # zip for sharing
+npm run pack    # check, test, then build dist/better-edurec-<version>.zip
+npm run icons   # redraw icons/ from scripts/icons.py
 ```
 
 To try the UI without EduRec, open the local harness. It runs the real scripts against fake PeopleSoft-style pages with invented data:
@@ -65,6 +69,8 @@ npm run harness
 The parsers read page text rather than PeopleSoft markup, so small layout changes usually don't break them. If NUS changes a page's wording, update the matching parser and its test.
 
 ## Background
+
+`docs/store/listing.md` has everything the Chrome Web Store asks for (listing text, permission justifications, privacy answers, screenshots).
 
 `docs/research` has the crawl inventory, comparable designs and the design critique (10/40) that motivated this. `docs/prototype` has the Claude Design prototype source, with invented data.
 
