@@ -280,9 +280,14 @@ html[data-edr-collapsed] { --edr-nav-w: 64px; }
 }
 .edr-brand-link { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; color: var(--edr-brand-ink) !important; text-decoration: none !important; }
 .edr-brand-mark {
-  width: 32px; height: 32px; flex: none; border-radius: var(--edr-radius-sm); display: flex; align-items: center; justify-content: center;
-  background: var(--edr-brand-ink); color: var(--edr-brand-bg); font-weight: 800; font-size: 17px; letter-spacing: -0.02em;
+  width: 34px; height: 34px; flex: none; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  background: rgb(0 0 0 / .22); color: var(--edr-brand-ink);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
+.edr-brand-mark svg rect:nth-child(2) { transform-origin: 8px 32px; transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1); }
+/* The mark's own sidebar folds with the real one. */
+html[data-edr-collapsed] .edr-brand-mark svg rect:nth-child(2) { transform: scaleX(.6); }
+.edr-brand-link:hover .edr-brand-mark { transform: translateY(-1px); }
 .edr-brand-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; white-space: nowrap; }
 .edr-brand-name { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
 .edr-brand-sub { font-size: 12px; color: var(--edr-brand-sub); }
@@ -316,6 +321,32 @@ html[data-edr-collapsed] { --edr-nav-w: 64px; }
 .edr-nav-item svg { flex: none; }
 .edr-nav-item:hover { background: var(--edr-surface-2); }
 .edr-nav-item:active { background: var(--edr-surface-3); }
+.edr-nav-item svg, .edr-link-btn svg { transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), color 150ms ease; }
+.edr-nav-item:active svg, .edr-link-btn:active svg { transform: scale(.88); }
+
+/* Gliding highlight (EDR.glide): one surface travels between items instead of
+   each item lighting up on its own. Items keep their own active/selected tint. */
+.edr-has-glide { position: relative !important; isolation: isolate; }
+.edr-glide {
+  position: absolute; left: 0; top: 0; z-index: -1; pointer-events: none; box-sizing: border-box;
+  border-radius: var(--edr-radius-sm); background: var(--edr-surface-2);
+  opacity: 0; transition: opacity 180ms ease;
+}
+.edr-glide.is-on { opacity: 1; }
+.edr-glide.is-tint { background: var(--edr-tint); }
+.edr-has-glide > .edr-nav-item:not(.is-active):hover,
+.edr-has-glide > .edr-link-btn:hover,
+.edr-has-glide .edr-pal-item.is-active { background: transparent; }
+.edr-has-glide > .edr-nav-item:hover { color: var(--edr-ink) !important; }
+.edr-has-glide > .edr-link-btn:hover svg { color: var(--edr-ink); }
+html[data-edr-on] ul.psa_list-linkmenu.edr-has-glide > li:not(.psc_selected):hover { background: transparent !important; }
+html[data-edr-on] ul.psa_list-linkmenu.edr-has-glide > li:not(.psc_selected):hover .ps-link { color: var(--edr-ink) !important; }
+html[data-edr-theme="terminal"] .edr-glide { border-radius: 0; }
+
+/* Theme changes paint in as a growing circle (EDR.paintTheme). */
+html.edr-painting::view-transition-old(root),
+html.edr-painting::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+html.edr-painting::view-transition-new(root) { z-index: 2; }
 .edr-nav-item.is-active { background: var(--edr-tint); color: var(--edr-selected-ink) !important; font-weight: 600; }
 .edr-shell-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 12px; border-top: 1px solid var(--edr-line); }
 .edr-link-btn {
@@ -609,6 +640,7 @@ html[data-edr-on] td.ps_grid-cell { font-variant-numeric: tabular-nums; }
 /* Reduced motion: keep state changes (colour, opacity), drop movement. */
 @media (prefers-reduced-motion: reduce) {
   .edr-shell { transition: none !important; }
+  .edr-brand-mark, .edr-brand-mark svg rect, .edr-nav-item svg, .edr-link-btn svg { transition: none !important; }
   .edr-pal, .edr-wizard, .edr-toast, .edr-badge.is-saved, #PT_CONTENT.edr-settle { animation: edr-fade 160ms ease-out both !important; }
   .edr-wiz-seg.is-now::after { animation: none !important; transform: scaleX(.5); }
   .edr-page .edr-bar > span, .edr-inline.is-new .edr-bar > span, .edr-inline.is-new { animation: edr-fade 200ms ease-out both !important; }

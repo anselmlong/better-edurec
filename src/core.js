@@ -20,6 +20,95 @@
     return el;
   };
 
+  const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)';
+
+  // One highlight per list that travels to the hovered or focused item instead of
+  // each item lighting up on its own. Interruptible: a new target starts from
+  // wherever the highlight is mid-flight. Returns { sync(el), hide() } for lists
+  // that re-render (the palette) or drive the target themselves.
+  EDR.glide = function glide(container, itemSelector, opts) {
+    const o = opts || {};
+    const pill = EDR.h('span', { class: 'edr-glide' + (o.className ? ' ' + o.className : ''), 'aria-hidden': 'true' });
+    let current = null;
+    let anim = null;
+
+    function attach() {
+      if (pill.parentNode !== container) container.prepend(pill);
+      container.classList.add('edr-has-glide');
+    }
+
+    function moveTo(el) {
+      attach();
+      if (!el || !el.isConnected || !el.getClientRects().length) { hide(); return; }
+      const c = container.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      const x = r.left - c.left + container.scrollLeft - container.clientLeft;
+      const y = r.top - c.top + container.scrollTop - container.clientTop;
+      const to = 'translate(' + x + 'px, ' + y + 'px)';
+      const glideFrom = current && pill.classList.contains('is-on') && !reducedMotion();
+      const from = glideFrom ? getComputedStyle(pill).transform : null;
+      const fromSize = glideFrom ? [pill.offsetWidth, pill.offsetHeight] : null;
+      if (anim) anim.cancel();
+      pill.style.transform = to;
+      pill.style.width = r.width + 'px';
+      pill.style.height = r.height + 'px';
+      if (from && from !== 'none') {
+        anim = pill.animate([
+          { transform: from, width: fromSize[0] + 'px', height: fromSize[1] + 'px' },
+          { transform: to, width: r.width + 'px', height: r.height + 'px' }
+        ], { duration: o.duration || 280, easing: EASE_OUT });
+      }
+      pill.classList.add('is-on');
+      current = el;
+    }
+
+    function hide() {
+      pill.classList.remove('is-on');
+      current = null;
+    }
+
+    if (!o.manual) {
+      const target = (e) => e.target.closest && e.target.closest(itemSelector);
+      container.addEventListener('pointerover', (e) => { const el = target(e); if (el && container.contains(el) && el !== current) moveTo(el); });
+      container.addEventListener('pointerleave', () => {
+        const focused = container.querySelector(itemSelector + ':focus-visible');
+        if (focused) moveTo(focused); else hide();
+      });
+      container.addEventListener('focusin', (e) => { const el = target(e); if (el && el.matches(':focus-visible')) moveTo(el); });
+      container.addEventListener('focusout', (e) => { if (!container.contains(e.relatedTarget) && !container.matches(':hover')) hide(); });
+    }
+    attach();
+    return { sync: moveTo, hide, el: pill };
+  };
+
+  // Paints a theme change in as a circle growing from the control that chose it,
+  // using a view transition. Falls back to an instant swap.
+  let themeTransition = null;
+  EDR.paintTheme = function paintTheme(apply, origin) {
+    if (!document.startViewTransition || reducedMotion() || document.hidden) { apply(); return; }
+    if (themeTransition) themeTransition.skipTransition();
+    let x = innerWidth / 2;
+    let y = innerHeight / 2;
+    if (origin && origin.getBoundingClientRect) {
+      const r = origin.getBoundingClientRect();
+      x = r.left + r.width / 2; y = r.top + r.height / 2;
+    }
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    document.documentElement.classList.add('edr-painting');
+    const t = document.startViewTransition(apply);
+    themeTransition = t;
+    t.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + radius + 'px at ' + x + 'px ' + y + 'px)'] },
+        { duration: 460, easing: EASE_OUT, pseudoElement: '::view-transition-new(root)' });
+    }).catch(() => {});
+    t.finished.finally(() => {
+      if (themeTransition === t) themeTransition = null;
+      document.documentElement.classList.remove('edr-painting');
+    });
+  };
+
   EDR.debounce = function debounce(fn, ms) {
     let t;
     return (...args) => {

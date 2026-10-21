@@ -18,7 +18,11 @@
     if (prefs.navCollapsed) EDR.flag('collapsed');
     if (prefs.sideCollapsed) EDR.flag('side-collapsed');
     // Keep every frame (EduRec puts some reports in iframes) on the chosen theme.
-    EDR.store.onPrefsChange((next) => EDR.themes.apply(next.theme));
+    EDR.store.onPrefsChange((next) => {
+      if (document.documentElement.getAttribute('data-edr-theme') === next.theme) return;
+      // Chosen elsewhere (popup, another tab): paint it in rather than snapping.
+      if (EDR.isTop) EDR.paintTheme(() => EDR.themes.apply(next.theme)); else EDR.themes.apply(next.theme);
+    });
 
     const page = EDR.routes.detectPage(location.href);
     if (EDR.isTop) {

@@ -17,6 +17,20 @@
   };
   const isMac = navigator.platform.includes('Mac');
 
+  // The logo: the reskin's own layout (sidebar + content) as a glyph. Matches icons/.
+  function brandGlyph() {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 64 64');
+    svg.setAttribute('width', '22');
+    svg.setAttribute('height', '22');
+    const add = (tag, attrs) => { const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); svg.append(el); };
+    add('rect', { x: 8, y: 11, width: 48, height: 42, rx: 7, fill: 'none', stroke: 'currentColor', 'stroke-width': 6 });
+    add('rect', { x: 8, y: 11, width: 17, height: 42, rx: 7, fill: 'currentColor' });
+    add('path', { d: 'M33 24h13M33 32h9M33 40h11', stroke: 'var(--edr-brand-accent, #7DD3FC)', 'stroke-width': 5, 'stroke-linecap': 'round' });
+    return svg;
+  }
+
   // Sidebar + search palette, mounted once in the top frame of every EduRec page.
   function mount(page) {
     if (document.getElementById('edr-shell')) return;
@@ -45,7 +59,7 @@
     const shell = h('aside', { id: 'edr-shell', class: 'edr-root edr-shell' },
       h('div', { class: 'edr-brand' },
         h('a', { class: 'edr-brand-link', href: EDR.routes.HOME, 'aria-label': 'Better EduRec overview' },
-          h('span', { class: 'edr-brand-mark', 'aria-hidden': 'true' }, 'B'),
+          h('span', { class: 'edr-brand-mark', 'aria-hidden': 'true' }, brandGlyph()),
           h('span', { class: 'edr-brand-text' },
             h('span', { class: 'edr-brand-name' }, 'Better EduRec'),
             h('span', { class: 'edr-brand-sub' }, 'Unofficial · not by NUS'))),
@@ -73,6 +87,8 @@
     // Mounted on <html>, outside <body>, so the body offset in theme.css doesn't move it.
     document.documentElement.append(shell, toggle);
     syncNavButton();
+    glides.nav = EDR.glide(nav, '.edr-nav-item');
+    glides.foot = EDR.glide(shell.querySelector('.edr-shell-foot'), '.edr-link-btn');
 
     document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -84,10 +100,13 @@
   }
 
   const has = (name) => document.documentElement.hasAttribute('data-edr-' + name);
+  const glides = {};
 
   function toggleNav() {
     const collapsed = !has('collapsed');
     EDR.flag('collapsed', collapsed);
+    // The rail changes width under the highlight; let the next hover place it afresh.
+    for (const g of Object.values(glides)) g.hide();
     slidePage(collapsed ? 184 : -184);
     syncNavButton();
     EDR.store.setPrefs({ navCollapsed: collapsed });
@@ -126,6 +145,8 @@
         if (el.title.trim() === el.textContent.trim()) el.removeAttribute('title');
       }
     }
+    const list = side && side.querySelector('ul.psa_list-linkmenu');
+    if (list && !list.classList.contains('edr-has-glide')) EDR.glide(list, ':scope > li');
     if (!side || !slot) { if (btn) btn.remove(); return; }
     if (!btn) {
       btn = h('button', { id: 'edr-side-toggle', class: 'edr-root edr-side-toggle', type: 'button', onclick: toggleSide, 'aria-controls': 'PT_SIDE' },
@@ -169,8 +190,8 @@
 
   // ---- Palette: search, ':' commands, and the theme picker share one component ----
 
-  function setTheme(id) {
-    EDR.themes.apply(id);
+  function setTheme(id, origin) {
+    if (document.documentElement.getAttribute('data-edr-theme') !== id) EDR.paintTheme(() => EDR.themes.apply(id), origin);
     EDR.store.setPrefs({ theme: id });
   }
 
@@ -227,6 +248,7 @@
     let picked = false;
 
     const list = h('ul', { class: 'edr-pal-list', role: 'listbox', id: 'edr-pal-list', 'aria-label': 'Results' });
+    const glide = EDR.glide(list, '.edr-pal-item', { manual: true, className: 'is-tint', duration: 220 });
     const input = h('input', {
       class: 'edr-pal-input', type: 'text', placeholder: spec.placeholder,
       role: 'combobox', 'aria-expanded': 'true', 'aria-autocomplete': 'list',
@@ -244,9 +266,12 @@
           h('span', null, kbd('Enter'), mode === 'theme' ? ' keep' : ' open'),
           mode === 'theme' ? h('span', null, kbd('Esc'), ' revert') : h('span', null, kbd('?'), ' all shortcuts'))));
 
+    // Each previewed theme paints in from its swatch.
     function preview() {
       const r = results[active];
-      if (mode === 'theme' && r) EDR.themes.apply(r.theme);
+      if (mode !== 'theme' || !r || document.documentElement.getAttribute('data-edr-theme') === r.theme) return;
+      const swatch = list.querySelector('#edr-opt-' + active + ' .edr-swatch');
+      EDR.paintTheme(() => EDR.themes.apply(r.theme), swatch);
     }
 
     function render() {
@@ -267,7 +292,8 @@
         input.setAttribute('aria-activedescendant', 'edr-opt-' + active);
         const el = document.getElementById('edr-opt-' + active);
         if (el) el.scrollIntoView({ block: 'nearest' });
-      } else input.removeAttribute('aria-activedescendant');
+        glide.sync(el && el.firstChild);
+      } else { input.removeAttribute('aria-activedescendant'); glide.hide(); }
     }
 
     function pick(r) {
