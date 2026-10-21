@@ -174,6 +174,7 @@
   }
 
   async function classicView() {
+    EDR.boot.save({ on: false });
     await EDR.store.setEnabled(false);
     location.reload();
   }

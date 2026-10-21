@@ -24,6 +24,19 @@
         "https://myedurec.nus.edu.sg/psc/*"
       ],
       "js": [
+        "src/boot.js"
+      ],
+      "css": [
+        "src/theme.css"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "https://myedurec.nus.edu.sg/psc/*"
+      ],
+      "js": [
         "src/core.js",
         "src/routes.js",
         "src/parsers.js",
@@ -36,9 +49,6 @@
         "src/overview.js",
         "src/enhancers.js",
         "src/main.js"
-      ],
-      "css": [
-        "src/theme.css"
       ],
       "run_at": "document_idle",
       "all_frames": true

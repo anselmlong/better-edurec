@@ -133,16 +133,21 @@
   const byId = Object.fromEntries(THEMES.map((t) => [t.id, t]));
   const DEFAULT = 'campus';
 
+  function rule(t) {
+    const decl = TOKENS.map((k) => '--edr-' + k + ': ' + t.tokens[k] + ';');
+    if (t.font) decl.push('--edr-font: ' + t.font + ';');
+    decl.push('--edr-radius: ' + (t.radius || '8px') + ';', '--edr-radius-sm: ' + (t.radiusSm || '6px') + ';');
+    decl.push('color-scheme: ' + (t.dark ? 'dark' : 'light') + ';');
+    return 'html[data-edr-on][data-edr-theme="' + t.id + '"] { ' + decl.join(' ') + ' }';
+  }
+
   // One stylesheet for all themes, keyed by html[data-edr-theme].
   function css() {
-    return THEMES.map((t) => {
-      const decl = TOKENS.map((k) => '--edr-' + k + ': ' + t.tokens[k] + ';');
-      if (t.font) decl.push('--edr-font: ' + t.font + ';');
-      decl.push('--edr-radius: ' + (t.radius || '8px') + ';', '--edr-radius-sm: ' + (t.radiusSm || '6px') + ';');
-      decl.push('color-scheme: ' + (t.dark ? 'dark' : 'light') + ';');
-      return 'html[data-edr-on][data-edr-theme="' + t.id + '"] { ' + decl.join(' ') + ' }';
-    }).join('\n');
+    return THEMES.map(rule).join('\n');
   }
+
+  // Just one theme's rule, cached for the next page's first paint (boot.js).
+  const cssFor = (id) => rule(byId[id] || byId[DEFAULT]);
 
   function apply(id) {
     const theme = byId[id] || byId[DEFAULT];
@@ -163,5 +168,5 @@
     return THEMES[(i + (step || 1) + THEMES.length) % THEMES.length].id;
   }
 
-  EDR.themes = { THEMES, TOKENS, byId, DEFAULT, css, apply, next };
+  EDR.themes = { THEMES, TOKENS, byId, DEFAULT, css, cssFor, apply, next };
 })();

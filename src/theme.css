@@ -241,6 +241,26 @@ html[data-edr-on] .ps_apps_content .ps_box-edit > .ps_box-value { font-size: 15p
   }
 }
 
+/* Until the sidebar mounts (document_idle), paint its silhouette so the page
+   doesn't jump sideways or flash stock EduRec on every navigation. The real
+   sidebar sits on top of this at a higher z-index. */
+@media (min-width: 900px) {
+  html[data-edr-on][data-edr-top]::before {
+    content: ""; position: fixed; top: 0; left: 0; bottom: 0; z-index: 2147482999; width: var(--edr-nav-w); box-sizing: border-box;
+    background: linear-gradient(var(--edr-brand-bg) 0 68px, var(--edr-surface) 68px); border-right: 1px solid var(--edr-line);
+    pointer-events: none;
+  }
+  html[data-edr-on][data-edr-top][data-edr-collapsed]::before { background: linear-gradient(var(--edr-brand-bg) 0 108px, var(--edr-surface) 108px); }
+}
+
+/* Same-origin page changes crossfade instead of cutting to white. */
+@view-transition { navigation: auto; }
+html[data-edr-on]:not(.edr-painting)::view-transition-old(root),
+html[data-edr-on]:not(.edr-painting)::view-transition-new(root) { animation-duration: 160ms; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
+}
+
 /* Homepage: hide everything EduRec renders; the Overview replaces it. */
 html[data-edr-home] body > *:not(.edr-root) { display: none !important; }
 html[data-edr-home] body { overflow: auto !important; height: auto !important; }
