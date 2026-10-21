@@ -199,7 +199,7 @@
   function commands() {
     const t = EDR.themes;
     return [
-      { label: 'Set up Overview', hint: 'Command', keys: 'setup overview wizard collect', run: () => EDR.wizard.start() },
+      { label: 'Fill in Overview', hint: 'Command', keys: 'setup overview guide collect fill', href: EDR.routes.HOME + '#overview' },
       { label: 'Open Overview', hint: 'Command', keys: 'overview home dashboard', href: EDR.routes.HOME + '#overview' },
       { label: 'Pick a theme', hint: 'Command', keys: 'theme themes colour color picker', run: () => openPalette({ mode: 'theme' }) },
       ...t.THEMES.map((th) => ({ label: 'Theme: ' + th.label, hint: 'Command', keys: 'theme ' + th.id + ' ' + th.label.toLowerCase(), run: () => setTheme(th.id) })),

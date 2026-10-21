@@ -81,7 +81,8 @@
   ];
   // Not a quick link, but the Up next card opens View Classes the same way.
   const TIMETABLE_LINK = { id: 'timetable', tile: 'acadrec', open: 'View Classes' };
-  const isOpenable = (label) => SHORTCUTS.concat(TIMETABLE_LINK).some((sc) => sc.open === label);
+  // Guide steps (guide.js) open their pages the same way.
+  const isOpenable = (label) => SHORTCUTS.concat(TIMETABLE_LINK).some((sc) => sc.open === label) || !!(EDR.guide && EDR.guide.isStepLabel(label));
 
   const byId = Object.fromEntries(TILES.map((t) => [t.id, t]));
   const byComp = Object.fromEntries(TILES.map((t) => [t.comp, t]));

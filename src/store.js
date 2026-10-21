@@ -37,7 +37,7 @@
   }
 
   // When each summary was last read from its page (even if unchanged). The setup
-  // wizard waits on this; it's separate from saveSnapshot's change timestamp.
+  // guide waits on this; it's separate from saveSnapshot's change timestamp.
   const SEEN = 'edr:seen';
   async function getSeen() {
     return (await area().get(SEEN))[SEEN] || {};

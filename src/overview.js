@@ -9,7 +9,6 @@
   let prefs = {};
   let lastData = {};
   let rootEl = null;
-  let run = null;          // the setup run in progress, if any (wizard state)
   let filledBefore = null; // summary keys that had data at the previous render
 
   async function mount(initialPrefs) {
@@ -19,29 +18,13 @@
     rootEl = h('main', { id: 'edr-overview', class: 'edr-root edr-page' });
     document.body.append(rootEl);
     lastData = await EDR.store.getData();
-    run = live(await EDR.wizard.getState());
     render();
     // After the first paint, re-renders (new data, setup progress) don't replay
     // entrance motion; only a card that just received its data animates in.
     setTimeout(() => rootEl.setAttribute('data-settled', ''), 1200);
     EDR.store.onDataChange((data) => { lastData = data; render(); });
-    EDR.wizard.onChange(async (next, prev) => {
-      run = live(next);
-      render();
-      if (!next && prev) {
-        const p = await EDR.store.getPrefs();
-        if (p.wizardJustFinished && Date.now() - p.wizardJustFinished < 60000) {
-          showFinished(p.lastWizard || {});
-          EDR.store.setPrefs({ wizardJustFinished: 0 });
-        }
-      }
-    });
     // Live: keep "Up next" and the now-line current without re-running entrance motion.
     setInterval(renderLive, 30000);
-    if (prefs.wizardJustFinished && Date.now() - prefs.wizardJustFinished < 60000) {
-      showFinished(prefs.lastWizard || {});
-      EDR.store.setPrefs({ wizardJustFinished: 0 });
-    }
   }
 
   function render() {
@@ -55,7 +38,7 @@
         h('p', { class: 'edr-muted' }, now.toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ' · AY' + term.ay + ' ' + term.label),
         h('h1', { class: 'edr-h1' }, 'Overview')),
       quickLinks(),
-      run ? progressCard(run) : setupPrompt(data),
+      setupPrompt(data),
       h('section', { class: 'edr-grid', 'aria-label': 'Summary' },
         safe('Results', gpaCard, data.results, byId.exams.path, 'results'),
         safe('Degree progress', degreeCard, data.audit, byId.degree.path, 'audit'),
@@ -67,9 +50,6 @@
     markArrivals();
   }
 
-  // A wizard state counts only while fresh; one left by a closed tab is ignored.
-  const live = (s) => (s && s.id && Date.now() - s.stepAt < 10 * 60 * 1000 ? s : null);
-
   // Cards whose summary just arrived get a one-off entrance.
   function markArrivals() {
     const filled = new Set(KEYS.filter((k) => lastData[k]));
@@ -80,26 +60,6 @@
       }
     }
     filledBefore = filled;
-  }
-
-  // Setup running in a background tab: what's done, what's being read, what's next.
-  function progressCard(s) {
-    const { STEPS } = EDR.wizard;
-    const now = STEPS[s.queue[s.i]];
-    const ICON = { done: 'M5 12.5l4.5 4.5L19 7.5', skipped: 'M6 12h12' };
-    return h('section', { class: 'edr-setup edr-collecting', role: 'status', 'aria-live': 'polite', 'aria-labelledby': 'edr-collect-title' },
-      h('div', { class: 'edr-setup-copy' },
-        h('h2', { class: 'edr-h2', id: 'edr-collect-title' }, now ? 'Reading your ' + now.label.toLowerCase() + '…' : 'Finishing up…'),
-        h('p', { class: 'edr-muted' }, 'Step ' + Math.min(s.i + 1, s.queue.length) + ' of ' + s.queue.length + '. It runs in a background tab and only opens view pages, so you can keep using this one.')),
-      h('ol', { class: 'edr-collect-steps' }, s.queue.map((k, i) => {
-        const status = i < s.i ? (s.outcome[k] === 'done' ? 'done' : 'skipped') : i === s.i ? 'now' : 'todo';
-        return h('li', { class: 'is-' + status },
-          h('span', { class: 'edr-collect-dot', 'aria-hidden': 'true' }, ICON[status] ? EDR.icon(ICON[status], 12) : null),
-          h('span', null, STEPS[k].label),
-          h('span', { class: 'edr-visually-hidden' }, status === 'now' ? ' (reading)' : status === 'todo' ? ' (next)' : ' (' + status + ')'));
-      })),
-      h('div', { class: 'edr-setup-actions' },
-        h('button', { type: 'button', class: 'edr-btn is-small is-ghost', onclick: () => EDR.wizard.stop() }, 'Stop')));
   }
 
   function card(title, href, updated, ...body) {
@@ -125,63 +85,43 @@
     }
   }
 
-  // Empty card: one click collects just this summary.
+  // Empty card: a link that walks the student to the page this summary comes from.
   function empty(key, text) {
-    // While setup is reading this summary, say so instead of offering a button.
-    if (run && run.queue.includes(STEP_FOR[key])) {
-      const reading = run.queue[run.i] === STEP_FOR[key];
-      return h('div', { class: 'edr-empty is-waiting' + (reading ? ' is-reading' : '') },
-        h('p', null, text),
-        h('p', { class: 'edr-waiting-line' }, h('span', { class: 'edr-collect-dot', 'aria-hidden': 'true' }), reading ? 'Reading from EduRec…' : 'Queued'));
-    }
+    const G = EDR.guide;
     return h('div', { class: 'edr-empty' },
       h('p', null, text),
-      h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start(stepsFor([key])) },
-        EDR.icon('M12 5v10M7 10l5 5 5-5M5 19h14', 16), 'Collect'));
+      G.link(G.STEP_FOR[key], { class: 'edr-btn is-small' }, 'Show me', EDR.icon('M5 12h14M13 6l6 6-6 6', 16)));
   }
 
-  // Summary key -> the wizard step that collects it, and how the prompt names it.
   const KEYS = ['results', 'audit', 'sessions'];
-  const STEP_FOR = { results: 'results', audit: 'audit', sessions: 'timetable', slots: 'timetable', classes: 'classes' };
-  const NAME_FOR = { results: 'Exam results', audit: 'Graduation audit', sessions: 'Timetable' };
-  const stepsFor = (keys) => [...new Set(keys.map((k) => STEP_FOR[k]))];
+  const REQUIRED = ['results', 'audit', 'timetable'];
 
+  // Checklist: open each page once and the Overview fills itself. Never blocks:
+  // it can be dismissed, and every card works on its own.
   function setupPrompt(data) {
-    const missing = KEYS.filter((k) => !data[k]);
+    const G = EDR.guide;
+    const missing = REQUIRED.filter((k) => !G.isDone(k, data));
     if (!missing.length || prefs.setupDismissed) return null;
     const dismiss = () => { prefs.setupDismissed = true; EDR.store.setPrefs({ setupDismissed: true }); render(); };
-    if (missing.length === KEYS.length) {
-      return h('section', { class: 'edr-setup', 'aria-labelledby': 'edr-setup-title' },
-        h('div', { class: 'edr-setup-copy' },
-          h('h2', { class: 'edr-h2', id: 'edr-setup-title' }, 'Set up your Overview'),
-          h('p', { class: 'edr-muted' }, 'One click reads your exam results, degree audit and classes from EduRec. It takes about 20 seconds and never submits anything.')),
-        h('div', { class: 'edr-setup-actions' },
-          h('button', { type: 'button', class: 'edr-btn', onclick: () => EDR.wizard.start() }, 'Set up Overview'),
-          h('button', { type: 'button', class: 'edr-btn is-ghost', onclick: dismiss }, 'Not now')));
-    }
-    return h('section', { class: 'edr-setup is-compact', 'aria-label': 'Overview setup' },
-      h('p', { class: 'edr-setup-line' },
-        h('strong', null, (KEYS.length - missing.length) + ' of ' + KEYS.length + ' summaries ready.'), ' ',
-        missing.map((k) => NAME_FOR[k]).join(', ') + ' still to collect.'),
-      h('div', { class: 'edr-setup-actions' },
-        h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start(stepsFor(missing)) }, 'Collect the rest'),
-        h('button', { type: 'button', class: 'edr-icon-btn is-dark', 'aria-label': 'Dismiss', title: 'Dismiss', onclick: dismiss },
-          EDR.icon('M6 6l12 12M18 6L6 18', 16))));
-  }
-
-  // Short, proportional confirmation when the setup run lands back here.
-  function showFinished(outcome) {
-    const keys = Object.keys(outcome);
-    const done = keys.filter((k) => outcome[k] === 'done').length;
-    const skipped = keys.filter((k) => outcome[k] !== 'done').map((k) => EDR.wizard.STEPS[k].label.toLowerCase());
-    const toast = h('div', { class: 'edr-root edr-toast', role: 'status' },
-      EDR.icon('M5 12.5l4.5 4.5L19 7.5', 18),
-      h('span', null, done === keys.length
-        ? 'Overview ready. ' + done + (done === 1 ? ' summary' : ' summaries') + ' collected.'
-        : done + ' of ' + keys.length + ' collected. Couldn’t read ' + skipped.join(', ') + '; try Collect on that card.'));
-    document.documentElement.append(toast);
-    setTimeout(() => toast.classList.add('is-leaving'), 5200);
-    setTimeout(() => toast.remove(), 5600);
+    const first = missing[0];
+    return h('section', { class: 'edr-setup edr-checklist', 'aria-labelledby': 'edr-setup-title' },
+      h('div', { class: 'edr-setup-copy' },
+        h('h2', { class: 'edr-h2', id: 'edr-setup-title' }, missing.length === REQUIRED.length ? 'Fill in your Overview' : 'Finish your Overview'),
+        h('p', { class: 'edr-muted' }, 'Open each page once and its summary appears here. A guide on each page shows what to click. Takes about a minute.')),
+      h('button', { type: 'button', class: 'edr-icon-btn is-dark edr-setup-close', 'aria-label': 'Dismiss', title: 'Dismiss', onclick: dismiss },
+        EDR.icon('M6 6l12 12M18 6L6 18', 16)),
+      h('ol', { class: 'edr-checklist-steps' }, G.ORDER.map((k, i) => {
+        const step = G.STEPS[k];
+        const done = G.isDone(k, data);
+        return h('li', { class: done ? 'is-done' : k === first ? 'is-next' : '' },
+          h('span', { class: 'edr-check-mark', 'aria-hidden': 'true' }, done ? EDR.icon('M5 12.5l4.5 4.5L19 7.5', 13) : String(i + 1)),
+          h('span', { class: 'edr-check-text' },
+            h('strong', null, step.label + (step.optional ? ' (optional)' : '')),
+            h('span', null, step.about)),
+          done
+            ? h('span', { class: 'edr-check-state' }, 'Done')
+            : G.link(k, { class: 'edr-btn is-small' + (k === first ? '' : ' is-ghost') }, k === first ? 'Start' : 'Open'));
+      })));
   }
 
   function gpaCard(snap, href) {
@@ -269,8 +209,7 @@
     const exportBtn = lastData.classes
       ? h('button', { type: 'button', class: 'edr-btn is-small is-ghost', onclick: () => T.openInNusmods(lastData.classes) },
         'Open in NUSMods', EDR.icon('M7 17L17 7M9 7h8v8', 14))
-      : h('button', { type: 'button', class: 'edr-btn is-small is-ghost', title: 'Needs your class groups from CourseReg', onclick: () => EDR.wizard.start(['classes']) },
-        'Collect class groups for NUSMods');
+      : EDR.guide.link('classes', { class: 'edr-btn is-small is-ghost', title: 'Needs your class groups from CourseReg' }, 'Add class groups for NUSMods');
     if (!wk) return h('div', { class: 'edr-card edr-week' }, head('This week', exportBtn), h('p', { class: 'edr-muted' }, 'No upcoming classes this term.'));
 
     const week = T.sessionsInWeek(sch.list, wk.monday);

@@ -48,7 +48,7 @@
       // popup, and is always reachable from the sidebar (#overview).
       if (isHome && (prefs.overviewHome !== false || location.hash === '#overview')) EDR.overview.mount(prefs);
       else EDR.flag('home', false);
-      EDR.wizard.resume(page);
+      EDR.guide.resume(page);
     }
     EDR.enhancers.start();
   } catch (err) {

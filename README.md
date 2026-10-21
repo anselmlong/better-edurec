@@ -7,7 +7,7 @@ Not affiliated with or endorsed by NUS. See the [FAQ and disclaimer](faq/faq.htm
 ## What it does
 
 - **Sidebar and search on every page.** It groups EduRec's 21 tiles into 9 sections. Press ⌘K (Ctrl K on Windows) to search every tile and sub-page, e.g. "transcript", "S/U" or "leave".
-- **An Overview page instead of the tile homepage.** It shows your GPA, degree progress, what's up next and this week's timetable. One click (Set up Overview) fills it; it's optional and can be turned off from the toolbar popup.
+- **An Overview page instead of the tile homepage.** It shows your GPA, degree progress, what's up next and this week's timetable. A checklist walks you to each source page once; a guide card on that page highlights what to click and confirms when the summary is saved. It's optional and can be turned off from the toolbar popup.
 - **Summary cards on EduRec pages:**
   - **Exam results:** term, cumulative GPA, units and grade chips.
   - **Graduation audit report:** units done out of required, plus each unmet requirement with a progress bar.
@@ -31,7 +31,7 @@ From a release zip (no Chrome Web Store needed):
 1. Download `better-edurec-<version>.zip` and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and pick the unzipped folder (or this repo's folder).
-4. Sign in to EduRec and click **Set up Overview** on the Overview. It reads exam results, your graduation audit and your classes, then returns. Each card also fills on its own whenever you open its page (or click **Collect** on it).
+4. Sign in to EduRec. The Overview's checklist opens exam results, the graduation audit and View Classes in turn; a guide card on each page shows what to click. Each card also fills on its own whenever you open its page.
 
 Fonts: it uses Public Sans and IBM Plex Mono if they're installed, and falls back to your system font otherwise.
 
@@ -64,7 +64,8 @@ npm run harness
 | `src/shell.js` | Sidebar, palette (search, `:` commands, theme picker), cheat sheet |
 | `src/themes.js` | Theme registry; generates one CSS rule per theme |
 | `src/keys.js` | Vim-style key table, resolver and actions |
-| `src/wizard.js` | One-click Overview setup |
+| `src/guide.js` | Guided Overview setup: checklist links and the coach card on each page |
+| `src/boot.js` | Applies cached flags and theme before EduRec paints (no flash) |
 | `src/theme.css` | Restyle and component styles, all scoped to `html.edr-on` |
 
 The parsers read page text rather than PeopleSoft markup, so small layout changes usually don't break them. If NUS changes a page's wording, update the matching parser and its test.

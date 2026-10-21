@@ -551,31 +551,6 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 .edr-icon-btn.is-dark:hover { background: var(--edr-surface-3); color: var(--edr-ink); }
 
 /* Setup wizard progress, shown on every page while it runs. */
-.edr-wizard {
-  position: fixed; z-index: 2147483500; left: 50%; bottom: 20px; transform: translateX(-50%);
-  width: min(720px, calc(100vw - 32px)); display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; align-items: center;
-  padding: 14px 16px 14px 20px; border-radius: 10px; background: var(--edr-inverse-bg); color: var(--edr-inverse-ink);
-  box-shadow: 0 16px 40px rgb(var(--edr-shadow-rgb) / .3); animation: edr-rise 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.edr-wiz-text { display: flex; flex-direction: column; gap: 2px; font-size: 14px; min-width: 0; }
-.edr-wiz-step { color: var(--edr-inverse-muted); font-size: 13px; }
-.edr-wiz-actions { display: flex; gap: 6px; grid-row: span 2; }
-.edr-wiz-btn {
-  min-height: 36px; padding: 0 12px; border: 1px solid var(--edr-inverse-line); border-radius: var(--edr-radius-sm);
-  background: transparent; color: var(--edr-inverse-ink); font: 600 13px var(--edr-font, system-ui); cursor: pointer;
-}
-.edr-wiz-btn:hover { background: var(--edr-inverse-line); }
-.edr-wiz-btn.is-quiet { border-color: transparent; color: var(--edr-inverse-muted); }
-.edr-wiz-segs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; }
-.edr-wiz-seg { height: 4px; border-radius: 2px; background: var(--edr-inverse-line); overflow: hidden; position: relative; }
-.edr-wiz-seg.is-done { background: var(--edr-inverse-ink); }
-.edr-wiz-seg.is-now::after {
-  content: ""; position: absolute; inset: 0; background: var(--edr-inverse-ink); transform-origin: left;
-  animation: edr-wiz-progress 6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-.edr-wiz-seg.is-now.is-done::after { animation: none; }
-@keyframes edr-wiz-progress { from { transform: scaleX(0); } to { transform: scaleX(.85); } }
-@media (max-width: 599px) { .edr-wizard { grid-template-columns: 1fr; } .edr-wiz-actions { grid-row: auto; } }
 
 .edr-toast {
   position: fixed; z-index: 2147483500; left: 50%; bottom: 24px; transform: translateX(-50%);
@@ -662,8 +637,8 @@ html[data-edr-on] td.ps_grid-cell { font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) {
   .edr-shell { transition: none !important; }
   .edr-brand-mark, .edr-brand-mark svg rect, .edr-nav-item svg, .edr-link-btn svg { transition: none !important; }
-  .edr-pal, .edr-wizard, .edr-toast, .edr-badge.is-saved, #PT_CONTENT.edr-settle { animation: edr-fade 160ms ease-out both !important; }
-  .edr-wiz-seg.is-now::after { animation: none !important; transform: scaleX(.5); }
+  .edr-pal, .edr-coach, .edr-toast, .edr-badge.is-saved, #PT_CONTENT.edr-settle { animation: edr-fade 160ms ease-out both !important; }
+  .edr-coach-target { animation: none !important; }
   .edr-page .edr-bar > span, .edr-inline.is-new .edr-bar > span, .edr-inline.is-new { animation: edr-fade 200ms ease-out both !important; }
 }
 
@@ -700,14 +675,14 @@ html[data-edr-theme="terminal"] .edr-root { letter-spacing: 0; }
 
 /* Printing EduRec pages (e.g. the audit's printer-friendly view): no shell. */
 @media print {
-  .edr-shell, .edr-menu-toggle, .edr-wizard, .edr-toast, .edr-pal-overlay, .edr-help-overlay, .edr-side-toggle { display: none !important; }
+  .edr-shell, .edr-menu-toggle, .edr-coach, .edr-toast, .edr-pal-overlay, .edr-help-overlay, .edr-side-toggle { display: none !important; }
   html[data-edr-on][data-edr-top] body { margin-left: 0 !important; width: auto !important; max-width: none !important; transform: none !important; }
 }
 
 /* Windows high-contrast / forced colours: let the system palette win and keep focus visible. */
 @media (forced-colors: active) {
   .edr-root *:focus-visible { outline: 2px solid CanvasText !important; }
-  .edr-bar > span, .edr-wiz-seg.is-done { background: Highlight !important; forced-color-adjust: none; }
+  .edr-bar > span, .edr-check-mark { background: Highlight !important; forced-color-adjust: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   html[data-edr-theme="terminal"] .edr-h1::after { animation: none; }
@@ -800,29 +775,6 @@ html[data-edr-on] :is(.PSLEVEL1GRIDWBO, .PSLEVEL1GRID, .PSGROUPBOXWBO) { border-
 html[data-edr-on] :is(.PSACTIVETAB, .PSTABACTIVE) { background: var(--edr-tint) !important; color: var(--edr-selected-ink) !important; border-color: var(--edr-line) !important; }
 html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-surface) !important; color: var(--edr-ink-2) !important; border-color: var(--edr-line) !important; }
 
-/* ---------- Setup running in the background (Overview) ---------- */
-.edr-collecting { animation: none; }
-.edr-collect-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; flex: 1 1 100%; order: 3; }
-.edr-collect-steps li { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--edr-muted); transition: color 200ms ease; }
-.edr-collect-steps li.is-now { color: var(--edr-ink); font-weight: 600; }
-.edr-collect-steps li.is-done { color: var(--edr-ink-2); }
-.edr-collect-dot {
-  width: 18px; height: 18px; flex: none; border-radius: 50%; display: inline-grid; place-items: center; box-sizing: border-box;
-  border: 1.5px solid var(--edr-line-strong); color: var(--edr-on-primary); transition: background-color 240ms ease, border-color 240ms ease;
-}
-.is-done > .edr-collect-dot { background: var(--edr-navy); border-color: var(--edr-navy); animation: edr-pop 320ms cubic-bezier(0.16, 1, 0.3, 1); }
-.is-skipped > .edr-collect-dot { color: var(--edr-muted); }
-/* The step being read: a ring that sweeps, so waiting reads as work happening. */
-.is-now > .edr-collect-dot, .is-reading .edr-collect-dot {
-  border-color: color-mix(in srgb, var(--edr-navy) 25%, transparent); border-top-color: var(--edr-navy);
-  animation: edr-spin 800ms linear infinite;
-}
-@keyframes edr-spin { to { transform: rotate(360deg); } }
-.edr-empty.is-waiting { border-style: solid; }
-.edr-waiting-line { display: inline-flex; align-items: center; gap: 8px; font-size: 13px !important; color: var(--edr-muted) !important; }
-.edr-empty.is-reading .edr-waiting-line { color: var(--edr-ink) !important; font-weight: 600; }
-.edr-empty.is-waiting:not(.is-reading) .edr-collect-dot { width: 10px; height: 10px; }
-
 /* Re-renders after the first paint don't replay motion; a card whose summary
    just arrived comes into focus instead. */
 #edr-overview[data-settled] .edr-bar > span { animation: none; }
@@ -831,5 +783,55 @@ html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-su
 @keyframes edr-arrive { from { opacity: 0; transform: translateY(6px); filter: blur(6px); } }
 @media (prefers-reduced-motion: reduce) {
   #edr-overview[data-settled] .is-arriving { animation: edr-fade 200ms ease-out both; }
-  .is-now > .edr-collect-dot, .is-reading .edr-collect-dot { animation-duration: 2.4s; }
 }
+
+/* ---------- Guided setup: Overview checklist ---------- */
+.edr-checklist { position: relative; align-items: flex-start; }
+.edr-setup-close { position: absolute; top: 10px; right: 10px; }
+.edr-checklist .edr-setup-copy { padding-right: 32px; }
+.edr-checklist-steps { list-style: none; margin: 0; padding: 0; flex: 1 1 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.edr-checklist-steps li {
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; gap: 10px 12px; align-items: start;
+  padding: 14px; border: 1px solid var(--edr-line); border-radius: var(--edr-radius-sm); background: var(--edr-surface-2);
+}
+.edr-checklist-steps li.is-next { background: var(--edr-surface); border-color: color-mix(in srgb, var(--edr-navy) 45%, var(--edr-line)); }
+.edr-check-mark {
+  width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--edr-line-strong); color: var(--edr-muted); font-variant-numeric: tabular-nums;
+}
+.is-next > .edr-check-mark { border-color: var(--edr-navy); color: var(--edr-selected-ink); }
+.is-done > .edr-check-mark { background: var(--edr-navy); border-color: var(--edr-navy); color: var(--edr-on-primary); }
+.edr-check-text { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--edr-muted); line-height: 1.35; }
+.edr-check-text strong { font-size: 14px; color: var(--edr-ink); font-weight: 600; }
+.edr-checklist-steps li > .edr-btn, .edr-check-state { grid-column: 2; justify-self: start; }
+.edr-check-state { font-size: 13px; font-weight: 600; color: var(--edr-selected-ink); min-height: 36px; display: inline-flex; align-items: center; }
+
+/* ---------- Guided setup: coach card on EduRec pages ---------- */
+.edr-coach {
+  position: fixed; z-index: 2147483500; right: 20px; bottom: 20px; width: min(340px, calc(100vw - 32px));
+  display: flex; flex-direction: column; gap: 6px; padding: 14px 16px 16px;
+  background: var(--edr-surface); color: var(--edr-ink); border: 1px solid var(--edr-line); border-radius: var(--edr-radius);
+  box-shadow: 0 14px 40px rgb(var(--edr-shadow-rgb) / .22);
+  animation: edr-rise 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.edr-coach.is-leaving { opacity: 0; transform: translateY(6px); }
+.edr-coach-head { display: flex; justify-content: space-between; align-items: center; margin: -4px -6px 0 0; }
+.edr-coach-step { font-size: 12px; font-weight: 600; color: var(--edr-muted); }
+.edr-coach-title { font-size: 16px; font-weight: 700; }
+.edr-coach-text { margin: 0; font-size: 14px; color: var(--edr-ink-2); }
+.edr-coach-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.edr-coach-actions:empty { display: none; }
+.edr-coach.is-done .edr-coach-title { color: var(--edr-selected-ink); }
+.edr-coach a.edr-btn { text-decoration: none !important; color: var(--edr-on-primary) !important; }
+.edr-coach a.edr-btn.is-ghost { color: var(--edr-ink-2) !important; }
+/* The thing to click next: a soft ring that breathes, on EduRec's own element. */
+html[data-edr-on] .edr-coach-target {
+  border-radius: 6px; position: relative;
+  box-shadow: 0 0 0 2px var(--edr-blue), 0 0 0 6px color-mix(in srgb, var(--edr-blue) 22%, transparent) !important;
+  animation: edr-coach-ring 1.8s ease-in-out infinite;
+}
+@keyframes edr-coach-ring {
+  50% { box-shadow: 0 0 0 2px var(--edr-blue), 0 0 0 10px color-mix(in srgb, var(--edr-blue) 0%, transparent); }
+}
+@media (max-width: 599px) { .edr-coach { right: 16px; left: 16px; width: auto; bottom: 80px; } }

@@ -44,7 +44,7 @@
         "src/themes.js",
         "src/keys.js",
         "src/timetable.js",
-        "src/wizard.js",
+        "src/guide.js",
         "src/shell.js",
         "src/overview.js",
         "src/enhancers.js",
@@ -71,8 +71,5 @@
       ]
     }
   ],
-  "homepage_url": "https://github.com/anselmlong/edurec-reskin",
-  "background": {
-    "service_worker": "src/background.js"
-  }
+  "homepage_url": "https://github.com/anselmlong/edurec-reskin"
 }
