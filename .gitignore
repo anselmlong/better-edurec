@@ -2,3 +2,6 @@ node_modules/
 .DS_Store
 *.zip
 .omc/
+# Local-only: crawl notes and screenshots with personal data
+edurec-research/
+codedb.snapshot
