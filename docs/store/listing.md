@@ -89,3 +89,10 @@ Restyle the NUS EduRec student portal in the user's browser and summarise the us
 ## Sharing without the store
 
 Attach the zip to a GitHub release. Install: unzip → `chrome://extensions` → Developer mode on → Load unpacked → pick the folder. Updates are manual: download the new zip, replace the folder, click reload.
+
+## Shipping an update
+
+1. `npm run release` (or `npm run release -- minor`). It bumps the version in `manifest.json` and `package.json`, runs checks and tests, builds `dist/better-edurec-<version>.zip`, commits and tags. Add `-- --push` to push and attach the zip to a GitHub release for people who install unpacked.
+2. Developer Dashboard → Better EduRec → Package → Upload new package → the new zip.
+3. Update the listing or privacy answers only if something visible or a permission changed. New permissions disable the extension for users until they accept them.
+4. Submit for review. The current version stays live meanwhile; approved updates reach users automatically within hours.

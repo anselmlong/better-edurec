@@ -44,6 +44,7 @@ npm test        # parser and routing unit tests (node:test)
 npm run check   # syntax check every script
 npm run pack    # check, test, then build dist/better-edurec-<version>.zip
 npm run icons   # redraw icons/ from scripts/icons.py
+npm run release # bump version (patch; or -- minor / major / x.y.z), test, zip, commit, tag; add -- --push to push and make a GitHub release
 ```
 
 To try the UI without EduRec, open the local harness. It runs the real scripts against fake PeopleSoft-style pages with invented data:
