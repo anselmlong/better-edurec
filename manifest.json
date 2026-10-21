@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A personal, read-only reskin of NUS EduRec: overview dashboard, sidebar, search and readable summaries.",
   "permissions": ["storage"],
-  "host_permissions": ["https://myedurec.nus.edu.sg/*"],
+  "host_permissions": ["https://myedurec.nus.edu.sg/*", "https://api.nusmods.com/*"],
   "action": {
     "default_title": "EduRec Reskin",
     "default_popup": "popup/popup.html"
@@ -19,6 +19,7 @@
         "src/store.js",
         "src/themes.js",
         "src/keys.js",
+        "src/timetable.js",
         "src/wizard.js",
         "src/shell.js",
         "src/overview.js",

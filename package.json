@@ -5,7 +5,7 @@
   "description": "Personal, read-only reskin of NUS EduRec as a Chrome extension.",
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check": "node --check src/core.js && node --check src/routes.js && node --check src/parsers.js && node --check src/store.js && node --check src/themes.js && node --check src/keys.js && node --check src/wizard.js && node --check src/shell.js && node --check src/overview.js && node --check src/enhancers.js && node --check src/main.js && node --check popup/popup.js",
+    "check": "node --check src/core.js && node --check src/routes.js && node --check src/parsers.js && node --check src/store.js && node --check src/themes.js && node --check src/keys.js && node --check src/timetable.js && node --check src/wizard.js && node --check src/shell.js && node --check src/overview.js && node --check src/enhancers.js && node --check src/main.js && node --check popup/popup.js",
     "pack": "rm -f edurec-reskin.zip && zip -qr edurec-reskin.zip manifest.json src popup",
     "harness": "node scripts/serve.mjs"
   },

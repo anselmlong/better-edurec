@@ -8,11 +8,12 @@
   // enhancer reports the summary, and moves on. It only ever clicks view links
   // named below, never buttons that submit anything.
   const STEPS = {
-    results: { label: 'Exam results', tile: 'exams', nav: 'View Exam Results', pickTerm: true },
-    audit: { label: 'Graduation audit', tile: 'degree', nav: 'View Graduation Audit Report' },
-    classes: { label: 'My classes', tile: 'coursereg', nav: 'View My Classes@CourseReg' }
+    results: { label: 'Exam results', tile: 'exams', nav: 'View Exam Results', pickTerm: true, wait: ['results'] },
+    audit: { label: 'Graduation audit', tile: 'degree', nav: 'View Graduation Audit Report', wait: ['audit'] },
+    timetable: { label: 'Timetable', tile: 'acadrec', nav: 'View Classes', pickTerm: true, wait: ['sessions', 'slots'], radio: { after: 'sessions', label: 'By Class' } },
+    classes: { label: 'Class groups', tile: 'coursereg', nav: 'View My Classes@CourseReg', wait: ['classes'] }
   };
-  const ORDER = ['results', 'audit', 'classes'];
+  const ORDER = ['results', 'audit', 'timetable', 'classes'];
   const STEP_TIMEOUT = 25000;
   const RUN_TTL = 10 * 60 * 1000; // a run left over from a closed tab or expired session is dropped
   const KEY = 'edr:wizard';
@@ -78,9 +79,10 @@
     const clicked = new Set();
     const begun = Date.now();
     const timer = setInterval(async () => {
-      const seen = (await EDR.store.getSeen())[key] || 0;
-      if (seen >= state.stepAt) { clearInterval(timer); setBar('Got it', true); setTimeout(() => advance('done'), 450); return; }
-      if (Date.now() - begun > STEP_TIMEOUT) { clearInterval(timer); advance('skipped'); return; }
+      const seen = await EDR.store.getSeen();
+      const got = (k) => (seen[k] || 0) >= state.stepAt;
+      if (step.wait.every(got)) { clearInterval(timer); setBar('Got it', true); setTimeout(() => advance('done'), 450); return; }
+      if (Date.now() - begun > STEP_TIMEOUT) { clearInterval(timer); advance(step.wait.some(got) ? 'done' : 'skipped'); return; }
       if (step.nav && !clicked.has('nav')) {
         const link = navLink(step.nav);
         if (link) {
@@ -91,8 +93,12 @@
         }
       }
       if (step.pickTerm && !clicked.has('term')) {
-        const term = document.querySelector('a[id^="TERM$"]');
-        if (term) { clicked.add('term'); term.click(); }
+        const term = document.querySelector('a[id^="TERM$"]') || document.querySelector('#PT_MAIN .ps_box-grid-list li.ps_grid-row a');
+        if (term) { clicked.add('term'); term.click(); return; }
+      }
+      if (step.radio && got(step.radio.after) && !clicked.has('radio')) {
+        const label = [...document.querySelectorAll('#PT_MAIN label')].find((l) => l.textContent.trim() === step.radio.label);
+        if (label) { clicked.add('radio'); label.click(); }
       }
     }, 700);
   }

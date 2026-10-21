@@ -51,7 +51,7 @@
       h('div', { class: 'edr-shell-body' },
         h('button', { class: 'edr-search-btn', type: 'button', onclick: () => openPalette(), 'data-tip': 'Search', 'aria-label': 'Search EduRec' },
           EDR.icon(I.search, 16),
-          h('span', { class: 'edr-label' }, 'Search'),
+          h('span', { class: 'edr-label edr-search-label' }, 'Search'),
           h('kbd', { class: 'edr-label' }, isMac ? '⌘K' : 'Ctrl K')),
         nav,
         h('div', { class: 'edr-shell-foot' },
@@ -329,10 +329,29 @@
     closeBtn.focus();
   }
 
+  // Shortcut links carry #edr-open=<page-list label>; click that item once it renders.
+  // Only labels from the shortcut table are followed, and only page-list links.
+  function followDeepLink() {
+    const m = /#edr-open=([^&]+)/.exec(location.hash);
+    if (!m) return;
+    const label = decodeURIComponent(m[1]);
+    if (!EDR.routes.SHORTCUTS.some((sc) => sc.open === label)) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    const started = Date.now();
+    const timer = setInterval(() => {
+      const link = [...document.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label);
+      if (link) {
+        clearInterval(timer);
+        const li = link.closest('li');
+        if (!li || !li.classList.contains('psc_selected')) link.click();
+      } else if (Date.now() - started > 10000) clearInterval(timer);
+    }, 300);
+  }
+
   // h moves focus into the sidebar; on narrow screens that means opening the drawer.
   function revealNav() {
     if (innerWidth < 900) EDR.flag('nav-open', true);
   }
 
-  EDR.shell = { mount, mountRestoreButton, openPalette, openHelp, revealNav, ensureSideToggle, toggleNav, toggleSide, setTheme };
+  EDR.shell = { mount, mountRestoreButton, openPalette, openHelp, revealNav, followDeepLink, ensureSideToggle, toggleNav, toggleSide, setTheme };
 })();

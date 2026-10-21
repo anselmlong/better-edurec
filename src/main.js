@@ -25,6 +25,7 @@
       EDR.flag('top');
       EDR.shell.mount(page);
       EDR.keys.start();
+      EDR.shell.followDeepLink();
       // The signed-in homepage shares its URL with the sign-in page, so confirm it by its form too.
       const lp = new URLSearchParams(location.search).get('lp');
       const isHome = page.key === 'home' || (document.getElementById('PT_LANDINGPAGE') && (!lp || lp === 'SA.EMPLOYEE.DEFAULT_LP'));

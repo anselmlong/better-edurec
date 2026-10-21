@@ -138,5 +138,90 @@
     return s.toLowerCase().replace(/\b[a-z][a-z']*/g, (w, i) => (i > 0 && small.has(w) ? w : w[0].toUpperCase() + w.slice(1)));
   }
 
-  EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, titleCase, aidName };
+  // ---- Timetable (Academic Records › View Classes) ----
+
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  // "2:00PM" -> "14:00"
+  function to24(t) {
+    const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(String(t).trim());
+    if (!m) return null;
+    let hr = Number(m[1]) % 12;
+    if (/pm/i.test(m[3])) hr += 12;
+    return String(hr).padStart(2, '0') + ':' + m[2];
+  }
+
+  // Calendar year of a month inside an academic year "2026/2027": Aug–Dec are the first year.
+  function yearFor(ay, monthIndex) {
+    const [first, second] = ay.split('/').map(Number);
+    return monthIndex >= 6 ? first : second;
+  }
+
+  // "By Date" view: one entry per class meeting with date, start, course, type and room.
+  function parseSessions(text) {
+    const ls = lines(text);
+    if (!ls.includes('By Date') || !ls.some((l) => /^Room:/.test(l))) return null;
+    const termM = TERM_RE.exec(flat(text));
+    const ay = termM ? termM[1].slice(0, 9) : null;
+    const DAY = new RegExp('^(' + WEEKDAYS.join('|') + ') (' + MONTHS.join('|') + ') (\\d{1,2})$');
+    const CLS = /^([A-Z]{2,4}) ?(\d{4}[A-Z]{0,3})\s+(.+)$/;
+    const sessions = [];
+    for (let i = 0; i < ls.length; i++) {
+      const d = DAY.exec(ls[i]);
+      if (!d) continue;
+      const start = to24(ls[i + 1]);
+      const c = CLS.exec(ls[i + 2] || '');
+      if (!start || !c) continue;
+      const room = /^Room:\s*(.*)$/.exec(ls[i + 3] || '');
+      const status = /^Status:\s*(.*)$/.exec(ls[i + (room ? 4 : 3)] || '');
+      const month = MONTHS.indexOf(d[2]);
+      const year = ay ? yearFor(ay, month) : new Date().getFullYear();
+      sessions.push({
+        date: year + '-' + String(month + 1).padStart(2, '0') + '-' + d[3].padStart(2, '0'),
+        start, code: c[1] + c[2], type: c[3].trim(),
+        room: room ? room[1].trim() : '', status: status ? status[1].trim() : ''
+      });
+    }
+    return { term: termM ? termM[1] : null, sessions };
+  }
+
+  // "By Class" view: weekly slots with end times ("Days: Tuesday", "Times: 2:00PM to 3:00PM").
+  function parseSlots(text) {
+    const ls = lines(text);
+    if (!ls.some((l) => /^Times:\s/.test(l))) return null;
+    const termM = TERM_RE.exec(flat(text));
+    const HEAD = /^([A-Z]{2,4}) ?(\d{4}[A-Z]{0,3}) (.+)$/;
+    const slots = [];
+    const seen = new Set();
+    let code = null;
+    let day = null;
+    for (const l of ls) {
+      const head = HEAD.exec(l);
+      if (head && !/^Days:|^Times:/.test(l)) { code = head[1] + head[2]; continue; }
+      const dm = /^Days:\s*(\w+)/.exec(l);
+      if (dm) { day = dm[1]; continue; }
+      const tm = /^Times:\s*(\d{1,2}:\d{2}\s*[AP]M)\s+to\s+(\d{1,2}:\d{2}\s*[AP]M)/i.exec(l);
+      if (tm && code && day) {
+        const slot = { code, day, start: to24(tm[1]), end: to24(tm[2]) };
+        const key = slot.code + slot.day + slot.start;
+        if (!seen.has(key)) { seen.add(key); slots.push(slot); }
+      }
+    }
+    return { term: termM ? termM[1] : null, slots };
+  }
+
+  // Attach end times from the weekly slots to dated sessions (1 hour if unknown).
+  function mergeSchedule(sessions, slots) {
+    const ends = new Map((slots || []).map((s) => [s.code + s.day + s.start, s.end]));
+    return (sessions || []).map((s) => {
+      const [y, m, d] = s.date.split('-').map(Number);
+      const day = WEEKDAYS[new Date(y, m - 1, d).getDay()];
+      const end = ends.get(s.code + day + s.start);
+      const [hh, mm] = s.start.split(':').map(Number);
+      return { ...s, day, end: end || String(Math.min(hh + 1, 23)).padStart(2, '0') + ':' + String(mm).padStart(2, '0'), endKnown: !!end };
+    });
+  }
+
+  EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName };
 })();

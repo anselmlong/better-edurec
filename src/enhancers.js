@@ -29,6 +29,20 @@
       render: classesCard
     },
     {
+      key: 'sessions', anchor: 'Please note that there will be no classes on public holidays.',
+      test: (t) => t.includes('By Date') && /\nRoom:/.test(t),
+      parse: (t) => EDR.parsers.parseSessions(t),
+      useful: (d) => d && d.sessions.length,
+      render: sessionsCard
+    },
+    {
+      key: 'slots', anchor: 'Please note that there will be no classes on public holidays.',
+      test: (t) => /\nTimes: /.test(t),
+      parse: (t) => EDR.parsers.parseSlots(t),
+      useful: (d) => d && d.slots.length,
+      render: slotsCard
+    },
+    {
       key: 'finaid', anchor: 'FA Code',
       test: (t) => t.includes('Posted Date') && t.includes('FA Code'),
       parse: (t) => EDR.parsers.parseFinAid(t),
@@ -147,6 +161,18 @@
         h('li', null,
           h('span', null, h('span', { class: 'edr-mono' }, m.code), ' ', m.title),
           h('span', { class: 'edr-muted' }, m.classes.map((k) => k.type + ' ' + k.group).join(' · '))))));
+  }
+
+  function sessionsCard(d) {
+    const codes = [...new Set(d.sessions.map((s) => s.code))];
+    return cardShell('Timetable' + (d.term ? ' · ' + d.term : ''),
+      h('p', { class: 'edr-muted' }, d.sessions.length + ' class meetings across ' + codes.length + (codes.length === 1 ? ' course' : ' courses') + '. Your Overview shows this week and what’s up next.'));
+  }
+
+  function slotsCard(d) {
+    return cardShell('Class times' + (d.term ? ' · ' + d.term : ''),
+      h('ul', { class: 'edr-chips' }, d.slots.map((s) =>
+        h('li', { class: 'edr-chip' }, h('span', { class: 'edr-mono' }, s.code), ' ', s.day.slice(0, 3) + ' ' + s.start + '–' + s.end))));
   }
 
   function aidCard(f) {

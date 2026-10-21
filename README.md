@@ -14,6 +14,8 @@ Not affiliated with or endorsed by NUS.
   - **View My Classes (CourseReg):** each course with its lecture and tutorial groups.
   - **Financial aid:** the total disbursed and the latest payment.
 - **A light restyle of EduRec itself:** type, colours, buttons and tables.
+- **Live timetable:** an Up next card (what's on now or next, room, countdown) and a NUSMods-style week grid with a moving now-line, built from Academic Records › View Classes. **Open in NUSMods** exports your class groups as a NUSMods share link; only course codes are sent to NUSMods' public API, and only when you click it.
+- **Quick links:** one click to the exact sub-page for the unofficial transcript, exam results and schedule, course registration, timetable, degree audit, S/U declarations, status letter and leave of absence. Search shows them first.
 - **12 themes:** Campus (default), Dark, Girlypop, Terminal, Monokai, Dracula, Nord, Solarized Light, Gruvbox, Catppuccin, Rosé Pine and Tokyo Night. Pick one from the sidebar's Theme button, `t`, `:theme <name>`, or the toolbar popup. Arrowing through the picker previews each theme; Esc reverts. Every theme passes WCAG AA contrast for body text (checked by `test/themes.test.mjs`).
 - **Vim-style keyboard control:** `j`/`k` move, `h`/`l` switch panes (sidebar, EduRec's page list, content), `gg`/`G` first and last, `d`/`u` half-page scroll, `/` search, `:` command line, `H`/`L` back and forward, `1`–`9` sidebar sections, `[`/`]` collapse the sidebar or page list, `?` shows every shortcut.
 - **Classic view.** One click turns everything off. The toolbar popup also has the switch.

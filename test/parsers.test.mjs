@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 await import('../src/parsers.js');
-const { parseAudit, parseResults, parseMyClasses, parseFinAid, titleCase, aidName } = globalThis.EDR.parsers;
+const { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName } = globalThis.EDR.parsers;
 
 // Fixtures mirror EduRec's text layout (one text node per line); all values are invented.
 
@@ -244,4 +244,87 @@ test('aidName strips the repeated type columns', () => {
 test('titleCase only rewrites all-caps titles', () => {
   assert.equal(titleCase('INTRODUCTION TO OPERATING SYSTEMS'), 'Introduction to Operating Systems');
   assert.equal(titleCase('Already Fine'), 'Already Fine');
+});
+
+// View Classes, "By Date" and "By Class" layouts (values invented).
+const BY_DATE = `
+2026/2027 Semester 1
+By Class
+By Date
+From
+To
+Please note that there will be no classes on public holidays.
+Monday August 10
+6:00PM
+ABC 2101  Lecture
+Room: LT01
+Status: Enrolled
+Tuesday August 25
+2:00PM
+XY 3219  Tutorial
+Room: COM9-01
+Status: Enrolled
+Monday January 11
+9:00AM
+ABC 2101  Lecture
+Room: LT01
+Status: Enrolled
+`;
+
+const BY_CLASS = `
+2026/2027 Semester 1
+By Class
+By Date
+XY 3219   Software Design and Architectu
+Class
+Start/End Dates
+Days and Times
+Room
+25/08/2026 - 25/08/2026
+Days: Tuesday
+Times: 2:00PM to 3:00PM
+Days: Tuesday
+Times: 2:00PM to 3:00PM
+COM9-01
+ABC 2101   Example Course
+Days: Monday
+Times: 6:00PM to 8:00PM
+`;
+
+test('to24 converts 12-hour times', () => {
+  assert.equal(to24('2:00PM'), '14:00');
+  assert.equal(to24('12:30PM'), '12:30');
+  assert.equal(to24('12:00AM'), '00:00');
+  assert.equal(to24('9:05 AM'), '09:05');
+  assert.equal(to24('nope'), null);
+});
+
+test('parseSessions reads dated meetings and places January in the next year', () => {
+  const r = parseSessions(BY_DATE);
+  assert.equal(r.term, '2026/2027 Semester 1');
+  assert.deepEqual(r.sessions[0], { date: '2026-08-10', start: '18:00', code: 'ABC2101', type: 'Lecture', room: 'LT01', status: 'Enrolled' });
+  assert.equal(r.sessions[1].code, 'XY3219');
+  assert.equal(r.sessions[2].date, '2027-01-11');
+});
+
+test('parseSlots reads weekly end times without duplicates', () => {
+  assert.deepEqual(parseSlots(BY_CLASS).slots, [
+    { code: 'XY3219', day: 'Tuesday', start: '14:00', end: '15:00' },
+    { code: 'ABC2101', day: 'Monday', start: '18:00', end: '20:00' }
+  ]);
+});
+
+test('mergeSchedule attaches end times and falls back to one hour', () => {
+  const merged = mergeSchedule(parseSessions(BY_DATE).sessions, parseSlots(BY_CLASS).slots);
+  assert.equal(merged[0].day, 'Monday');
+  assert.equal(merged[0].end, '20:00');
+  assert.equal(merged[0].endKnown, true);
+  const lone = mergeSchedule([{ date: '2026-08-12', start: '10:00', code: 'Q1000', type: 'Lab', room: '' }], []);
+  assert.equal(lone[0].end, '11:00');
+  assert.equal(lone[0].endKnown, false);
+});
+
+test('schedule parsers ignore unrelated pages', () => {
+  assert.equal(parseSessions('Course Grades\nGPA 4.00'), null);
+  assert.equal(parseSlots('Course Grades\nGPA 4.00'), null);
 });

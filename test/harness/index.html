@@ -43,6 +43,23 @@
         '2', 'Example Merit Award', 'Third Party Contracts', 'Example Merit Award', '2026/2027 Semester 1', '11/08/2026', '3850.00']
     }
   };
+  // Fake View Classes pages, generated around today so the live timetable has data.
+  (function () {
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const mon = new Date(); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+    const plan = [[0,'10:00AM','AB 1001  Lecture','LT1'],[1,'2:00PM','CD 2002  Tutorial','COM1-02'],[2,'9:00AM','AB 1001  Lecture','LT1'],[2,'4:00PM','EF 3003  Laboratory','LAB-3'],[3,'12:00PM','CD 2002  Lecture','LT19'],[4,'10:00AM','EF 3003  Lecture','LT7']];
+    const byDate = ['2026/2027 Semester 1','By Class','By Date','From','To','Please note that there will be no classes on public holidays.'];
+    for (const [d, t, c, r] of plan) {
+      const day = new Date(mon); day.setDate(mon.getDate() + d);
+      byDate.push(DAYS[day.getDay()] + ' ' + MONTHS[day.getMonth()] + ' ' + day.getDate(), t, c, 'Room: ' + r, 'Status: Enrolled');
+    }
+    PAGES.schedule = { url: '/psc/cs90prd_37/EMPLOYEE/SA/c/SSR_STUDENT_ACAD_REC_FL.SSR_MD_ACAD_REC_FL.GBL?GComp=SSR_SP_ACAD_REC_FL', lines: byDate };
+    PAGES.slots = { url: PAGES.schedule.url, lines: ['2026/2027 Semester 1','By Class','By Date','Please note that there will be no classes on public holidays.',
+      'AB 1001   Example Course A','Days: Monday','Times: 10:00AM to 12:00PM','Days: Wednesday','Times: 9:00AM to 11:00AM',
+      'CD 2002   Example Course B','Days: Tuesday','Times: 2:00PM to 3:00PM','Days: Thursday','Times: 12:00PM to 2:00PM',
+      'EF 3003   Example Course C','Days: Wednesday','Times: 4:00PM to 6:00PM','Days: Friday','Times: 10:00AM to 12:00PM'] };
+  })();
   const key = new URLSearchParams(location.search).get('page') || 'home';
   const page = PAGES[key];
 
@@ -108,6 +125,7 @@
 </script>
 <script src="../../src/themes.js"></script>
 <script src="../../src/keys.js"></script>
+<script src="../../src/timetable.js"></script>
 <script src="../../src/wizard.js"></script>
 <script src="../../src/shell.js"></script>
 <script src="../../src/overview.js"></script>

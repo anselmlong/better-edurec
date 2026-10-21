@@ -19,6 +19,8 @@
     lastData = await EDR.store.getData();
     render();
     EDR.store.onDataChange((data) => { lastData = data; render(); });
+    // Live: keep "Up next" and the now-line current without re-running entrance motion.
+    setInterval(renderLive, 30000);
     if (prefs.wizardJustFinished && Date.now() - prefs.wizardJustFinished < 60000) {
       showFinished(prefs.lastWizard || {});
       EDR.store.setPrefs({ wizardJustFinished: 0 });
@@ -35,14 +37,17 @@
       h('header', { class: 'edr-page-head' },
         h('p', { class: 'edr-muted' }, now.toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ' · AY' + term.ay + ' ' + term.label),
         h('h1', { class: 'edr-h1' }, 'Overview')),
+      quickLinks(),
       setupPrompt(data),
       h('section', { class: 'edr-grid', 'aria-label': 'Summary' },
         safe('Results', gpaCard, data.results, byId.exams.path),
         safe('Degree progress', degreeCard, data.audit, byId.degree.path),
-        safe('This semester', classesCard, data.classes, byId.coursereg.path)),
+        h('div', { id: 'edr-upnext-slot', class: 'edr-slot' })),
+      h('section', { id: 'edr-week-slot', class: 'edr-slot', 'aria-label': 'Timetable' }),
       shortcuts(),
       h('p', { class: 'edr-fineprint' }, 'Summaries are read from EduRec pages and kept in this browser only. Turn the Overview off from the extension’s toolbar button.')
     ].filter(Boolean));
+    renderLive();
   }
 
   function card(title, href, updated, ...body) {
@@ -68,11 +73,15 @@
   function empty(key, text) {
     return h('div', { class: 'edr-empty' },
       h('p', null, text),
-      h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start([key]) },
+      h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start(stepsFor([key])) },
         EDR.icon('M12 5v10M7 10l5 5 5-5M5 19h14', 16), 'Collect'));
   }
 
-  const KEYS = ['results', 'audit', 'classes'];
+  // Summary key -> the wizard step that collects it, and how the prompt names it.
+  const KEYS = ['results', 'audit', 'sessions'];
+  const STEP_FOR = { results: 'results', audit: 'audit', sessions: 'timetable', slots: 'timetable', classes: 'classes' };
+  const NAME_FOR = { results: 'Exam results', audit: 'Graduation audit', sessions: 'Timetable' };
+  const stepsFor = (keys) => [...new Set(keys.map((k) => STEP_FOR[k]))];
 
   function setupPrompt(data) {
     const missing = KEYS.filter((k) => !data[k]);
@@ -90,9 +99,9 @@
     return h('section', { class: 'edr-setup is-compact', 'aria-label': 'Overview setup' },
       h('p', { class: 'edr-setup-line' },
         h('strong', null, (KEYS.length - missing.length) + ' of ' + KEYS.length + ' summaries ready.'), ' ',
-        missing.map((k) => EDR.wizard.STEPS[k].label).join(', ') + ' still to collect.'),
+        missing.map((k) => NAME_FOR[k]).join(', ') + ' still to collect.'),
       h('div', { class: 'edr-setup-actions' },
-        h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start(missing) }, 'Collect the rest'),
+        h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start(stepsFor(missing)) }, 'Collect the rest'),
         h('button', { type: 'button', class: 'edr-icon-btn is-dark', 'aria-label': 'Dismiss', title: 'Dismiss', onclick: dismiss },
           EDR.icon('M6 6l12 12M18 6L6 18', 16))));
   }
@@ -139,19 +148,109 @@
         h('li', null, h('span', { class: 'edr-list-label' }, r.label), h('span', { class: 'edr-tag is-warn' }, r.needed + ' needed')))) : null);
   }
 
-  function classesCard(snap, href) {
-    const c = snap && snap.value;
-    if (!c || !c.courses.length) {
-      return card('This semester', href, null, empty('classes', 'Your courses and class groups, read from My Classes.'));
+  // ---- Quick links: one click to the sub-page people open most ----
+
+  function quickLinks() {
+    return h('nav', { class: 'edr-quick', 'aria-label': 'Quick links' },
+      EDR.routes.SHORTCUTS.map((sc) => h('a', { class: 'edr-quick-link', href: EDR.routes.shortcutHref(sc) },
+        EDR.icon(sc.icon, 16), h('span', null, sc.label))));
+  }
+
+  // ---- Live timetable: Up next card + this week's grid ----
+
+  function schedule() {
+    const s = lastData.sessions && lastData.sessions.value;
+    if (!s || !s.sessions.length) return null;
+    const slots = lastData.slots && lastData.slots.value;
+    return { term: s.term, list: EDR.parsers.mergeSchedule(s.sessions, slots && slots.slots), at: lastData.sessions.at };
+  }
+
+  function renderLive() {
+    const up = document.getElementById('edr-upnext-slot');
+    const week = document.getElementById('edr-week-slot');
+    if (!up || !week) return;
+    const sch = schedule();
+    try { up.replaceChildren(upNextCard(sch)); } catch (err) { console.warn('[EduRec Reskin] up next failed', err); }
+    try { week.replaceChildren(weekSection(sch)); } catch (err) { console.warn('[EduRec Reskin] timetable failed', err); }
+  }
+
+  const fmtTime = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return ((h + 11) % 12 + 1) + (m ? ':' + String(m).padStart(2, '0') : '') + (h < 12 ? ' am' : ' pm'); };
+  const what = (s) => s.code + ' ' + s.type;
+
+  function upNextCard(sch) {
+    const href = EDR.routes.shortcutHref(EDR.routes.SHORTCUTS.find((x) => x.id === 'timetable'));
+    if (!sch) return card('Up next', href, null, empty('sessions', 'Your next class, its room and a countdown, read from View Classes.'));
+    const { current, next } = EDR.timetable.nowAndNext(sch.list, new Date());
+    if (!current && !next) {
+      return card('Up next', href, sch.at, h('p', { class: 'edr-big' }, 'Done', h('span', { class: 'edr-big-unit' }, 'no more classes this term')));
     }
-    const classCount = c.courses.reduce((n, m) => n + m.classes.length, 0);
-    return card('This semester', href, snap.at,
-      h('p', { class: 'edr-big' }, String(c.courses.length), h('span', { class: 'edr-big-unit' }, (c.courses.length === 1 ? 'course · ' : 'courses · ') + classCount + (classCount === 1 ? ' class' : ' classes'))),
-      c.term ? h('p', { class: 'edr-muted' }, c.term) : null,
-      h('ul', { class: 'edr-list' }, c.courses.map((m) =>
-        h('li', null,
-          h('span', { class: 'edr-list-label' }, h('span', { class: 'edr-mono' }, m.code), ' ', m.title),
-          h('span', { class: 'edr-muted' }, m.classes.map((k) => k.type + ' ' + k.group).join(' · '))))));
+    const s = current || next;
+    return card(current ? 'Happening now' : 'Up next', href, sch.at,
+      h('p', { class: 'edr-big' }, current ? 'until ' + fmtTime(s.end) : fmtTime(s.start), h('span', { class: 'edr-big-unit' }, current ? '' : EDR.timetable.until(s, new Date()))),
+      h('p', { class: 'edr-upnext-what' }, h('span', { class: 'edr-mono' }, s.code), ' ', s.type),
+      h('p', { class: 'edr-muted' }, [s.room, new Date(s.date + 'T00:00').toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'short' })].filter(Boolean).join(' · ')),
+      current && next ? h('p', { class: 'edr-muted' }, 'Then ' + what(next) + ' at ' + fmtTime(next.start)) : null);
+  }
+
+  const COURSE_COLORS = ['var(--edr-blue)', 'var(--edr-orange)', 'var(--edr-selected-ink)', 'var(--edr-warn)', 'var(--edr-navy)', 'var(--edr-muted)'];
+  const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // NUSMods-style grid: one row per day, hours across, a live now-line on today.
+  function weekSection(sch) {
+    const T = EDR.timetable;
+    const head = (label, extra) => h('div', { class: 'edr-week-head' },
+      h('h2', { class: 'edr-h2' }, label), h('div', { class: 'edr-week-actions' }, extra));
+    if (!sch) return null;
+    const now = new Date();
+    const wk = T.weekToShow(sch.list, now);
+    const exportBtn = lastData.classes
+      ? h('button', { type: 'button', class: 'edr-btn is-small is-ghost', onclick: () => T.openInNusmods(lastData.classes) },
+        'Open in NUSMods', EDR.icon('M7 17L17 7M9 7h8v8', 14))
+      : h('button', { type: 'button', class: 'edr-btn is-small is-ghost', title: 'Needs your class groups from CourseReg', onclick: () => EDR.wizard.start(['classes']) },
+        'Collect class groups for NUSMods');
+    if (!wk) return h('div', { class: 'edr-card edr-week' }, head('This week', exportBtn), h('p', { class: 'edr-muted' }, 'No upcoming classes this term.'));
+
+    const week = T.sessionsInWeek(sch.list, wk.monday);
+    const codes = [...new Set(sch.list.map((s) => s.code))].sort();
+    const color = (code) => COURSE_COLORS[codes.indexOf(code) % COURSE_COLORS.length];
+    const dayIdx = (s) => (T.dateOf(s.date).getDay() + 6) % 7;
+    const days = [0, 1, 2, 3, 4].concat([5, 6].filter((d) => week.some((s) => dayIdx(s) === d)));
+    const startH = Math.min(8, ...week.map((s) => Math.floor(T.minutes(s.start) / 60)));
+    const endH = Math.max(19, ...week.map((s) => Math.ceil(T.minutes(s.end) / 60)));
+    const span = (endH - startH) * 60;
+    const pct = (min) => ((min - startH * 60) / span) * 100 + '%';
+    const todayIdx = T.isoOf(now) >= T.isoOf(wk.monday) ? (now.getDay() + 6) % 7 : -1;
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const showNow = wk.label === 'This week' && nowMin >= startH * 60 && nowMin <= endH * 60;
+
+    const hours = [];
+    for (let hh = startH; hh < endH; hh++) hours.push(h('span', { class: 'edr-week-hour', style: { left: pct(hh * 60) } }, fmtTime(String(hh).padStart(2, '0') + ':00').replace(' ', '')));
+
+    const rows = days.map((d) => {
+      const date = new Date(wk.monday); date.setDate(date.getDate() + d);
+      const isToday = d === todayIdx && wk.label === 'This week';
+      const items = week.filter((s) => dayIdx(s) === d);
+      return h('div', { class: 'edr-week-row' + (isToday ? ' is-today' : '') },
+        h('div', { class: 'edr-week-day' }, h('strong', null, DAY_NAMES[d]), h('span', null, String(date.getDate()))),
+        h('div', { class: 'edr-week-track' },
+          items.map((s) => {
+            const past = s.date < T.isoOf(now) || (s.date === T.isoOf(now) && T.minutes(s.end) <= nowMin);
+            return h('div', {
+              class: 'edr-week-block' + (past ? ' is-past' : ''),
+              style: { left: pct(T.minutes(s.start)), width: 'calc(' + (((T.minutes(s.end) - T.minutes(s.start)) / span) * 100) + '% - 3px)', '--c': color(s.code) },
+              title: what(s) + ' · ' + fmtTime(s.start) + '–' + fmtTime(s.end) + (s.room ? ' · ' + s.room : '')
+            }, h('span', { class: 'edr-mono' }, s.code), h('span', null, s.type + (s.room ? ' · ' + s.room : '')));
+          }),
+          isToday && showNow ? h('span', { class: 'edr-week-now', style: { left: pct(nowMin) }, 'aria-label': 'Now' }) : null));
+    });
+
+    return h('div', { class: 'edr-card edr-week' },
+      head(wk.label, exportBtn),
+      h('div', { class: 'edr-week-scroll' },
+        h('div', { class: 'edr-week-grid' },
+          h('div', { class: 'edr-week-hours' }, h('span', { class: 'edr-week-day' }), h('div', { class: 'edr-week-track' }, hours)),
+          rows)),
+      h('div', { class: 'edr-week-legend' }, codes.map((code) => h('span', { class: 'edr-legend-item', style: { '--c': color(code) } }, h('i', { 'aria-hidden': 'true' }), code))));
   }
 
   function shortcuts() {
