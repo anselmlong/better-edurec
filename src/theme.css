@@ -329,7 +329,8 @@ html[data-edr-collapsed] .edr-brand-mark svg rect:nth-child(2) { transform: scal
 .edr-has-glide { position: relative !important; isolation: isolate; }
 .edr-glide {
   position: absolute; left: 0; top: 0; z-index: -1; pointer-events: none; box-sizing: border-box;
-  border-radius: var(--edr-radius-sm); background: var(--edr-surface-2);
+  /* A neutral ink wash, so hovering never reads as the selected (tinted) item. */
+  border-radius: var(--edr-radius-sm); background: color-mix(in srgb, var(--edr-ink) 6%, transparent);
   opacity: 0; transition: opacity 180ms ease;
 }
 .edr-glide.is-on { opacity: 1; }
@@ -746,13 +747,13 @@ html[data-edr-theme="terminal"] .edr-quick-link { border-radius: 0; }
 /* ---------- Courses this term: one card per course, colour-matched to the grid ---------- */
 .edr-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
 .edr-course {
-  display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 14px 18px; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; position: relative; overflow: hidden;
   background: color-mix(in srgb, var(--c) 7%, var(--edr-surface)); border: 1px solid color-mix(in srgb, var(--c) 30%, var(--edr-line));
   border-radius: var(--edr-radius-sm);
 }
-.edr-course::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--c); }
 .edr-course-head { display: flex; flex-direction: column; gap: 2px; }
-.edr-course-code { font-family: var(--edr-mono); font-weight: 700; font-size: 14px; color: var(--edr-ink); }
+.edr-course-code { display: inline-flex; align-items: center; gap: 8px; font-family: var(--edr-mono); font-weight: 700; font-size: 14px; color: var(--edr-ink); }
+.edr-course-code::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
 .edr-course-title { font-size: 13px; color: var(--edr-muted); line-height: 1.3; }
 .edr-course-lessons { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .edr-course-lessons li { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: 13px; color: var(--edr-ink-2); }
@@ -760,3 +761,21 @@ html[data-edr-theme="terminal"] .edr-quick-link { border-radius: 0; }
 .edr-course-lessons .edr-course-when { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .edr-course-lessons .edr-course-room { grid-column: 1 / -1; font-size: 12px; color: var(--edr-muted); }
 html[data-edr-theme="terminal"] .edr-course { border-radius: 0; }
+
+/* ---------- Classic PeopleSoft pages (Global education, some reports) ---------- */
+html[data-edr-on] :is(.PSLEVEL1GRIDLABEL, .PSLEVEL2GRIDLABEL, .PSGROUPBOXLABEL),
+html[data-edr-on] :is(.PSLEVEL1GRIDLABEL, .PSLEVEL2GRIDLABEL, .PSGROUPBOXLABEL) :is(a, span) {
+  background: var(--edr-surface-2) !important; background-image: none !important; color: var(--edr-ink) !important;
+  border-color: var(--edr-line) !important; font-weight: 600 !important;
+}
+html[data-edr-on] :is(.PSLEVEL1GRIDCOLUMNHDR, .PSLEVEL2GRIDCOLUMNHDR, .PSLEVEL1SSGRIDCOLUMNHDR),
+html[data-edr-on] :is(.PSLEVEL1GRIDCOLUMNHDR, .PSLEVEL2GRIDCOLUMNHDR, .PSLEVEL1SSGRIDCOLUMNHDR) a {
+  background: var(--edr-surface-3) !important; background-image: none !important; color: var(--edr-muted) !important;
+  border-color: var(--edr-line) !important; font-weight: 600 !important;
+}
+html[data-edr-on] :is(.PSLEVEL1GRIDODDROW, .PSLEVEL1GRIDEVENROW, .PSLEVEL2GRIDODDROW, .PSLEVEL2GRIDEVENROW) {
+  background: var(--edr-surface) !important; color: var(--edr-ink-2) !important; border-color: var(--edr-line-2) !important;
+}
+html[data-edr-on] :is(.PSLEVEL1GRIDWBO, .PSLEVEL1GRID, .PSGROUPBOXWBO) { border-color: var(--edr-line) !important; background: var(--edr-surface) !important; }
+html[data-edr-on] :is(.PSACTIVETAB, .PSTABACTIVE) { background: var(--edr-tint) !important; color: var(--edr-selected-ink) !important; border-color: var(--edr-line) !important; }
+html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-surface) !important; color: var(--edr-ink-2) !important; border-color: var(--edr-line) !important; }

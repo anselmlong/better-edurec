@@ -258,7 +258,8 @@
     const titles = {};
     for (const key of ['classes', 'results']) {
       const v = lastData[key] && lastData[key].value;
-      for (const c of (v && v.courses) || []) if (c.title && !titles[c.code]) titles[c.code] = c.title;
+      // CourseReg cuts titles at 30 characters; keep the longest version seen.
+      for (const c of (v && v.courses) || []) if (c.title && c.title.length > (titles[c.code] || '').length) titles[c.code] = c.title;
     }
     const dayOrder = (s) => (T.dateOf(s.date).getDay() + 6) % 7;
     return h('ul', { class: 'edr-courses', 'aria-label': 'Courses this term' }, codes.map((code) => {

@@ -306,7 +306,7 @@
     }
 
     function close(silent) {
-      if (mode === 'theme' && !picked) EDR.themes.apply(originalTheme);
+      if (mode === 'theme' && !picked && document.documentElement.getAttribute('data-edr-theme') !== originalTheme) EDR.paintTheme(() => EDR.themes.apply(originalTheme), input);
       overlay.remove();
       palette = null;
       if (!silent && returnFocus && returnFocus.focus) returnFocus.focus();
@@ -393,15 +393,24 @@
     }, true);
     const label = pendingDeepLink();
     if (!label) return;
+    // EduRec selects its default page while it starts up, which can undo an early
+    // click. Wait for the page to settle, click, then confirm and retry.
     const started = Date.now();
+    let clickedAt = 0;
+    let tries = 0;
+    const find = () => [...document.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label);
+    const selected = (a) => { const li = a && a.closest('li'); return !!li && li.classList.contains('psc_selected'); };
     const timer = setInterval(() => {
-      const link = [...document.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label);
-      if (link) {
-        clearInterval(timer);
-        const li = link.closest('li');
-        if (!li || !li.classList.contains('psc_selected')) link.click();
-      } else if (Date.now() - started > 15000) clearInterval(timer);
-    }, 300);
+      const link = find();
+      if (Date.now() - started > 20000 || tries > 3) { clearInterval(timer); return; }
+      if (!link || document.readyState !== 'complete') return;
+      if (selected(link)) { clearInterval(timer); return; }
+      if (Date.now() - clickedAt < 2500) return;
+      if (!clickedAt && Date.now() - started < 900) return;
+      tries++;
+      clickedAt = Date.now();
+      link.click();
+    }, 250);
   }
 
   // h moves focus into the sidebar; on narrow screens that means opening the drawer.
