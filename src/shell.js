@@ -117,6 +117,12 @@
     const side = document.getElementById('PT_SIDE');
     const slot = document.querySelector('[id$="hdrdivPT_NAV_CONT"]');
     let btn = document.getElementById('edr-side-toggle');
+    if (side) {
+      // Each page-list item repeats its visible label as a native tooltip; drop it.
+      for (const el of side.querySelectorAll('ul.psa_list-linkmenu [title]')) {
+        if (el.title.trim() === el.textContent.trim()) el.removeAttribute('title');
+      }
+    }
     if (!side || !slot) { if (btn) btn.remove(); return; }
     if (!btn) {
       btn = h('button', { id: 'edr-side-toggle', class: 'edr-root edr-side-toggle', type: 'button', onclick: toggleSide, 'aria-controls': 'PT_SIDE' },
@@ -267,7 +273,7 @@
       if (r.theme) { setTheme(r.theme); close(); return; }
       close();
       if (r.run) r.run();
-      else if (r.href) location.href = r.href;
+      else if (r.href) { rememberDeepLink(r.href); location.href = r.href; }
     }
 
     function close(silent) {
@@ -329,14 +335,35 @@
     closeBtn.focus();
   }
 
-  // Shortcut links carry #edr-open=<page-list label>; click that item once it renders.
+  // Shortcut links carry #edr-open=<page-list label>. EduRec redirects tile URLs and
+  // drops the hash, so the label is also kept in sessionStorage when the link is
+  // followed, then the matching page-list item is clicked once it renders.
   // Only labels from the shortcut table are followed, and only page-list links.
+  const OPEN_KEY = 'edr:open';
+  const labelFrom = (href) => { const m = /#edr-open=([^&]+)/.exec(href || ''); return m ? decodeURIComponent(m[1]) : null; };
+
+  function rememberDeepLink(href) {
+    const label = labelFrom(href);
+    if (!label || !EDR.routes.isOpenable(label)) return;
+    try { sessionStorage.setItem(OPEN_KEY, JSON.stringify({ label, at: Date.now() })); } catch (e) { /* storage blocked */ }
+  }
+
+  function pendingDeepLink() {
+    const fromHash = labelFrom(location.hash);
+    if (fromHash) history.replaceState(null, '', location.pathname + location.search);
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem(OPEN_KEY) || 'null'); sessionStorage.removeItem(OPEN_KEY); } catch (e) { /* storage blocked */ }
+    const label = fromHash || (saved && Date.now() - saved.at < 30000 ? saved.label : null);
+    return label && EDR.routes.isOpenable(label) ? label : null;
+  }
+
   function followDeepLink() {
-    const m = /#edr-open=([^&]+)/.exec(location.hash);
-    if (!m) return;
-    const label = decodeURIComponent(m[1]);
-    if (!EDR.routes.SHORTCUTS.some((sc) => sc.open === label)) return;
-    history.replaceState(null, '', location.pathname + location.search);
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest && e.target.closest('a[href*="#edr-open="]');
+      if (a) rememberDeepLink(a.getAttribute('href'));
+    }, true);
+    const label = pendingDeepLink();
+    if (!label) return;
     const started = Date.now();
     const timer = setInterval(() => {
       const link = [...document.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label);
@@ -344,7 +371,7 @@
         clearInterval(timer);
         const li = link.closest('li');
         if (!li || !li.classList.contains('psc_selected')) link.click();
-      } else if (Date.now() - started > 10000) clearInterval(timer);
+      } else if (Date.now() - started > 15000) clearInterval(timer);
     }, 300);
   }
 

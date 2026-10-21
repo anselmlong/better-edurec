@@ -73,16 +73,15 @@
   // Commonly needed pages, each opened straight on its sub-page: the tile URL plus
   // #edr-open=<page-list label>, which the shell clicks once the page loads.
   const SHORTCUTS = [
-    { id: 'transcript', label: 'Unofficial transcript', tile: 'transcripts', open: 'View Unofficial Transcript', icon: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6' },
+    { id: 'transcript', label: 'Unofficial transcript', tile: 'exams', open: 'View Unofficial Transcript', icon: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6' },
     { id: 'results', label: 'Exam results', tile: 'exams', open: 'View Exam Results', icon: 'M5 20V11M12 20V5M19 20v-6' },
     { id: 'examtimes', label: 'Exam schedule', tile: 'exams', open: 'View Exam Schedule', icon: 'M4 6h16v14H4zM4 10h16M9 3v4M15 3v4M8 14h3' },
     { id: 'register', label: 'Course registration', tile: 'coursereg', open: 'Select Courses', icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM16.5 13v7M13 16.5h7' },
-    { id: 'timetable', label: 'My timetable', tile: 'acadrec', open: 'View Classes', icon: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18z' },
-    { id: 'audit', label: 'Degree audit', tile: 'degree', open: 'View Graduation Audit Report', icon: 'M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5' },
-    { id: 'su', label: 'S/U declarations', tile: 'exams', open: 'Submit S/U Declarations', icon: 'M5 12.5l4.5 4.5L19 7.5' },
-    { id: 'letter', label: 'Status letter', tile: 'acadrec', open: 'View Student Status Letter', icon: 'M4 6h16v12H4zM4 7l8 6 8-6' },
-    { id: 'loa', label: 'Leave of absence', tile: 'acadrec', open: 'Apply for Leave of Absence', icon: 'M8 5v14M16 5v14' }
+    { id: 'su', label: 'S/U declarations', tile: 'exams', open: 'Submit S/U Declarations', icon: 'M5 12.5l4.5 4.5L19 7.5' }
   ];
+  // Not a quick link, but the Up next card opens View Classes the same way.
+  const TIMETABLE_LINK = { id: 'timetable', tile: 'acadrec', open: 'View Classes' };
+  const isOpenable = (label) => SHORTCUTS.concat(TIMETABLE_LINK).some((sc) => sc.open === label);
 
   const byId = Object.fromEntries(TILES.map((t) => [t.id, t]));
   const byComp = Object.fromEntries(TILES.map((t) => [t.comp, t]));
@@ -152,6 +151,6 @@
       .map((x) => x.r);
   }
 
-  EDR.routes = { TILES, SECTIONS, SHORTCUTS, HOME, byId, sectionHref, shortcutHref, detectPage, termFor, searchIndex, search,
+  EDR.routes = { TILES, SECTIONS, SHORTCUTS, TIMETABLE_LINK, isOpenable, HOME, byId, sectionHref, shortcutHref, detectPage, termFor, searchIndex, search,
     logoutHref: 'https://myedurec.nus.edu.sg/psp/cs90prd_2/EMPLOYEE/SA/?cmd=logout' };
 })();
