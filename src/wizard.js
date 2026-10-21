@@ -18,7 +18,7 @@
     classes: { label: 'Class groups', tile: 'coursereg', nav: 'View My Classes@CourseReg', wait: ['classes'] }
   };
   const ORDER = ['results', 'audit', 'timetable', 'classes'];
-  const STEP_TIMEOUT = 25000;
+  const STEP_TIMEOUT = 45000; // background tabs run slower
   const RUN_TTL = 10 * 60 * 1000; // a run left over from a closed tab or expired session is dropped
   const KEY = 'edr:wizard';
 
@@ -105,31 +105,62 @@
       return;
     }
 
-    const clicked = new Set();
+    // EduRec ignores clicks that land while it is still starting up (and a
+    // background tab starts up slowly), then shows its default page. So each
+    // click waits for EduRec to be idle, is checked, and is retried if it didn't
+    // take, instead of being fired once.
     const begun = Date.now();
+    const tries = { nav: 0, term: 0, radio: 0 };
+    const lastClick = { nav: 0, term: 0, radio: 0 };
+    let quietSince = 0;
+    const act = (kind, el, gap, max) => {
+      if (tries[kind] >= max || Date.now() - lastClick[kind] < gap) return false;
+      tries[kind] += 1;
+      lastClick[kind] = Date.now();
+      quietSince = 0;
+      el.click();
+      return true;
+    };
     const timer = setInterval(async () => {
       const seen = await EDR.store.getSeen();
       const got = (k) => (seen[k] || 0) >= state.stepAt;
       if (step.wait.every(got)) { clearInterval(timer); setBar('Got it', true); setTimeout(() => advance('done'), 450); return; }
       if (Date.now() - begun > STEP_TIMEOUT) { clearInterval(timer); advance(step.wait.some(got) ? 'done' : 'skipped'); return; }
-      if (step.nav && !clicked.has('nav')) {
+      if (busy()) { quietSince = 0; return; }
+      if (!quietSince) { quietSince = Date.now(); return; }
+      if (Date.now() - quietSince < 900) return;
+
+      if (step.nav) {
         const link = navLink(step.nav);
-        if (link) {
-          clicked.add('nav');
-          const li = link.closest('li');
-          if (!li || !li.classList.contains('psc_selected')) link.click();
-          return;
-        }
+        if (!link) return;
+        const li = link.closest('li');
+        if (li && !li.classList.contains('psc_selected')) { act('nav', link, 2500, 5); return; }
       }
-      if (step.pickTerm && !clicked.has('term')) {
-        const term = document.querySelector('a[id^="TERM$"]') || document.querySelector('#PT_MAIN .ps_box-grid-list li.ps_grid-row a');
-        if (term) { clicked.add('term'); term.click(); return; }
+      if (step.pickTerm && !step.wait.some(got)) {
+        const term = termLink();
+        if (term) { act('term', term, 3500, 4); return; }
       }
-      if (step.radio && got(step.radio.after) && !clicked.has('radio')) {
+      if (step.radio && got(step.radio.after) && !step.wait.every(got)) {
         const label = [...document.querySelectorAll('#PT_MAIN label')].find((l) => l.textContent.trim() === step.radio.label);
-        if (label) { clicked.add('radio'); label.click(); }
+        if (label) act('radio', label, 3500, 4);
       }
-    }, 700);
+    }, 500);
+  }
+
+  // The latest semester in the page's term list (EduRec lists newest first). Ids
+  // differ between pages (TERM$0, SSR_ENTRMCUR_VW_TERM_DESCR30$0), so match text.
+  const TERM_TEXT = /^\d{4}\/\d{4} (Semester \d|Special Term)/;
+  function termLink() {
+    return [...document.querySelectorAll('#PT_MAIN a')].find((a) => TERM_TEXT.test(a.textContent.trim())) || null;
+  }
+
+  // EduRec shows #processing while it works; clicks during that are dropped.
+  function busy() {
+    if (document.readyState !== 'complete') return true;
+    const p = document.getElementById('processing');
+    if (!p) return false;
+    const cs = getComputedStyle(p);
+    return cs.visibility !== 'hidden' && cs.display !== 'none';
   }
 
   function navLink(label) {
