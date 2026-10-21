@@ -799,3 +799,37 @@ html[data-edr-on] :is(.PSLEVEL1GRIDODDROW, .PSLEVEL1GRIDEVENROW, .PSLEVEL2GRIDOD
 html[data-edr-on] :is(.PSLEVEL1GRIDWBO, .PSLEVEL1GRID, .PSGROUPBOXWBO) { border-color: var(--edr-line) !important; background: var(--edr-surface) !important; }
 html[data-edr-on] :is(.PSACTIVETAB, .PSTABACTIVE) { background: var(--edr-tint) !important; color: var(--edr-selected-ink) !important; border-color: var(--edr-line) !important; }
 html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-surface) !important; color: var(--edr-ink-2) !important; border-color: var(--edr-line) !important; }
+
+/* ---------- Setup running in the background (Overview) ---------- */
+.edr-collecting { animation: none; }
+.edr-collect-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; flex: 1 1 100%; order: 3; }
+.edr-collect-steps li { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--edr-muted); transition: color 200ms ease; }
+.edr-collect-steps li.is-now { color: var(--edr-ink); font-weight: 600; }
+.edr-collect-steps li.is-done { color: var(--edr-ink-2); }
+.edr-collect-dot {
+  width: 18px; height: 18px; flex: none; border-radius: 50%; display: inline-grid; place-items: center; box-sizing: border-box;
+  border: 1.5px solid var(--edr-line-strong); color: var(--edr-on-primary); transition: background-color 240ms ease, border-color 240ms ease;
+}
+.is-done > .edr-collect-dot { background: var(--edr-navy); border-color: var(--edr-navy); animation: edr-pop 320ms cubic-bezier(0.16, 1, 0.3, 1); }
+.is-skipped > .edr-collect-dot { color: var(--edr-muted); }
+/* The step being read: a ring that sweeps, so waiting reads as work happening. */
+.is-now > .edr-collect-dot, .is-reading .edr-collect-dot {
+  border-color: color-mix(in srgb, var(--edr-navy) 25%, transparent); border-top-color: var(--edr-navy);
+  animation: edr-spin 800ms linear infinite;
+}
+@keyframes edr-spin { to { transform: rotate(360deg); } }
+.edr-empty.is-waiting { border-style: solid; }
+.edr-waiting-line { display: inline-flex; align-items: center; gap: 8px; font-size: 13px !important; color: var(--edr-muted) !important; }
+.edr-empty.is-reading .edr-waiting-line { color: var(--edr-ink) !important; font-weight: 600; }
+.edr-empty.is-waiting:not(.is-reading) .edr-collect-dot { width: 10px; height: 10px; }
+
+/* Re-renders after the first paint don't replay motion; a card whose summary
+   just arrived comes into focus instead. */
+#edr-overview[data-settled] .edr-bar > span { animation: none; }
+#edr-overview[data-settled] .is-arriving { animation: edr-arrive 520ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+#edr-overview[data-settled] .is-arriving .edr-bar > span { animation: edr-fill 900ms cubic-bezier(0.16, 1, 0.3, 1) 160ms both; }
+@keyframes edr-arrive { from { opacity: 0; transform: translateY(6px); filter: blur(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  #edr-overview[data-settled] .is-arriving { animation: edr-fade 200ms ease-out both; }
+  .is-now > .edr-collect-dot, .is-reading .edr-collect-dot { animation-duration: 2.4s; }
+}

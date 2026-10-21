@@ -104,7 +104,12 @@
         localStorage.setItem('edr-harness', JSON.stringify(mem));
         listeners.forEach((fn) => fn(changes, 'local'));
       },
-      async remove(k) { delete mem[k]; localStorage.setItem('edr-harness', JSON.stringify(mem)); }
+      async remove(k) {
+        const changes = {};
+        for (const key of [].concat(k)) { changes[key] = { oldValue: mem[key] }; delete mem[key]; }
+        localStorage.setItem('edr-harness', JSON.stringify(mem));
+        listeners.forEach((fn) => fn(changes, 'local'));
+      }
     },
     onChanged: { addListener(fn) { listeners.push(fn); } }
   } };

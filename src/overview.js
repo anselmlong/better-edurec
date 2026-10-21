@@ -9,6 +9,8 @@
   let prefs = {};
   let lastData = {};
   let rootEl = null;
+  let run = null;          // the setup run in progress, if any (wizard state)
+  let filledBefore = null; // summary keys that had data at the previous render
 
   async function mount(initialPrefs) {
     if (document.getElementById('edr-overview')) return;
@@ -17,8 +19,23 @@
     rootEl = h('main', { id: 'edr-overview', class: 'edr-root edr-page' });
     document.body.append(rootEl);
     lastData = await EDR.store.getData();
+    run = live(await EDR.wizard.getState());
     render();
+    // After the first paint, re-renders (new data, setup progress) don't replay
+    // entrance motion; only a card that just received its data animates in.
+    setTimeout(() => rootEl.setAttribute('data-settled', ''), 1200);
     EDR.store.onDataChange((data) => { lastData = data; render(); });
+    EDR.wizard.onChange(async (next, prev) => {
+      run = live(next);
+      render();
+      if (!next && prev) {
+        const p = await EDR.store.getPrefs();
+        if (p.wizardJustFinished && Date.now() - p.wizardJustFinished < 60000) {
+          showFinished(p.lastWizard || {});
+          EDR.store.setPrefs({ wizardJustFinished: 0 });
+        }
+      }
+    });
     // Live: keep "Up next" and the now-line current without re-running entrance motion.
     setInterval(renderLive, 30000);
     if (prefs.wizardJustFinished && Date.now() - prefs.wizardJustFinished < 60000) {
@@ -38,15 +55,51 @@
         h('p', { class: 'edr-muted' }, now.toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ' · AY' + term.ay + ' ' + term.label),
         h('h1', { class: 'edr-h1' }, 'Overview')),
       quickLinks(),
-      setupPrompt(data),
+      run ? progressCard(run) : setupPrompt(data),
       h('section', { class: 'edr-grid', 'aria-label': 'Summary' },
-        safe('Results', gpaCard, data.results, byId.exams.path),
-        safe('Degree progress', degreeCard, data.audit, byId.degree.path),
+        safe('Results', gpaCard, data.results, byId.exams.path, 'results'),
+        safe('Degree progress', degreeCard, data.audit, byId.degree.path, 'audit'),
         h('div', { id: 'edr-upnext-slot', class: 'edr-slot' })),
       h('section', { id: 'edr-week-slot', class: 'edr-slot', 'aria-label': 'Timetable' }),
       h('p', { class: 'edr-fineprint' }, 'Summaries are read from EduRec pages and kept in this browser only. Turn the Overview off from the extension’s toolbar button.')
     ].filter(Boolean));
     renderLive();
+    markArrivals();
+  }
+
+  // A wizard state counts only while fresh; one left by a closed tab is ignored.
+  const live = (s) => (s && s.id && Date.now() - s.stepAt < 10 * 60 * 1000 ? s : null);
+
+  // Cards whose summary just arrived get a one-off entrance.
+  function markArrivals() {
+    const filled = new Set(KEYS.filter((k) => lastData[k]));
+    if (filledBefore) {
+      for (const k of filled) {
+        if (filledBefore.has(k)) continue;
+        for (const el of rootEl.querySelectorAll('[data-key="' + k + '"]')) el.classList.add('is-arriving');
+      }
+    }
+    filledBefore = filled;
+  }
+
+  // Setup running in a background tab: what's done, what's being read, what's next.
+  function progressCard(s) {
+    const { STEPS } = EDR.wizard;
+    const now = STEPS[s.queue[s.i]];
+    const ICON = { done: 'M5 12.5l4.5 4.5L19 7.5', skipped: 'M6 12h12' };
+    return h('section', { class: 'edr-setup edr-collecting', role: 'status', 'aria-live': 'polite', 'aria-labelledby': 'edr-collect-title' },
+      h('div', { class: 'edr-setup-copy' },
+        h('h2', { class: 'edr-h2', id: 'edr-collect-title' }, now ? 'Reading your ' + now.label.toLowerCase() + '…' : 'Finishing up…'),
+        h('p', { class: 'edr-muted' }, 'Step ' + Math.min(s.i + 1, s.queue.length) + ' of ' + s.queue.length + '. It runs in a background tab and only opens view pages, so you can keep using this one.')),
+      h('ol', { class: 'edr-collect-steps' }, s.queue.map((k, i) => {
+        const status = i < s.i ? (s.outcome[k] === 'done' ? 'done' : 'skipped') : i === s.i ? 'now' : 'todo';
+        return h('li', { class: 'is-' + status },
+          h('span', { class: 'edr-collect-dot', 'aria-hidden': 'true' }, ICON[status] ? EDR.icon(ICON[status], 12) : null),
+          h('span', null, STEPS[k].label),
+          h('span', { class: 'edr-visually-hidden' }, status === 'now' ? ' (reading)' : status === 'todo' ? ' (next)' : ' (' + status + ')'));
+      })),
+      h('div', { class: 'edr-setup-actions' },
+        h('button', { type: 'button', class: 'edr-btn is-small is-ghost', onclick: () => EDR.wizard.stop() }, 'Stop')));
   }
 
   function card(title, href, updated, ...body) {
@@ -60,8 +113,12 @@
 
   // A malformed saved summary (older version, partial data) shows a recoverable
   // card instead of breaking the whole Overview.
-  function safe(title, fn, snap, href) {
-    try { return fn(snap, href); } catch (err) {
+  function safe(title, fn, snap, href, key) {
+    try {
+      const el = fn(snap, href);
+      if (key) el.dataset.key = key;
+      return el;
+    } catch (err) {
       console.warn('[Better EduRec] could not show', title, err);
       return card(title, href, null, h('div', { class: 'edr-empty' },
         h('p', null, 'This summary couldn’t be shown. Collecting it again usually fixes it.')));
@@ -70,6 +127,13 @@
 
   // Empty card: one click collects just this summary.
   function empty(key, text) {
+    // While setup is reading this summary, say so instead of offering a button.
+    if (run && run.queue.includes(STEP_FOR[key])) {
+      const reading = run.queue[run.i] === STEP_FOR[key];
+      return h('div', { class: 'edr-empty is-waiting' + (reading ? ' is-reading' : '') },
+        h('p', null, text),
+        h('p', { class: 'edr-waiting-line' }, h('span', { class: 'edr-collect-dot', 'aria-hidden': 'true' }), reading ? 'Reading from EduRec…' : 'Queued'));
+    }
     return h('div', { class: 'edr-empty' },
       h('p', null, text),
       h('button', { type: 'button', class: 'edr-btn is-small', onclick: () => EDR.wizard.start(stepsFor([key])) },
@@ -169,8 +233,8 @@
     const week = document.getElementById('edr-week-slot');
     if (!up || !week) return;
     const sch = schedule();
-    try { up.replaceChildren(...[upNextCard(sch)].filter(Boolean)); } catch (err) { console.warn('[Better EduRec] up next failed', err); }
-    try { week.replaceChildren(...[weekSection(sch)].filter(Boolean)); } catch (err) { console.warn('[Better EduRec] timetable failed', err); }
+    try { up.replaceChildren(...[upNextCard(sch)].filter(Boolean)); if (up.firstChild) up.firstChild.dataset.key = 'sessions'; } catch (err) { console.warn('[Better EduRec] up next failed', err); }
+    try { week.replaceChildren(...[weekSection(sch)].filter(Boolean)); if (week.firstChild) week.firstChild.dataset.key = 'sessions'; } catch (err) { console.warn('[Better EduRec] timetable failed', err); }
   }
 
   const fmtTime = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return ((h + 11) % 12 + 1) + (m ? ':' + String(m).padStart(2, '0') : '') + (h < 12 ? ' am' : ' pm'); };

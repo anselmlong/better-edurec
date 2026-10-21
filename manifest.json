@@ -71,5 +71,8 @@
       ]
     }
   ],
-  "homepage_url": "https://github.com/anselmlong/edurec-reskin"
+  "homepage_url": "https://github.com/anselmlong/edurec-reskin",
+  "background": {
+    "service_worker": "src/background.js"
+  }
 }

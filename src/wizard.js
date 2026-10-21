@@ -7,6 +7,10 @@
   // right view (page-list item, then the latest semester), waits until the
   // enhancer reports the summary, and moves on. It only ever clicks view links
   // named below, never buttons that submit anything.
+  //
+  // The run happens in a background tab (see background.js) while the Overview
+  // shows progress and fills in live. If that tab can't be opened, it falls back
+  // to running in the current tab with a progress bar.
   const STEPS = {
     results: { label: 'Exam results', tile: 'exams', nav: 'View Exam Results', pickTerm: true, wait: ['results'] },
     audit: { label: 'Graduation audit', tile: 'degree', nav: 'View Graduation Audit Report', wait: ['audit'] },
@@ -22,11 +26,28 @@
   const getState = async () => (await area().get(KEY))[KEY] || null;
   const setState = (s) => (s ? area().set({ [KEY]: s }) : area().remove(KEY));
 
+  const send = (msg) => new Promise((resolve) => {
+    try {
+      chrome.runtime.sendMessage(msg, (res) => resolve(chrome.runtime.lastError ? null : res));
+    } catch (e) { resolve(null); }
+  });
+
   async function start(keys) {
     const queue = (keys && keys.length ? keys : ORDER).filter((k) => STEPS[k]);
-    const state = { id: Date.now(), queue, i: 0, outcome: {}, stepAt: Date.now() };
+    const state = { id: Date.now(), queue, i: 0, outcome: {}, stepAt: Date.now(), bg: true };
+    await setState(state);
+    const res = await send({ type: 'collect:start', path: EDR.routes.byId[STEPS[queue[0]].tile].path });
+    if (res && res.ok) return;
+    state.bg = false;
     await setState(state);
     go(state);
+  }
+
+  // Lets the Overview follow a run happening in another tab.
+  function onChange(fn) {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'local' && KEY in changes) fn(changes[KEY].newValue || null, changes[KEY].oldValue || null);
+    });
   }
 
   function go(state) {
@@ -41,9 +62,10 @@
     state.i += 1;
     state.stepAt = Date.now();
     if (state.i >= state.queue.length) {
-      await setState(null);
       await EDR.store.setPrefs({ wizardJustFinished: Date.now(), lastWizard: state.outcome });
-      location.href = EDR.routes.HOME + '#overview';
+      await setState(null);
+      if (state.bg) send({ type: 'collect:end' });
+      else location.href = EDR.routes.HOME + '#overview';
       return;
     }
     await setState(state);
@@ -51,7 +73,9 @@
   }
 
   async function stop() {
+    const state = await getState();
     await setState(null);
+    if (state && state.bg) send({ type: 'collect:end' });
     const bar = document.getElementById('edr-wizard');
     if (bar) bar.remove();
   }
@@ -61,10 +85,15 @@
     const state = await getState();
     if (!state || !EDR.isTop) return;
     if (!state.id || Date.now() - state.stepAt > RUN_TTL) { await setState(null); return; }
+    // A background run only continues in its own tab, never in the student's.
+    if (state.bg) {
+      const res = await send({ type: 'collect:whoami' });
+      if (!res || !res.collector) return;
+    }
     const key = state.queue[state.i];
     const step = STEPS[key];
     if (!step) { await stop(); return; }
-    mountBar(state, step);
+    if (!state.bg) mountBar(state, step);
 
     if (page.key !== step.tile) {
       // Landed somewhere else (EduRec redirected): head to the step's page once.
@@ -133,5 +162,5 @@
     if (ok && now) now.classList.add('is-done');
   }
 
-  EDR.wizard = { start, stop, resume, STEPS, ORDER };
+  EDR.wizard = { start, stop, resume, onChange, getState, STEPS, ORDER };
 })();
