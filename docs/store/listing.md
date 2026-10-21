@@ -79,6 +79,18 @@ Restyle the NUS EduRec student portal in the user's browser and summarise the us
 **Privacy policy URL:** https://github.com/anselmlong/edurec-reskin/blob/main/PRIVACY.md
 (The repo must be public for this link to work. Alternatively publish `PRIVACY.md` as a GitHub Gist or GitHub Pages page.)
 
+## Test instructions tab
+
+Reviewers can't sign in to EduRec (it needs an NUS student account), so no credentials are given. Paste:
+
+> Better EduRec only runs on https://myedurec.nus.edu.sg, the National University of Singapore's student records portal, which requires an NUS student login. We can't share credentials because they are a real student's university account.
+>
+> What it does on that site: restyles pages (sidebar, search, themes, keyboard shortcuts), and reads the text of pages the student opens to show their own grades, degree progress and timetable on an Overview page. Data stays in chrome.storage.local. It never submits forms.
+>
+> To review without an account: the screenshots show every feature. The source is public at https://github.com/anselmlong/edurec-reskin, and `npm run harness` runs the real content scripts against fake EduRec pages with invented data (open http://127.0.0.1:8765/test/harness/index.html?page=home). The only network request is to api.nusmods.com, with course codes only, when the user clicks "Open in NUSMods".
+
+If you record a short screen video of it working, add the link here; it helps reviewers a lot.
+
 ## Before submitting
 
 1. Run `npm run pack` and load `dist/` unzipped once in `chrome://extensions` to check it works.
