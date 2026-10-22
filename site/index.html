@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Better EduRec</title>
+<meta name="description" content="An unofficial, read-only Chrome extension that redesigns NUS EduRec: GPA, degree progress and your timetable at a glance, with search, themes and keyboard controls.">
+<link rel="icon" href="icons/icon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F4F6F9; --surface: #FFFFFF; --ink: #16202E; --ink-2: #34404F; --muted: #5B6675;
+  --line: #DCE1E7; --navy: #123A6B; --navy-ink: #FFFFFF; --tint: #E5EEF8; --sky: #7DD3FC;
+  --shadow: 0 1px 2px rgb(16 24 40 / .06), 0 12px 32px -8px rgb(16 24 40 / .14);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0E131A; --surface: #151C26; --ink: #E6EBF2; --ink-2: #C3CCD8; --muted: #9AA6B5;
+    --line: #283342; --navy: #8DB6EA; --navy-ink: #0E131A; --tint: #1C2A3D;
+    --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 16px 40px -8px rgb(0 0 0 / .5);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink-2);
+  font: 16px/1.6 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--navy); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+h1, h2, h3 { color: var(--ink); letter-spacing: -0.02em; line-height: 1.15; }
+h2 { font-size: clamp(26px, 3.4vw, 34px); margin: 0 0 10px; }
+h3 { font-size: 17px; margin: 0 0 6px; letter-spacing: -0.01em; }
+p { margin: 0; }
+kbd, code {
+  font: 0.85em ui-monospace, "SF Mono", Menlo, monospace; background: var(--tint); color: var(--ink);
+  padding: 2px 6px; border-radius: 5px;
+}
+kbd { border: 1px solid var(--line); border-bottom-width: 2px; background: var(--surface); }
+
+/* Top bar */
+.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 12px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); text-decoration: none; letter-spacing: -0.01em; }
+.mark { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: #0F172A; flex: none; }
+.top nav { margin-left: auto; display: flex; gap: 4px; }
+.top nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 10px; border-radius: 6px; }
+.top nav a:hover { color: var(--ink); background: var(--tint); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 10px;
+  font-weight: 600; font-size: 15px; text-decoration: none; border: 1px solid transparent;
+  transition: transform .15s ease, background-color .15s ease, border-color .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--navy); color: var(--navy-ink); }
+.btn-ghost { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--muted); }
+
+/* Hero */
+.hero { padding: 72px 0 40px; text-align: center; }
+.eyebrow { display: inline-block; font-size: 13px; font-weight: 600; color: var(--navy); background: var(--tint); padding: 4px 12px; border-radius: 999px; margin-bottom: 20px; }
+.hero h1 { font-size: clamp(36px, 6vw, 60px); margin: 0 auto 18px; max-width: 14ch; letter-spacing: -0.035em; }
+.hero .lead { font-size: clamp(17px, 2vw, 19px); color: var(--muted); max-width: 40rem; margin: 0 auto 28px; }
+.cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.facts { display: flex; gap: 6px 20px; justify-content: center; flex-wrap: wrap; margin-top: 20px; font-size: 14px; color: var(--muted); list-style: none; padding: 0; }
+.facts li::before { content: "✓"; color: var(--navy); font-weight: 700; margin-right: 6px; }
+
+/* Demo */
+.demo { padding: 24px 0 80px; }
+.window { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.chrome { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--bg); }
+.dots { display: flex; gap: 6px; flex: none; }
+.dots i { width: 11px; height: 11px; border-radius: 50%; background: var(--line); }
+.url { flex: 1; min-width: 0; font-size: 13px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 4px 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge { flex: none; font-size: 12px; font-weight: 600; color: var(--navy); background: var(--tint); border-radius: 999px; padding: 3px 10px; }
+.tabs { display: flex; gap: 4px; padding: 8px 10px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.tabs button {
+  font: inherit; font-size: 14px; font-weight: 500; color: var(--muted); background: none; border: 0;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+}
+.tabs button:hover { color: var(--ink); background: var(--bg); }
+.tabs button[aria-selected="true"] { color: var(--ink); background: var(--tint); }
+.window iframe { display: block; width: 100%; height: min(680px, 78vh); border: 0; background: #fff; }
+.hint { margin-top: 14px; text-align: center; font-size: 14px; color: var(--muted); }
+.hint kbd { margin: 0 2px; }
+
+/* Features */
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 56px; }
+.feature { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+.feature p { font-size: 15px; color: var(--muted); }
+.icon { width: 36px; height: 36px; border-radius: 9px; background: var(--tint); color: var(--navy); display: grid; place-items: center; margin-bottom: 14px; }
+
+/* Install */
+.install { padding: 80px 0; border-top: 1px solid var(--line); background: var(--surface); }
+.section-head { max-width: 40rem; margin-bottom: 36px; }
+.section-head p { color: var(--muted); font-size: 17px; }
+.cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: start; }
+.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; display: grid; gap: 4px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 36px 1fr; gap: 14px; padding: 14px 0; }
+.steps li + li { border-top: 1px solid var(--line); }
+.steps li::before {
+  content: counter(s); width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--navy); color: var(--navy-ink); font-weight: 700; font-size: 14px;
+}
+.steps b { color: var(--ink); }
+.steps p { font-size: 15px; color: var(--muted); margin-top: 2px; }
+.repo { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+.repo p { font-size: 15px; color: var(--muted); margin-bottom: 14px; }
+.code { position: relative; }
+.code pre {
+  margin: 0; background: #0F172A; color: #E2E8F0; border-radius: 10px; padding: 16px 18px; overflow-x: auto;
+  font: 13.5px/1.7 ui-monospace, "SF Mono", Menlo, monospace;
+}
+.code pre .c { color: #7C8BA1; }
+.copy {
+  position: absolute; top: 8px; right: 8px; font: 600 12px "Inter", system-ui, sans-serif; color: #CBD5E1;
+  background: #1E293B; border: 1px solid #334155; border-radius: 6px; padding: 4px 10px; cursor: pointer;
+}
+.copy:hover { color: #fff; }
+.update { margin-top: 16px; font-size: 14px; color: var(--muted); }
+
+/* Gallery */
+.gallery { padding: 80px 0; }
+.shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.shots figure { margin: 0; }
+.shots img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+.shots figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+footer { border-top: 1px solid var(--line); padding: 32px 0 48px; font-size: 14px; color: var(--muted); }
+footer .wrap { display: flex; gap: 12px 32px; justify-content: space-between; flex-wrap: wrap; }
+footer p { max-width: 46rem; }
+footer nav { display: flex; gap: 16px; }
+
+section[id] { scroll-margin-top: 60px; }
+.features > *, .shots > *, .cols > * { min-width: 0; }
+
+@media (max-width: 860px) {
+  .features, .shots, .cols { grid-template-columns: 1fr; }
+  .cols { gap: 28px; }
+}
+@media (max-width: 560px) {
+  .wrap { padding: 0 16px; }
+  .top nav a:not(.keep) { display: none; }
+  .hero { padding-top: 48px; }
+  .badge { display: none; }
+  .window iframe { height: 560px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .btn { transition: none; }
+  .btn:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 64 64" width="19" height="19"><rect x="8" y="11" width="48" height="42" rx="7" fill="none" stroke="#fff" stroke-width="6"/><rect x="8" y="11" width="17" height="42" rx="7" fill="#fff"/><path d="M33 24h13M33 32h9M33 40h11" stroke="#7DD3FC" stroke-width="5" stroke-linecap="round"/></svg></span>
+      Better EduRec
+    </a>
+    <nav aria-label="Main">
+      <a href="#demo">Demo</a>
+      <a href="#install" class="keep">Install</a>
+      <a href="faq/faq.html">FAQ</a>
+      <a href="https://github.com/anselmlong/better-edurec">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Unofficial Chrome extension for NUS students</span>
+      <h1>EduRec, without the hunting.</h1>
+      <p class="lead">Your GPA, degree progress and this week's timetable on one page. Search any EduRec page with <kbd>⌘</kbd><kbd>K</kbd>, move around with the keyboard, and pick from 12 themes.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/anselmlong/better-edurec/releases/latest">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>
+          Download the extension
+        </a>
+        <a class="btn btn-ghost" href="#demo">Try the live demo</a>
+      </div>
+      <ul class="facts">
+        <li>Free and open source</li>
+        <li>Read-only</li>
+        <li>Nothing leaves your browser</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="demo" id="demo" aria-label="Live demo">
+    <div class="wrap">
+      <div class="window">
+        <div class="chrome">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="url">edurec.nus.edu.sg</span>
+          <span class="badge">Demo · made-up data</span>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Demo page">
+          <button role="tab" aria-selected="true" data-p="home">Overview</button>
+          <button role="tab" aria-selected="false" data-p="results">Exam results</button>
+          <button role="tab" aria-selected="false" data-p="audit">Graduation audit</button>
+          <button role="tab" aria-selected="false" data-p="classes">Classes</button>
+          <button role="tab" aria-selected="false" data-p="finaid">Financial aid</button>
+        </div>
+        <iframe id="frame" src="test/harness/index.html?embed&page=home" title="Better EduRec running on a mock EduRec page"></iframe>
+      </div>
+      <p class="hint">This is the real extension code on fake pages. Click inside, then try <kbd>⌘</kbd><kbd>K</kbd> to search, <kbd>t</kbd> for themes, or <kbd>?</kbd> for every shortcut.</p>
+
+      <div class="features">
+        <div class="feature">
+          <div class="icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></div>
+          <h3>One Overview page</h3>
+          <p>Replaces the tile homepage with your GPA, degree progress, what's next and a live weekly timetable.</p>
+        </div>
+        <div class="feature">
+          <div class="icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+          <h3>Search and shortcuts</h3>
+          <p>Jump to any page from the palette. Vim-style keys move through lists and tables without the mouse.</p>
+        </div>
+        <div class="feature">
+          <div class="icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.5-.8 1.5-1.5 0-.9-.6-1.2-.6-2 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4c0-5-4-9-9-9Z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="11" cy="7.5" r="1.2"/><circle cx="15.5" cy="8.5" r="1.2"/></svg></div>
+          <h3>12 themes</h3>
+          <p>Campus, Dark, Nord, Dracula, Catppuccin and more. Every one passes WCAG AA contrast for body text.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="install" id="install">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Install in about a minute</h2>
+        <p>It isn't on the Chrome Web Store yet, so you load it yourself. No build step.</p>
+      </div>
+      <div class="cols">
+        <ol class="steps">
+          <li><div><b>Download the zip</b><p>Get <code>better-edurec-&lt;version&gt;.zip</code> from the <a href="https://github.com/anselmlong/better-edurec/releases/latest">latest release</a> and unzip it somewhere you'll keep it.</p></div></li>
+          <li><div><b>Open Chrome's extensions page</b><p>Go to <code>chrome://extensions</code> and switch on <b>Developer mode</b> in the top right.</p></div></li>
+          <li><div><b>Load unpacked</b><p>Click <b>Load unpacked</b> and choose the unzipped folder, the one with <code>manifest.json</code> in it.</p></div></li>
+          <li><div><b>Open EduRec</b><p>Sign in as usual. The Overview's checklist walks you to the pages it reads, once each.</p></div></li>
+        </ol>
+        <div class="repo">
+          <h3>Or straight from the repo</h3>
+          <p>Clone it, then do steps 2 and 3 with the cloned folder.</p>
+          <div class="code">
+            <pre id="clone">git clone https://github.com/anselmlong/better-edurec.git
+cd better-edurec
+<span class="c"># optional: run the tests</span>
+npm test</pre>
+            <button class="copy" type="button" data-copy="clone">Copy</button>
+          </div>
+          <p class="update">To update, replace the folder (or <code>git pull</code>) and click the reload icon on the extension's card in <code>chrome://extensions</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="gallery" aria-label="Screenshots">
+    <div class="wrap">
+      <div class="section-head"><h2>On real EduRec</h2></div>
+      <div class="shots">
+        <figure><img src="docs/store/screenshot-overview.png" alt="Overview page with GPA, degree progress and timetable" width="1280" height="800" loading="lazy"><figcaption>The Overview</figcaption></figure>
+        <figure><img src="docs/store/screenshot-timetable.png" alt="Weekly timetable" width="1280" height="800" loading="lazy"><figcaption>This week's timetable</figcaption></figure>
+        <figure><img src="docs/store/screenshot-themes.png" alt="Theme picker" width="1280" height="800" loading="lazy"><figcaption>Theme picker</figcaption></figure>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Unofficial. Not made, endorsed or supported by NUS. Summaries stay in <code>chrome.storage.local</code>; the only network request is to the public NUSMods API, with course codes, when you click Open in NUSMods.</p>
+    <nav aria-label="Footer">
+      <a href="faq/faq.html">FAQ and privacy</a>
+      <a href="https://github.com/anselmlong/better-edurec">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+const frame = document.getElementById('frame');
+const tabs = document.querySelectorAll('[data-p]');
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(o => o.setAttribute('aria-selected', String(o === t)));
+  frame.src = 'test/harness/index.html?embed&page=' + t.dataset.p;
+}));
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+  const text = document.getElementById(b.dataset.copy).innerText.split('\n').filter(l => !l.startsWith('#')).join('\n');
+  try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; } catch { b.textContent = 'Press ⌘C'; }
+  setTimeout(() => { b.textContent = 'Copy'; }, 1600);
+}));
+</script>
+</body>
+</html>

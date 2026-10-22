@@ -122,6 +122,8 @@
   // Pretend to be on the EduRec page under test.
   const realDetect = EDR.routes.detectPage;
   EDR.routes.detectPage = () => realDetect(window.HARNESS_URL);
+  // ?embed runs the full shell inside an iframe (the landing page's live demo).
+  if (new URLSearchParams(location.search).has('embed')) EDR.isTop = true;
 </script>
 <script src="../../src/parsers.js"></script>
 <script src="../../src/store.js"></script>

@@ -9,7 +9,8 @@
     "pack": "npm run check && npm test && rm -rf dist && mkdir dist && zip -qr dist/better-edurec-$npm_package_version.zip manifest.json src popup faq icons/icon-16.png icons/icon-32.png icons/icon-48.png icons/icon-128.png -x '*.DS_Store'",
     "harness": "node scripts/serve.mjs",
     "icons": "python3 scripts/icons.py",
-    "release": "node scripts/release.mjs"
+    "release": "node scripts/release.mjs",
+    "site": "rm -rf dist/site && mkdir -p dist/site/test/harness dist/site/docs/store && cp site/index.html dist/site/ && cp -r src faq icons dist/site/ && cp test/harness/index.html dist/site/test/harness/ && cp docs/store/*.png dist/site/docs/store/"
   },
   "license": "MIT"
 }
