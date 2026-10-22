@@ -281,6 +281,9 @@ html[data-edr-home] body { overflow: auto !important; height: auto !important; }
 }
 .edr-root a { color: var(--edr-blue); text-decoration: none; }
 .edr-root a:hover { color: var(--edr-selected-ink); text-decoration: underline; }
+/* Links styled as buttons keep the button's colours, not the link blue. */
+.edr-root a.edr-btn, .edr-root a.edr-btn:hover { color: var(--edr-on-primary); text-decoration: none; }
+.edr-root a.edr-btn.is-ghost, .edr-root a.edr-btn.is-ghost:hover { color: var(--edr-ink-2); }
 /* EduRec's stylesheet draws dotted outlines on hover/focus; only keep a real
    keyboard focus ring on the reskin's own elements. */
 .edr-root, .edr-root *, .edr-root *:hover, .edr-root *:focus:not(:focus-visible) { outline: none !important; }
@@ -796,7 +799,8 @@ html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-su
 .edr-checklist .edr-setup-copy { padding-right: 32px; }
 .edr-checklist-steps { list-style: none; margin: 0; padding: 0; flex: 1 1 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
 .edr-checklist-steps li {
-  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; gap: 10px 12px; align-items: start;
+  /* Second row holds the button, pinned to the bottom so every step's button lines up. */
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr auto; gap: 14px 12px; align-items: start;
   padding: 14px; border: 1px solid var(--edr-line); border-radius: var(--edr-radius-sm); background: var(--edr-surface-2);
 }
 .edr-checklist-steps li.is-next { background: var(--edr-surface); border-color: color-mix(in srgb, var(--edr-navy) 45%, var(--edr-line)); }
@@ -808,7 +812,7 @@ html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-su
 .is-done > .edr-check-mark { background: var(--edr-navy); border-color: var(--edr-navy); color: var(--edr-on-primary); }
 .edr-check-text { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--edr-muted); line-height: 1.35; }
 .edr-check-text strong { font-size: 14px; color: var(--edr-ink); font-weight: 600; }
-.edr-checklist-steps li > .edr-btn, .edr-check-state { grid-column: 2; justify-self: start; }
+.edr-checklist-steps li > .edr-btn, .edr-check-state { grid-column: 2; grid-row: 2; justify-self: start; }
 .edr-check-state { font-size: 13px; font-weight: 600; color: var(--edr-selected-ink); min-height: 36px; display: inline-flex; align-items: center; }
 
 /* ---------- Guided setup: coach card on EduRec pages ---------- */
@@ -828,8 +832,6 @@ html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-su
 .edr-coach-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .edr-coach-actions:empty { display: none; }
 .edr-coach.is-done .edr-coach-title { color: var(--edr-selected-ink); }
-.edr-coach a.edr-btn { text-decoration: none !important; color: var(--edr-on-primary) !important; }
-.edr-coach a.edr-btn.is-ghost { color: var(--edr-ink-2) !important; }
 /* The thing to click next: a steady accent border on its row or card, with a
    small label. EduRec's own element, so overrides need !important. */
 html[data-edr-on] body .edr-coach-target.edr-coach-target.edr-coach-target {
@@ -845,3 +847,8 @@ html[data-edr-on] body .edr-coach-target.edr-coach-target[data-edr-hint]::after 
   animation: edr-pop 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @media (max-width: 599px) { .edr-coach { right: 16px; left: 16px; width: auto; bottom: 80px; } }
+
+/* Empty cards: copy at the top, action pinned to the bottom, so cards with
+   longer copy keep their buttons on the same line as their neighbours. */
+.edr-empty { justify-content: flex-start; }
+.edr-empty > .edr-btn { margin-top: auto; }
