@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Better EduRec (unofficial)",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Unofficial, read-only redesign of NUS EduRec: a clean sidebar, search, live timetable, themes and keyboard controls.",
   "permissions": [
     "storage"
