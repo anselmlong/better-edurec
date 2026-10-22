@@ -99,6 +99,10 @@ html[data-edr-on] .psc_focus,
 html[data-edr-on] .psc_focus * { outline: none !important; }
 html[data-edr-on] .psc_button-transparent .ps-button:hover { border-style: solid !important; border-color: transparent !important; }
 html[data-edr-on] #PT_WRAPPER :focus-visible { outline: 2px solid var(--edr-blue) !important; outline-offset: 2px !important; }
+/* EduRec focuses the first row of a list on load; an outline there gets clipped by
+   the list and ignores the card's radius, so rows show focus as their border. */
+html[data-edr-on] #PT_WRAPPER li.ps_grid-row:focus-visible,
+html[data-edr-on] #PT_WRAPPER li.ps_grid-row:focus { outline: none !important; border-color: var(--edr-blue) !important; }
 
 /* Header: white bar, left-aligned title, our sidebar replaces Home and NavBar. */
 html[data-edr-on] .ps_header_bar,
@@ -825,13 +829,18 @@ html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-su
 .edr-coach.is-done .edr-coach-title { color: var(--edr-selected-ink); }
 .edr-coach a.edr-btn { text-decoration: none !important; color: var(--edr-on-primary) !important; }
 .edr-coach a.edr-btn.is-ghost { color: var(--edr-ink-2) !important; }
-/* The thing to click next: a soft ring that breathes, on EduRec's own element. */
+/* The thing to click next: a steady accent border on its row or card, with a
+   small label. EduRec's own element, so overrides need !important. */
 html[data-edr-on] .edr-coach-target {
-  border-radius: 6px; position: relative;
-  box-shadow: 0 0 0 2px var(--edr-blue), 0 0 0 6px color-mix(in srgb, var(--edr-blue) 22%, transparent) !important;
-  animation: edr-coach-ring 1.8s ease-in-out infinite;
+  position: relative !important; overflow: visible !important;
+  border-color: var(--edr-blue) !important;
+  box-shadow: 0 0 0 1px var(--edr-blue), 0 0 0 5px color-mix(in srgb, var(--edr-blue) 14%, transparent) !important;
+  transition: box-shadow 200ms ease, border-color 200ms ease;
 }
-@keyframes edr-coach-ring {
-  50% { box-shadow: 0 0 0 2px var(--edr-blue), 0 0 0 10px color-mix(in srgb, var(--edr-blue) 0%, transparent); }
+html[data-edr-on] .edr-coach-target[data-edr-hint]::after {
+  content: attr(data-edr-hint); position: absolute; top: -10px; right: 12px; z-index: 2; pointer-events: none;
+  padding: 2px 8px; border-radius: 999px; background: var(--edr-blue); color: #fff;
+  font: 600 11px/16px var(--edr-font); letter-spacing: .01em; white-space: nowrap;
+  animation: edr-pop 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @media (max-width: 599px) { .edr-coach { right: 16px; left: 16px; width: auto; bottom: 80px; } }

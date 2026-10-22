@@ -59,14 +59,18 @@
   const navLink = (label) => [...document.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label) || null;
   const radioLabel = (label) => [...document.querySelectorAll('#PT_MAIN label')].find((l) => l.textContent.trim() === label) || null;
 
+  // Marks the thing to click next. Rings the whole row or card it sits in (a
+  // ring around just the link text looks cramped) and labels it.
   let target = null;
-  function point(el) {
-    if (target === el) return;
-    if (target) target.classList.remove('edr-coach-target');
-    target = el;
-    if (el) {
-      el.classList.add('edr-coach-target');
-      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  function point(el, hint) {
+    const box = el && (el.closest('li.ps_grid-row, tr.ps_grid-row, ul.psa_list-linkmenu > li') || el);
+    if (target === box) return;
+    if (target) { target.classList.remove('edr-coach-target'); target.removeAttribute('data-edr-hint'); }
+    target = box;
+    if (box) {
+      box.classList.add('edr-coach-target');
+      if (hint) box.setAttribute('data-edr-hint', hint);
+      box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }
 
@@ -118,20 +122,20 @@
       }
       if (step.radio && got(step.radio.after)) {
         const label = radioLabel(step.radio.label);
-        point(label);
+        point(label, 'Choose this');
         show('radio', 'Almost there', step.radio.hint);
         return;
       }
       const nav = step.nav && navLink(step.nav);
       const li = nav && nav.closest('li');
       if (nav && li && !li.classList.contains('psc_selected')) {
-        point(nav);
+        point(nav, 'Open this');
         show('nav', step.label, ['Choose ', h('strong', null, step.nav), ' in the list on the left.']);
         return;
       }
       const term = step.pickTerm && termLink();
       if (term) {
-        point(term);
+        point(term, 'Pick this');
         show('term', step.label, step.pickTerm);
         return;
       }
