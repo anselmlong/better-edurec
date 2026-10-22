@@ -25,7 +25,7 @@ Unofficial, read-only redesign of NUS EduRec: a clean sidebar, search, live time
 >
 > • A clean sidebar with every section, plus search (⌘K / Ctrl K) across pages and sub-pages
 > • Quick links straight to your unofficial transcript, exam results, exam schedule, course registration and S/U declarations
-> • An optional Overview: GPA, degree progress, what class is up next, and this week's timetable with a card per course
+> • An optional Overview: GPA, degree progress, what class is up next, and this week's timetable with a card per course. A short guided checklist fills it in.
 > • Open your timetable in NUSMods in one click
 > • 12 themes, including Dark, Monokai, Dracula, Nord, Terminal and Girlypop
 > • Vim-style keyboard controls (press ? for the list)
@@ -40,9 +40,9 @@ Unofficial, read-only redesign of NUS EduRec: a clean sidebar, search, live time
 - `docs/store/screenshot-timetable.png`
 - `docs/store/screenshot-themes.png`
 
-**Homepage URL:** https://github.com/anselmlong/edurec-reskin
+**Homepage URL:** https://github.com/anselmlong/better-edurec
 
-**Support URL:** https://github.com/anselmlong/edurec-reskin/issues
+**Support URL:** https://github.com/anselmlong/better-edurec/issues
 
 ## Privacy practices tab
 
@@ -76,7 +76,7 @@ Restyle the NUS EduRec student portal in the user's browser and summarise the us
 - I do not use or transfer user data for purposes that are unrelated to my item's single purpose
 - I do not use or transfer user data to determine creditworthiness or for lending purposes
 
-**Privacy policy URL:** https://github.com/anselmlong/edurec-reskin/blob/main/PRIVACY.md
+**Privacy policy URL:** https://github.com/anselmlong/better-edurec/blob/main/PRIVACY.md
 (The repo must be public for this link to work. Alternatively publish `PRIVACY.md` as a GitHub Gist or GitHub Pages page.)
 
 ## Test instructions tab
@@ -87,7 +87,7 @@ Reviewers can't sign in to EduRec (it needs an NUS student account), so no crede
 >
 > What it does on that site: restyles pages (sidebar, search, themes, keyboard shortcuts), and reads the text of pages the student opens to show their own grades, degree progress and timetable on an Overview page. Data stays in chrome.storage.local. It never submits forms.
 >
-> To review without an account: the screenshots show every feature. The source is public at https://github.com/anselmlong/edurec-reskin, and `npm run harness` runs the real content scripts against fake EduRec pages with invented data (open http://127.0.0.1:8765/test/harness/index.html?page=home). The only network request is to api.nusmods.com, with course codes only, when the user clicks "Open in NUSMods".
+> To review without an account: the screenshots show every feature. The source is public at https://github.com/anselmlong/better-edurec, and `npm run harness` runs the real content scripts against fake EduRec pages with invented data (open http://127.0.0.1:8765/test/harness/index.html?page=home). The only network request is to api.nusmods.com, with course codes only, when the user clicks "Open in NUSMods".
 
 If you record a short screen video of it working, add the link here; it helps reviewers a lot.
 
