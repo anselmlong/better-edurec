@@ -328,6 +328,33 @@ html[data-edr-on] :is(.PSLEVEL1GRIDWBO, .PSLEVEL1GRID, .PSGROUPBOXWBO) { border:
 
 html[data-edr-on] a { text-underline-offset: 2px; }
 
+/* ---------- Layout on EduRec pages (classes from src/layout.js) ---------- */
+/* Filters (All Terms, Term From/To, GO) sit on one row, the button level with the fields. */
+html[data-edr-on] .ps_apps_content .edr-filterbar { display: flex !important; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; margin: 4px 0 24px !important; }
+html[data-edr-on] .ps_apps_content .edr-filterbar > * { margin: 0 !important; }
+html[data-edr-on] .ps_apps_content .edr-filterbar > :is(.ps_box-checkbox, .ps_box-radio) { display: flex; align-items: center; min-height: 40px; }
+/* Long instructions show their opening lines; the rest is one click away. */
+html[data-edr-on] .edr-fold:not(.is-open) {
+  max-height: 7.5em; overflow: hidden;
+  -webkit-mask-image: linear-gradient(#000 50%, transparent); mask-image: linear-gradient(#000 50%, transparent);
+}
+html[data-edr-on] .edr-fold > p:first-child { margin-top: 0; }
+.edr-root.edr-fold-toggle {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 36px; margin: 2px 0 16px; padding: 0;
+  border: 0; background: none; color: var(--edr-blue); font: 600 14px var(--edr-font); cursor: pointer;
+}
+.edr-root.edr-fold-toggle:hover { color: var(--edr-selected-ink); text-decoration: underline; text-underline-offset: 2px; }
+.edr-fold-toggle svg { transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1); }
+.edr-fold-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+@media print {
+  html[data-edr-on] .edr-fold:not(.is-open) { max-height: none; -webkit-mask-image: none; mask-image: none; }
+  .edr-fold-toggle { display: none !important; }
+}
+/* Wide classic grids (Global education's 13 columns) scroll inside their border
+   instead of widening the page. The rows keep table layout inside tbody. */
+html[data-edr-on] table.PSLEVEL1GRIDWBO { display: block; max-width: 100%; overflow-x: auto; }
+html[data-edr-on] table.PSLEVEL1GRIDWBO > tbody { display: table; width: 100%; border-collapse: separate; border-spacing: 0; }
+
 /* Shift EduRec right of the sidebar on wide screens. The sidebar lives on <html>,
    outside <body>; the transform makes <body> the containing block for EduRec's own
    fixed/absolute headers and panels, so they move over with it instead of hiding

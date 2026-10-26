@@ -93,7 +93,36 @@
       <tr><th class="PSLEVEL1GRIDCOLUMNHDR">Course</th><th class="PSLEVEL1GRIDCOLUMNHDR">Description</th><th class="PSLEVEL1GRIDCOLUMNHDR">Units</th></tr>
       <tr><td class="PSLEVEL1GRIDODDROW">CS2105</td><td class="PSLEVEL1GRIDODDROW">Introduction to Computer Netwo</td><td class="PSLEVEL1GRIDODDROW">4.00</td></tr>
       <tr><td class="PSLEVEL1GRIDEVENROW">CS2106</td><td class="PSLEVEL1GRIDEVENROW">Introduction to Operating Syst</td><td class="PSLEVEL1GRIDEVENROW">4.00</td></tr>
-      <tr><td class="PSLEVEL1GRIDODDROW">CS3230</td><td class="PSLEVEL1GRIDODDROW">Design and Analysis of Algorit</td><td class="PSLEVEL1GRIDODDROW">4.00</td></tr></table>` };
+      <tr><td class="PSLEVEL1GRIDODDROW">CS3230</td><td class="PSLEVEL1GRIDODDROW">Design and Analysis of Algorit</td><td class="PSLEVEL1GRIDODDROW">4.00</td></tr></table>
+    <table class="PSLEVEL1GRIDWBO" style="margin-top:16px;width:100%"><tr><td class="PSLEVEL1GRIDNAVIGATIONBAR" colspan="13">External Study Applications &nbsp; 1-1 of 1</td></tr>
+      <tr>${['Application', 'Term', 'Host University', 'Country', 'Programme', 'Status', 'Status Date', 'Units', 'Mapped', 'Possible Actions 1', 'Possible Actions 2', 'Possible Actions 3', 'Remarks'].map((t) => '<th class="PSLEVEL1GRIDCOLUMNHDR">' + t + '</th>').join('')}</tr>
+      <tr>${['0001234', '2610', 'Example University', 'Example Country', 'Student Exchange Programme', 'Ext Study Accepted by Host', '02/09/2026', '20.00', 'Yes', 'NA', 'NA', 'NA', 'Awaiting module approval'].map((t) => '<td class="PSLEVEL1GRIDODDROW">' + t + '</td>').join('')}</tr></table>` };
+  // A filter row above a grid, and an instruction wall above two buttons.
+  const P = (t) => '<p>' + t + '</p>';
+  PAGES.filters = { url: '/psc/cs90prd_41/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_SF_FA_DISB_FL.GBL', html: `
+    <h1 id="PANEL_TITLE"><span class="ps-text">View Financial Aid Disbursed</span></h1>
+    <div class="ps_box-group psc_layout">
+      <div class="ps_box-checkbox"><input class="ps-checkbox" type="checkbox" id="fat" checked><label class="ps-label" for="fat">All Terms</label></div>
+      <div class="ps_box-dropdown"><div class="ps_box-label"><label class="ps-label" for="tf">Term From</label></div><div class="ps_box-control"><select id="tf" class="ps-dropdown"><option>2025/2026 Semester 1</option></select></div></div>
+      <div class="ps_box-dropdown"><div class="ps_box-label"><label class="ps-label" for="tt">Term To</label></div><div class="ps_box-control"><select id="tt" class="ps-dropdown"><option>2026/2027 Semester 1</option></select></div></div>
+      <div class="ps_box-button psc_primary"><a class="ps-button" href="#">GO</a></div>
+    </div>
+    <div class="ps_box-grid-flex"><div class="ps_box-grid-header"><span class="ps_grid-title">Disbursements</span></div><div class="ps_box-gridc"><table class="ps_grid-flex">
+      <tr class="ps_grid-head-row"><th class="ps_grid-col"><span class="ps_grid-col-label">Term</span></th><th class="ps_grid-col"><span class="ps_grid-col-label">Posted</span></th><th class="ps_grid-col psc_num"><span class="ps_grid-col-label">Amount</span></th></tr>
+      <tr class="ps_grid-row"><td class="ps_grid-cell"><span class="ps_box-value">2025/2026 Semester 2</span></td><td class="ps_grid-cell"><span class="ps_box-value">13/01/2026</span></td><td class="ps_grid-cell psc_num"><span class="ps_box-value">3,850.00</span></td></tr>
+      <tr class="ps_grid-row"><td class="ps_grid-cell"><span class="ps_box-value">2026/2027 Semester 1</span></td><td class="ps_grid-cell"><span class="ps_box-value">11/08/2026</span></td><td class="ps_grid-cell psc_num"><span class="ps_box-value">3,850.00</span></td></tr>
+    </table></div></div>` };
+  PAGES.notes = { url: '/psc/cs90prd_17/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_AD_REG_NAVCOL_FL.GBL', html: `
+    <h1 id="PANEL_TITLE"><span class="ps-text">Access Special Consideration</span></h1>
+    <div class="ps_box-longedit psc_label-none"><div class="ps_box-value">`
+      + P('1. Special consideration is for students whose examination performance was affected by illness or other circumstances beyond their control during the examination period.')
+      + P('2. Applications must be submitted within three working days of the affected examination, together with supporting documents such as a medical certificate.')
+      + P('3. Medical certificates must state the dates of incapacity and be issued by a registered medical practitioner. Certificates issued after the examination date may not be accepted.')
+      + P('4. Approval is not automatic. The Board of Examiners decides each case, and may offer a make-up examination or other arrangements.')
+      + P('5. Submitting false information is a disciplinary offence.')
+      + P('6. Questions about an application go to your faculty office, not the Registrar.') + `</div></div>
+    <div class="ps_box-button psc_primary"><a class="ps-button" href="#">Apply</a></div>
+    <div class="ps_box-button"><a class="ps-button" href="#">View my applications</a></div>` };
   const key = new URLSearchParams(location.search).get('page') || 'home';
   const page = PAGES[key];
 
@@ -190,6 +219,7 @@
 <script src="../../src/guide.js"></script>
 <script src="../../src/shell.js"></script>
 <script src="../../src/overview.js"></script>
+<script src="../../src/layout.js"></script>
 <script src="../../src/enhancers.js"></script>
 <script src="../../src/main.js"></script>
 </body>

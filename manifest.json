@@ -47,6 +47,7 @@
         "src/guide.js",
         "src/shell.js",
         "src/overview.js",
+        "src/layout.js",
         "src/enhancers.js",
         "src/main.js"
       ],

@@ -69,6 +69,7 @@
   function run() {
     if (!document.body || !EDR.store.alive()) return;
     if (EDR.shell && EDR.shell.ensureSideToggle) EDR.shell.ensureSideToggle();
+    if (EDR.layout) EDR.layout.run();
     // Cheap gate: only walk rendered text when some enhancer's anchor is on the page.
     const raw = document.body.textContent;
     if (!ENHANCERS.some((e) => raw.includes(e.anchor)) && !ENHANCERS.some((e) => document.getElementById('edr-card-' + e.key))) return;

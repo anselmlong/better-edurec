@@ -61,6 +61,7 @@ npm run harness
 | `src/parsers.js` | Pure text parsers for the audit, results, classes and financial aid pages |
 | `src/enhancers.js` | Recognises pages, inserts summary cards, saves snapshots |
 | `src/overview.js` | Overview dashboard on the homepage |
+| `src/layout.js` | Layout fixes on EduRec pages: filter rows, folded instruction text |
 | `src/shell.js` | Sidebar, palette (search, `:` commands, theme picker), cheat sheet |
 | `src/themes.js` | Theme registry; generates one CSS rule per theme |
 | `src/keys.js` | Vim-style key table, resolver and actions |
