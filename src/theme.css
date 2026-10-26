@@ -81,9 +81,6 @@ html[data-edr-on][data-edr-dark] :where(body *:not(.edr-root, .edr-root *, img, 
   background-color: transparent !important; background-image: none !important;
 }
 html[data-edr-on][data-edr-dark] :where(body a:not(.edr-root *), body .ps-link) { color: var(--edr-blue) !important; }
-html[data-edr-on][data-edr-dark] :where(body input, body select, body textarea):not(.edr-root *) {
-  background-color: var(--edr-surface-2) !important; color: var(--edr-ink) !important; border: 1px solid var(--edr-line) !important;
-}
 html[data-edr-on][data-edr-dark] :where(#PT_HEADER, .ps_header_bar, .ps_header_bar_cont, .ps_pagetitle_cont, #PT_SIDE, .ps_box-grid-flex, .ps_box-grid-list li.ps_grid-row, tr.ps_grid-row > td) {
   background-color: var(--edr-surface) !important;
 }
@@ -230,6 +227,106 @@ html[data-edr-on] #PT_MAIN .ps_box-longedit > .ps_box-value {
 html[data-edr-on] .ps_apps_content .ps_box-edit > .ps_box-label,
 html[data-edr-on] .ps_apps_content .ps_box-label .ps-label { font-size: 13px !important; color: var(--edr-muted) !important; font-weight: 500 !important; }
 html[data-edr-on] .ps_apps_content .ps_box-edit > .ps_box-value { font-size: 15px !important; color: var(--edr-ink) !important; }
+/* Instruction walls read at a comfortable measure. */
+html[data-edr-on] #PT_MAIN :is(.psc_label-none, .ps_box-longedit) > .ps_box-value { max-width: 72ch; }
+
+/* ---------- Form controls (Fluid and classic) ----------
+   Matched by element, not PeopleSoft class, so every page's fields get the same
+   treatment. Only paint changes: EduRec's scripts still own layout and behaviour. */
+html[data-edr-on] body :is(input:is([type="text"], [type="search"], [type="number"], [type="email"], [type="tel"], [type="password"], [type="date"], :not([type])), select, textarea):not(.edr-root *) {
+  min-height: 40px; box-sizing: border-box; padding: 0 12px !important;
+  background-color: var(--edr-surface) !important; color: var(--edr-ink) !important;
+  border: 1px solid var(--edr-line-strong) !important; border-radius: var(--edr-radius-sm) !important; box-shadow: none !important;
+  font: 400 14px/1.4 var(--edr-font) !important; caret-color: var(--edr-blue);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+html[data-edr-on] body textarea:not(.edr-root *) { padding: 10px 12px !important; line-height: 1.5 !important; }
+/* Selects lose the OS chevron for one drawn from the theme's muted ink. */
+html[data-edr-on] body select:not([multiple]):not(.edr-root *) {
+  appearance: none; -webkit-appearance: none; padding-right: 36px !important;
+  background-image: linear-gradient(45deg, transparent 50%, var(--edr-muted) 50%), linear-gradient(135deg, var(--edr-muted) 50%, transparent 50%) !important;
+  background-position: calc(100% - 18px) 52%, calc(100% - 13px) 52% !important; background-size: 5px 5px !important; background-repeat: no-repeat !important;
+}
+html[data-edr-on] body :is(input, select, textarea):not(.edr-root *)::placeholder { color: var(--edr-muted); opacity: 1; }
+html[data-edr-on] body :is(input, select, textarea):not(.edr-root *, :disabled, [readonly]):hover { border-color: var(--edr-ink-2) !important; }
+html[data-edr-on] body :is(input, select, textarea):not(.edr-root *, [type="checkbox"], [type="radio"]):focus {
+  outline: none !important; border-color: var(--edr-blue) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--edr-blue) 24%, transparent) !important;
+}
+html[data-edr-on] body :is(input, select, textarea):not(.edr-root *):is(:disabled, [readonly]) {
+  background-color: var(--edr-surface-2) !important; color: var(--edr-ink-2) !important; border-color: var(--edr-line) !important;
+}
+html[data-edr-on] body :is(input, select, textarea):not(.edr-root *):disabled { cursor: not-allowed; }
+html[data-edr-on] body :is(input, select, textarea):not(.edr-root *)[aria-invalid="true"] { border-color: var(--edr-warn) !important; }
+html[data-edr-on] body input:is([type="checkbox"], [type="radio"]):not(.edr-root *) { width: 18px; height: 18px; margin: 0 8px 0 0; vertical-align: -4px; cursor: pointer; }
+html[data-edr-on] body :is(input[type="checkbox"], input[type="radio"]):not(.edr-root *) + :is(label, .ps-label) { margin-right: 18px; color: var(--edr-ink) !important; font-size: 14px !important; cursor: pointer; }
+html[data-edr-on] .ps_apps_content :is(.ps_box-edit, .ps_box-dropdown, .ps_box-longedit, .ps_box-date) > .ps_box-label { margin-bottom: 6px; }
+html[data-edr-on] .ps_apps_content :is(.ps_box-edit, .ps_box-dropdown, .ps_box-longedit, .ps_box-date, .ps_box-radio, .ps_box-checkbox) { margin-bottom: 16px; }
+
+/* Buttons in page content and dialogs: one size, one weight, real states. */
+html[data-edr-on] :is(#PT_MAIN, .ps_modal_container, .PSMODALTABLE) :is(.ps-button, input[type="button"], input[type="submit"]),
+html[data-edr-on] .PSPUSHBUTTON {
+  display: inline-flex !important; align-items: center; justify-content: center; min-height: 38px; padding: 0 16px !important;
+  font: 600 14px/1 var(--edr-font) !important; text-decoration: none !important; cursor: pointer;
+  border-radius: var(--edr-radius-sm) !important; border: 1px solid var(--edr-line-strong) !important;
+  background: var(--edr-surface) !important; color: var(--edr-ink) !important; box-shadow: none !important;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 100ms ease;
+}
+html[data-edr-on] :is(#PT_MAIN, .ps_modal_container, .PSMODALTABLE) :is(.ps-button, input[type="button"], input[type="submit"]):hover,
+html[data-edr-on] .PSPUSHBUTTON:hover { background: var(--edr-surface-2) !important; border-color: var(--edr-ink-2) !important; }
+html[data-edr-on] :is(#PT_MAIN, .ps_modal_container, .PSMODALTABLE) :is(.ps-button.psc_primary, .psc_primary .ps-button) {
+  background: var(--edr-navy) !important; border-color: var(--edr-navy) !important; color: var(--edr-on-primary) !important;
+}
+html[data-edr-on] :is(#PT_MAIN, .ps_modal_container, .PSMODALTABLE) :is(.ps-button.psc_primary, .psc_primary .ps-button):hover { background: var(--edr-navy-ink) !important; border-color: var(--edr-navy-ink) !important; }
+html[data-edr-on] :is(#PT_MAIN, .ps_modal_container, .PSMODALTABLE) :is(.ps-button, input[type="button"], input[type="submit"]):active,
+html[data-edr-on] .PSPUSHBUTTON:active { transform: scale(.98); }
+html[data-edr-on] :is(.ps-button, input[type="button"], input[type="submit"], .PSPUSHBUTTON):is(:disabled, .psc_disabled, [aria-disabled="true"]) { opacity: .5; cursor: not-allowed; transform: none; }
+html[data-edr-on] .ps_apps_content .ps_box-button { display: inline-flex; margin: 0 8px 8px 0; }
+
+/* Dialogs: a raised surface over a dimmed page. The dark-theme reset clears EduRec's
+   fills, so the panel and its mask must set their own. */
+html[data-edr-on] :is(#pt_modalMask, .ps_masking) { background: rgb(var(--edr-shadow-rgb)) !important; opacity: .45 !important; }
+html[data-edr-on] :is(.ps_modal_container, .PSMODALTABLE) {
+  background: var(--edr-surface) !important; color: var(--edr-ink) !important;
+  border: 1px solid var(--edr-line) !important; border-radius: var(--edr-radius) !important;
+  box-shadow: 0 24px 70px rgb(var(--edr-shadow-rgb) / .35) !important;
+}
+html[data-edr-on] :is(.ps_modal_header, .PSMODALTITLE) {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px 12px !important;
+  background: transparent !important; background-image: none !important; border: 0 !important;
+}
+html[data-edr-on] :is(.ps_modal_title, .PSMODALTITLE), html[data-edr-on] :is(.ps_modal_title, .PSMODALTITLE) * {
+  font: 700 17px/1.3 var(--edr-font) !important; color: var(--edr-ink) !important;
+}
+html[data-edr-on] .ps_modal_close { color: var(--edr-muted) !important; text-decoration: none !important; font-size: 20px; line-height: 1; }
+html[data-edr-on] .ps_modal_close:hover { color: var(--edr-ink) !important; }
+html[data-edr-on] :is(.ps_modal_content, .PSMODALCONTENT) { padding: 0 20px 20px !important; background: transparent !important; color: var(--edr-ink-2) !important; }
+html[data-edr-on] #alertmsg, html[data-edr-on] #alertmsg * { font: 400 15px/1.55 var(--edr-font) !important; color: var(--edr-ink) !important; }
+html[data-edr-on] :is(.ps_modal_content, .PSMODALCONTENT) #alertmsg { margin-bottom: 16px; }
+/* A message on the page itself (not eligible, closed, errors) gets a quiet panel. */
+html[data-edr-on] #PT_MAIN #alertmsg {
+  max-width: 72ch; margin: 8px 0 16px; padding: 14px 16px;
+  background: var(--edr-surface-2) !important; border: 1px solid var(--edr-line) !important; border-radius: var(--edr-radius-sm) !important;
+}
+
+/* ---------- Classic pages (legacy iframes: audit report, Global education) ---------- */
+html[data-edr-on] .PAPAGETITLE { font: 700 22px/1.3 var(--edr-font) !important; color: var(--edr-ink) !important; letter-spacing: -0.01em; margin-bottom: 12px; }
+html[data-edr-on] :is(.PSEDITBOXLABEL, .PSDROPDOWNLABEL, .PSCHECKBOXLABEL, .PSRADIOBUTTONLABEL) { font-size: 13px !important; font-weight: 500 !important; color: var(--edr-muted) !important; }
+html[data-edr-on] :is(.PSEDITBOX_DISPONLY, .PSTEXT, .PSLONGEDITBOX, .PSDROPDOWNLIST_DISPONLY) { font-size: 14px !important; color: var(--edr-ink) !important; }
+html[data-edr-on] :is(.PSHYPERLINK, .PSHYPERLINK a) { color: var(--edr-blue) !important; }
+html[data-edr-on] :is(.PSLEVEL1GRIDNAVIGATIONBAR, .PSLEVEL2GRIDNAVIGATIONBAR, .PSLEVEL3GRIDNAVIGATIONBAR) {
+  padding: 10px 12px !important; background: var(--edr-surface) !important; background-image: none !important;
+  border: 0 !important; border-bottom: 1px solid var(--edr-line) !important;
+  font-size: 13px !important; font-weight: 600 !important; color: var(--edr-ink) !important; font-variant-numeric: tabular-nums;
+}
+html[data-edr-on] :is(.PSLEVEL1GRIDCOLUMNHDR, .PSLEVEL2GRIDCOLUMNHDR, .PSLEVEL1SSGRIDCOLUMNHDR) { padding: 8px 12px !important; text-align: left !important; font-size: 13px !important; }
+html[data-edr-on] :is(.PSLEVEL1GRIDODDROW, .PSLEVEL1GRIDEVENROW, .PSLEVEL2GRIDODDROW, .PSLEVEL2GRIDEVENROW) {
+  padding: 9px 12px !important; font-size: 14px !important; border-bottom: 1px solid var(--edr-line-2) !important;
+}
+html[data-edr-on] tr:last-child > :is(.PSLEVEL1GRIDODDROW, .PSLEVEL1GRIDEVENROW, .PSLEVEL2GRIDODDROW, .PSLEVEL2GRIDEVENROW) { border-bottom: 0 !important; }
+html[data-edr-on] :is(.PSLEVEL1GRIDWBO, .PSLEVEL1GRID, .PSGROUPBOXWBO) { border: 1px solid var(--edr-line) !important; border-radius: var(--edr-radius) !important; border-collapse: separate !important; border-spacing: 0; overflow: hidden; }
+
+html[data-edr-on] a { text-underline-offset: 2px; }
 
 /* Shift EduRec right of the sidebar on wide screens. The sidebar lives on <html>,
    outside <body>; the transform makes <body> the containing block for EduRec's own

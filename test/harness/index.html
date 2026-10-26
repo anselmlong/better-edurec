@@ -60,6 +60,40 @@
       'CD 2002   Example Course B','Days: Tuesday','Times: 2:00PM to 3:00PM','Days: Thursday','Times: 12:00PM to 2:00PM',
       'EF 3003   Example Course C','Days: Wednesday','Times: 4:00PM to 6:00PM','Days: Friday','Times: 10:00AM to 12:00PM'] };
   })();
+  // Form controls, messages and a classic (non-Fluid) page. The markup is approximated
+  // from PeopleSoft's Fluid and classic class names, not copied from EduRec.
+  PAGES.controls = { url: '/psc/cs90prd_41/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_SF_FA_DISB_FL.GBL', html: `
+    <h1 id="PANEL_TITLE"><span class="ps-text">Apply Official Transcript</span></h1>
+    <div class="ps_box-longedit psc_label-none"><div class="ps_box-value">Official transcripts are issued as a PDF and sent to the email address in your profile. Requests made after 5pm are processed the next working day. If you need a printed copy for a scholarship or visa application, choose the printed option and allow five working days for delivery. Transcripts for students with outstanding fees are held until the fees are paid.</div></div>
+    <div class="ps_box-group psc_layout">
+      <div class="ps_box-dropdown"><div class="ps_box-label"><label class="ps-label" for="rt">Report Type</label></div>
+        <div class="ps_box-control"><select id="rt" class="ps-dropdown"><option>Undergraduate Transcript</option><option>Graduate Transcript</option></select></div></div>
+      <div class="ps_box-edit"><div class="ps_box-label"><label class="ps-label" for="cp">Copies</label></div>
+        <div class="ps_box-control"><input id="cp" class="ps-edit" type="text" value="1"></div></div>
+      <div class="ps_box-edit"><div class="ps_box-label"><label class="ps-label" for="em">Send to</label></div>
+        <div class="ps_box-control"><input id="em" class="ps-edit" type="text" placeholder="name@u.nus.edu"></div></div>
+      <div class="ps_box-edit"><div class="ps_box-label"><label class="ps-label" for="ro">Student ID</label></div>
+        <div class="ps_box-control"><input id="ro" class="ps-edit" type="text" value="A0000000X" disabled></div></div>
+      <div class="ps_box-radio"><input class="ps-radio" type="radio" name="v" id="v1" checked><label class="ps-label" for="v1">By Class</label>
+        <input class="ps-radio" type="radio" name="v" id="v2"><label class="ps-label" for="v2">By Date</label></div>
+      <div class="ps_box-checkbox"><input class="ps-checkbox" type="checkbox" id="at" checked><label class="ps-label" for="at">All Terms</label></div>
+      <div class="ps_box-longedit"><div class="ps_box-label"><label class="ps-label" for="pu">Purpose</label></div>
+        <div class="ps_box-control"><textarea id="pu" class="ps-edit" rows="3"></textarea></div></div>
+      <div class="ps_box-button psc_primary"><span class="ps-button-wrapper"><a class="ps-button" href="#">Submit</a></span></div>
+      <div class="ps_box-button"><span class="ps-button-wrapper"><a class="ps-button" href="#">Cancel</a></span></div>
+      <input type="button" class="ps-button" value="GO">
+    </div>
+    <div id="alertmsg" class="ps_alert">You are not eligible for commencement registration !</div>` };
+  PAGES.classic = { url: '/psc/cs90prd_11/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SAA_SS_DPR_ADB.GBL', html: `
+    <div class="PAPAGETITLE">Academic Advisement Report</div>
+    <span class="PSEDITBOXLABEL">Report Date</span> <span class="PSEDITBOX_DISPONLY">20/10/2026</span>
+    <span class="PSDROPDOWNLABEL">Career</span> <select class="PSDROPDOWNLIST"><option>Undergraduate</option></select>
+    <input type="text" class="PSEDITBOX" value="0300CSHON"> <input type="button" class="PSPUSHBUTTON" value="Expand All">
+    <table class="PSLEVEL1GRIDWBO" style="margin-top:12px;width:100%"><tr><td class="PSLEVEL1GRIDNAVIGATIONBAR" colspan="3">Course List &nbsp; <a class="PSHYPERLINK" href="#">First</a> 1-3 of 9 <a class="PSHYPERLINK" href="#">Last</a></td></tr>
+      <tr><th class="PSLEVEL1GRIDCOLUMNHDR">Course</th><th class="PSLEVEL1GRIDCOLUMNHDR">Description</th><th class="PSLEVEL1GRIDCOLUMNHDR">Units</th></tr>
+      <tr><td class="PSLEVEL1GRIDODDROW">CS2105</td><td class="PSLEVEL1GRIDODDROW">Introduction to Computer Netwo</td><td class="PSLEVEL1GRIDODDROW">4.00</td></tr>
+      <tr><td class="PSLEVEL1GRIDEVENROW">CS2106</td><td class="PSLEVEL1GRIDEVENROW">Introduction to Operating Syst</td><td class="PSLEVEL1GRIDEVENROW">4.00</td></tr>
+      <tr><td class="PSLEVEL1GRIDODDROW">CS3230</td><td class="PSLEVEL1GRIDODDROW">Design and Analysis of Algorit</td><td class="PSLEVEL1GRIDODDROW">4.00</td></tr></table>` };
   const key = new URLSearchParams(location.search).get('page') || 'home';
   const page = PAGES[key];
 
@@ -91,8 +125,23 @@
     const grid = document.createElement('div'); grid.className = 'ps_box-grid-flex';
     const box = document.createElement('div');
     box.className = 'ps_box-group';
-    for (const l of page.lines) { const d = document.createElement('div'); d.textContent = l; box.append(d); }
-    grid.append(box); apps.append(grid); main.append(apps); content.append(main); mid.append(side, content); form.append(mid);
+    if (page.html) apps.innerHTML = page.html;
+    else {
+      for (const l of page.lines) { const d = document.createElement('div'); d.textContent = l; box.append(d); }
+      grid.append(box); apps.append(grid);
+    }
+    main.append(apps); content.append(main); mid.append(side, content); form.append(mid);
+  }
+  // ?modal shows a blocking PeopleSoft dialog over the page.
+  if (new URLSearchParams(location.search).has('modal')) {
+    const mask = document.createElement('div'); mask.id = 'pt_modalMask';
+    mask.style.cssText = 'position:fixed;inset:0;background:#000;opacity:.4;z-index:1000';
+    const dlg = document.createElement('div'); dlg.className = 'ps_modal_container'; dlg.setAttribute('role', 'dialog');
+    dlg.style.cssText = 'position:fixed;top:160px;left:50%;transform:translateX(-50%);width:460px;z-index:1001;background:#fff;border:1px solid #888';
+    dlg.innerHTML = '<div class="ps_modal_header"><span class="ps_modal_title">Leave of Absence</span><a class="ps_modal_close" href="#" aria-label="Close">×</a></div>'
+      + '<div class="ps_modal_content"><div id="alertmsg">Your application cannot be submitted online during the examination period. Please contact your faculty office.</div>'
+      + '<div class="ps_box-button psc_primary"><a class="ps-button" href="#">OK</a></div></div>';
+    form.append(mask, dlg);
   }
   document.body.append(form);
 
