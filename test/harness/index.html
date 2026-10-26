@@ -85,10 +85,14 @@
     const side = document.createElement('div'); side.id = 'PT_SIDE'; side.style.cssText = 'width:260px;flex:none';
     side.innerHTML = '<ul class="psa_list-linkmenu"><li class="psc_selected"><a class="ps-link"><span class="ps-text">View Exam Results</span></a></li><li><a class="ps-link"><span class="ps-text">View Exam Schedule</span></a></li></ul>';
     const content = document.createElement('div'); content.id = 'PT_CONTENT'; content.style.flex = '1';
+    // EduRec puts each page's lines inside a grid box, which the restyle draws as a card.
+    const main = document.createElement('div'); main.id = 'PT_MAIN';
+    const apps = document.createElement('div'); apps.className = 'ps_apps_content';
+    const grid = document.createElement('div'); grid.className = 'ps_box-grid-flex';
     const box = document.createElement('div');
     box.className = 'ps_box-group';
     for (const l of page.lines) { const d = document.createElement('div'); d.textContent = l; box.append(d); }
-    content.append(box); mid.append(side, content); form.append(mid);
+    grid.append(box); apps.append(grid); main.append(apps); content.append(main); mid.append(side, content); form.append(mid);
   }
   document.body.append(form);
 

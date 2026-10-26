@@ -7,6 +7,7 @@ html[data-edr-on] {
   --edr-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --edr-radius: 8px;
   --edr-radius-sm: 6px;
+  --edr-inset: 18px; /* left/right padding inside a card: EduRec grid headers, cells, summaries */
   --edr-nav-w: 248px;
 }
 
@@ -174,7 +175,7 @@ html[data-edr-on] .ps_box-grid-flex {
   background: var(--edr-surface) !important; border: 1px solid var(--edr-line) !important; border-radius: var(--edr-radius) !important;
   overflow: hidden; margin: 0 0 20px !important; max-width: 100% !important; box-shadow: none !important;
 }
-html[data-edr-on] .ps_box-grid-header { background: var(--edr-surface) !important; border: 0 !important; padding: 14px 18px 6px !important; }
+html[data-edr-on] .ps_box-grid-header { background: var(--edr-surface) !important; border: 0 !important; padding: 14px var(--edr-inset) 6px !important; }
 html[data-edr-on] .ps_grid-title,
 html[data-edr-on] .ps_grid-title .ps-text { font-size: 16px !important; font-weight: 700 !important; color: var(--edr-ink) !important; }
 html[data-edr-on] .psc_rowcount .ps-text { font-size: 13px !important; color: var(--edr-muted) !important; }
@@ -182,13 +183,13 @@ html[data-edr-on] .ps_box-gridc, html[data-edr-on] .ps_box-gridc-right, html[dat
 html[data-edr-on] table.ps_grid-flex { width: 100% !important; border-collapse: collapse !important; background: var(--edr-surface) !important; }
 html[data-edr-on] .ps_grid-head-row th.ps_grid-col {
   background: var(--edr-surface-2) !important; border: 0 !important; border-bottom: 1px solid var(--edr-line) !important;
-  padding: 10px 18px !important; text-align: left;
+  padding: 10px var(--edr-inset) !important; text-align: left;
 }
 html[data-edr-on] .ps_grid-col-label,
 html[data-edr-on] .ps_grid-col-label * { font-size: 13px !important; font-weight: 600 !important; color: var(--edr-muted) !important; text-decoration: none !important; }
 html[data-edr-on] tr.ps_grid-row > td.ps_grid-cell {
   background: var(--edr-surface) !important; border: 0 !important; border-bottom: 1px solid var(--edr-line-2) !important;
-  padding: 12px 18px !important; vertical-align: middle;
+  padding: 12px var(--edr-inset) !important; vertical-align: middle;
 }
 html[data-edr-on] tr.ps_grid-row:last-child > td.ps_grid-cell { border-bottom: 0 !important; }
 html[data-edr-on] tr.ps_grid-row:hover > td.ps_grid-cell { background: var(--edr-surface-2) !important; }
@@ -489,16 +490,23 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 /* Summary cards: three equal columns on wide screens so they line up; one column on narrow. */
 .edr-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: stretch; }
 @media (min-width: 980px) { .edr-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.edr-card {
+/* The one card surface. Anything inside a card is a section of it (spacing and
+   hairlines), never a second bordered or filled box. */
+.edr-card, .edr-setup {
   background: var(--edr-surface); border: 1px solid var(--edr-line); border-radius: var(--edr-radius);
-  padding: 20px 22px; display: flex; flex-direction: column; gap: 10px;
+  padding: 20px 22px;
 }
+.edr-card { display: flex; flex-direction: column; gap: 10px; }
 .edr-card-head { display: flex; justify-content: space-between; align-items: center; min-height: 32px; }
 .edr-card-link { font-size: 14px; font-weight: 600; }
 .edr-big { margin: 4px 0 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; min-height: 48px; font-size: 36px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
 .edr-big-unit { font-size: 14px; font-weight: 500; color: var(--edr-muted); }
 .edr-updated { margin: auto 0 0; padding-top: 14px; border-top: 1px solid var(--edr-line-2); font-size: 12px; color: var(--edr-muted); }
-.edr-empty { margin: 0; font-size: 14px; color: var(--edr-ink-2); }
+/* Empty cards: copy at the top, action pinned to the bottom, so cards with
+   longer copy keep their buttons on the same line as their neighbours. */
+.edr-empty { flex: 1; display: flex; flex-direction: column; gap: 14px; margin: 0; }
+.edr-empty p { margin: 0; font-size: 14px; color: var(--edr-ink-2); }
+.edr-empty > .edr-btn { margin-top: auto; align-self: flex-start; }
 .edr-bar { height: 8px; border-radius: 4px; background: var(--edr-line-2); overflow: hidden; }
 .edr-bar > span { display: block; height: 100%; background: var(--edr-blue); }
 .edr-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
@@ -508,16 +516,17 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 .edr-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .edr-tag.is-warn { background: var(--edr-warn-bg); color: var(--edr-warn); }
 .edr-tag.is-ok { background: var(--edr-tint); color: var(--edr-blue-ink); }
-.edr-shortcuts { display: flex; flex-direction: column; gap: 14px; }
-.edr-shortcut-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-.edr-shortcut-group { background: var(--edr-surface); border: 1px solid var(--edr-line); border-radius: var(--edr-radius); padding: 16px 18px; }
-.edr-shortcut-group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.edr-shortcut-group a { display: flex; min-height: 36px; align-items: center; font-size: 14px; }
 
-/* Inline summary cards on EduRec pages */
+/* Summaries on EduRec pages land inside EduRec's own box, which the restyle
+   already draws as a card. There the summary is that card's opening section:
+   same inset as EduRec's grid header and cells, a hairline above EduRec's rows. */
 .edr-inline {
-  margin: 16px 0; padding: 20px 22px; background: var(--edr-surface); border: 1px solid var(--edr-line);
-  border-radius: var(--edr-radius); display: flex; flex-direction: column; gap: 12px; max-width: 1000px;
+  margin: 0; padding: 18px var(--edr-inset) 20px; display: flex; flex-direction: column; gap: 12px;
+  border-bottom: 1px solid var(--edr-line);
+}
+/* No EduRec box around it: the summary is the only surface, so it draws one. */
+.edr-inline:not(:is(.ps_box-grid-flex, .PSGROUPBOXWBO, .PSLEVEL1GRIDWBO, .PSLEVEL1GRID) *) {
+  margin: 0 0 20px; background: var(--edr-surface); border: 1px solid var(--edr-line); border-radius: var(--edr-radius);
 }
 .edr-inline-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .edr-badge { font-size: 12px; font-weight: 600; color: var(--edr-selected-ink); background: var(--edr-tint); padding: 2px 8px; border-radius: 4px; }
@@ -533,15 +542,12 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 /* ---------- Overview extras ---------- */
 .edr-visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .edr-setup {
-  display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; padding: 20px 22px;
-  background: var(--edr-surface); border: 1px solid var(--edr-line); border-radius: var(--edr-radius);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap;
   animation: edr-fade 200ms ease-out both;
 }
 .edr-setup-copy { display: flex; flex-direction: column; gap: 6px; flex: 1 1 360px; }
 .edr-setup-copy .edr-muted { max-width: 62ch; }
 .edr-setup-actions { display: flex; align-items: center; gap: 8px; }
-.edr-setup.is-compact { padding: 12px 14px 12px 18px; }
-.edr-setup-line { margin: 0; font-size: 14px; color: var(--edr-ink-2); flex: 1 1 320px; }
 
 .edr-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
@@ -554,7 +560,6 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 .edr-btn.is-small { min-height: 36px; padding: 0 14px; }
 .edr-btn.is-ghost { background: transparent; border-color: var(--edr-line); color: var(--edr-ink-2); }
 .edr-btn.is-ghost:hover { background: var(--edr-surface-2); border-color: var(--edr-line-strong); }
-.edr-empty .edr-btn { align-self: flex-start; }
 .edr-icon-btn.is-dark { color: var(--edr-muted); }
 .edr-icon-btn.is-dark:hover { background: var(--edr-surface-3); color: var(--edr-ink); }
 
@@ -569,47 +574,8 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 }
 .edr-toast.is-leaving { opacity: 0; transform: translate(-50%, 6px); }
 
-.edr-empty { margin: 0; font-size: 14px; color: var(--edr-ink-2); }
-.edr-bar { height: 8px; border-radius: 4px; background: var(--edr-line-2); overflow: hidden; }
-.edr-bar > span { display: block; height: 100%; background: var(--edr-blue); }
-.edr-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.edr-list > li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--edr-line-2); font-size: 14px; flex-wrap: wrap; }
-.edr-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.edr-chip { padding: 5px 9px; border-radius: 4px; background: var(--edr-surface-3); font-size: 13px; }
-.edr-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-.edr-tag.is-warn { background: var(--edr-warn-bg); color: var(--edr-warn); }
-.edr-tag.is-ok { background: var(--edr-tint); color: var(--edr-blue-ink); }
-.edr-shortcuts { display: flex; flex-direction: column; gap: 14px; }
-.edr-shortcut-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-.edr-shortcut-group { background: var(--edr-surface); border: 1px solid var(--edr-line); border-radius: var(--edr-radius); padding: 16px 18px; }
-.edr-shortcut-group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.edr-shortcut-group a { display: flex; min-height: 36px; align-items: center; font-size: 14px; }
-
-/* Inline summary cards on EduRec pages */
-.edr-inline {
-  margin: 16px 0; padding: 20px 22px; background: var(--edr-surface); border: 1px solid var(--edr-line);
-  border-radius: var(--edr-radius); display: flex; flex-direction: column; gap: 12px; max-width: 1000px;
-}
-.edr-inline-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.edr-badge { font-size: 12px; font-weight: 600; color: var(--edr-selected-ink); background: var(--edr-tint); padding: 2px 8px; border-radius: 4px; }
-.edr-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.edr-stats { display: flex; flex-wrap: wrap; gap: 28px; }
-.edr-stat { display: flex; flex-direction: column; gap: 2px; }
-.edr-stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
-.edr-stat-label { font-size: 13px; color: var(--edr-muted); }
-.edr-reqs { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-.edr-req { display: flex; flex-direction: column; gap: 6px; }
-.edr-req-label { font-size: 14px; font-weight: 600; }
-
-/* ---------- Overview extras ---------- */
-.edr-visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @keyframes edr-pop { from { transform: scale(.4); opacity: 0; } }
 
-.edr-empty {
-  flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 16px;
-  border: 1px dashed var(--edr-line-strong); border-radius: var(--edr-radius); background: var(--edr-surface-2);
-}
-.edr-empty p { margin: 0; font-size: 14px; color: var(--edr-ink-2); }
 .edr-done-line { margin: 0; font-size: 14px; font-weight: 600; color: var(--edr-blue-ink); }
 .edr-list-label { flex: 1 1 180px; min-width: 0; }
 .edr-list > li .edr-tag { align-self: center; }
@@ -626,9 +592,9 @@ html[data-edr-side-collapsed] #PT_CONTENT { margin-left: 0 !important; left: 0 !
 .edr-reqs > li:nth-child(n+3) .edr-bar > span { animation-delay: 360ms; }
 @keyframes edr-fill { from { transform: scaleX(0); } }
 
-/* A summary card arriving on an EduRec page unrolls from its top edge. */
+/* A summary arriving on an EduRec page unrolls from its top edge. */
 .edr-inline.is-new { animation: edr-unroll 420ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-@keyframes edr-unroll { from { clip-path: inset(0 0 100% 0 round 8px); opacity: .4; } to { clip-path: inset(0 0 0 0 round 8px); } }
+@keyframes edr-unroll { from { clip-path: inset(0 0 100% 0); opacity: .4; } to { clip-path: inset(0); } }
 .edr-badge { display: inline-flex; align-items: center; gap: 6px; transition: background-color 200ms ease, color 200ms ease; }
 .edr-badge.is-saved { background: var(--edr-navy); color: var(--edr-on-primary); animation: edr-pop 320ms cubic-bezier(0.16, 1, 0.3, 1); }
 
@@ -747,13 +713,9 @@ html[data-edr-theme="terminal"] .edr-quick-link { border-radius: 0; }
 .edr-week-now { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--edr-orange); border-radius: 1px; }
 .edr-week-now::before { content: ""; position: absolute; top: -3px; left: -3px; width: 8px; height: 8px; border-radius: 4px; background: var(--edr-orange); }
 
-/* ---------- Courses this term: one card per course, colour-matched to the grid ---------- */
-.edr-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
-.edr-course {
-  display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; position: relative; overflow: hidden;
-  background: color-mix(in srgb, var(--c) 7%, var(--edr-surface)); border: 1px solid color-mix(in srgb, var(--c) 30%, var(--edr-line));
-  border-radius: var(--edr-radius-sm);
-}
+/* ---------- Courses this term: one column per course, colour-matched to the grid ---------- */
+.edr-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0 24px; margin: 6px 0 0; padding: 0; list-style: none; }
+.edr-course { display: flex; flex-direction: column; gap: 8px; padding: 14px 0 4px; border-top: 1px solid var(--edr-line-2); }
 .edr-course-head { display: flex; flex-direction: column; gap: 2px; }
 .edr-course-code { display: inline-flex; align-items: center; gap: 8px; font-family: var(--edr-mono); font-weight: 700; font-size: 14px; color: var(--edr-ink); }
 .edr-course-code::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
@@ -763,7 +725,6 @@ html[data-edr-theme="terminal"] .edr-quick-link { border-radius: 0; }
 .edr-course-lessons strong { font-weight: 600; color: var(--edr-ink); }
 .edr-course-lessons .edr-course-when { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .edr-course-lessons .edr-course-room { grid-column: 1 / -1; font-size: 12px; color: var(--edr-muted); }
-html[data-edr-theme="terminal"] .edr-course { border-radius: 0; }
 
 /* ---------- Classic PeopleSoft pages (Global education, some reports) ---------- */
 html[data-edr-on] :is(.PSLEVEL1GRIDLABEL, .PSLEVEL2GRIDLABEL, .PSGROUPBOXLABEL),
@@ -797,13 +758,12 @@ html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-su
 .edr-checklist { position: relative; align-items: flex-start; }
 .edr-setup-close { position: absolute; top: 10px; right: 10px; }
 .edr-checklist .edr-setup-copy { padding-right: 32px; }
-.edr-checklist-steps { list-style: none; margin: 0; padding: 0; flex: 1 1 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.edr-checklist-steps { list-style: none; margin: 0; padding: 0; flex: 1 1 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0 24px; }
 .edr-checklist-steps li {
   /* Second row holds the button, pinned to the bottom so every step's button lines up. */
   display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr auto; gap: 14px 12px; align-items: start;
-  padding: 14px; border: 1px solid var(--edr-line); border-radius: var(--edr-radius-sm); background: var(--edr-surface-2);
+  padding: 16px 0 4px; border-top: 1px solid var(--edr-line-2);
 }
-.edr-checklist-steps li.is-next { background: var(--edr-surface); border-color: color-mix(in srgb, var(--edr-navy) 45%, var(--edr-line)); }
 .edr-check-mark {
   width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700;
   border: 1.5px solid var(--edr-line-strong); color: var(--edr-muted); font-variant-numeric: tabular-nums;
@@ -847,8 +807,3 @@ html[data-edr-on] body .edr-coach-target.edr-coach-target[data-edr-hint]::after 
   animation: edr-pop 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @media (max-width: 599px) { .edr-coach { right: 16px; left: 16px; width: auto; bottom: 80px; } }
-
-/* Empty cards: copy at the top, action pinned to the bottom, so cards with
-   longer copy keep their buttons on the same line as their neighbours. */
-.edr-empty { justify-content: flex-start; }
-.edr-empty > .edr-btn { margin-top: auto; }

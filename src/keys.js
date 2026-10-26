@@ -41,7 +41,7 @@
     nav: () => qsa('#edr-shell .edr-nav-item'),
     side: () => qsa('#PT_SIDE ul.psa_list-linkmenu a'),
     content: () => document.getElementById('edr-overview')
-      ? qsa('#edr-overview .edr-btn, #edr-overview .edr-card-link, #edr-overview .edr-shortcut-group a')
+      ? qsa('#edr-overview .edr-btn, #edr-overview .edr-card-link')
       : qsa('#PT_MAIN .ps_box-grid-list li a, #PT_MAIN tr.ps_grid-row a, #PT_MAIN a.ps-link, #PT_MAIN .ps-button')
   };
   const ORDER = ['nav', 'side', 'content'];
