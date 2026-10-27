@@ -260,6 +260,108 @@
       foot('No classes on public holidays. Your instructors will tell you about any make-up classes.'));
   }
 
+  // ---- Personal Info ----
+
+  // "06/12/2003" (day first) → "6 December 2003"
+  const dmy = (s) => { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s || ''); return m ? fmt(m[3] + '-' + m[2] + '-' + m[1], { day: 'numeric', month: 'long', year: 'numeric' }) : s; };
+  const btn = (label, run, cls) => h('button', { type: 'button', class: 'edr-btn is-small is-ghost' + (cls ? ' ' + cls : ''), onclick: run }, label);
+
+  // An ID number shows its last four characters until asked.
+  function masked(number) {
+    const hidden = number.slice(0, 1) + '•'.repeat(Math.max(0, number.length - 5)) + number.slice(-4);
+    const text = h('span', { class: 'edr-mono' }, hidden);
+    const toggle = h('button', { type: 'button', class: 'edr-orig-toggle edr-reveal', 'aria-pressed': 'false' }, 'Show');
+    toggle.addEventListener('click', () => {
+      const on = toggle.getAttribute('aria-pressed') !== 'true';
+      text.textContent = on ? number : hidden;
+      toggle.textContent = on ? 'Hide' : 'Show';
+      toggle.setAttribute('aria-pressed', String(on));
+    });
+    return h('span', { class: 'edr-row edr-secret' }, text, toggle);
+  }
+
+  // Demographic Information, with EduRec's photo when there is one. myInfo opens
+  // the MyInfo page, where changes are made.
+  function demographic(d, photo, myInfo) {
+    const cit = d.citizenship[0];
+    const rows = [
+      ['Student ID', d.id && h('span', { class: 'edr-mono' }, d.id)],
+      ['Date of birth', d.dob && dmy(d.dob)],
+      ['Gender', d.gender],
+      ['Marital status', d.marital],
+      ...d.ids.map((x) => [x.type, x.number && masked(x.number)]),
+      ['Citizenship', cit && [cit.country, cit.status].filter(Boolean).join(', ')],
+      ['Birth country', cit && cit.birth],
+      ['Pre-admission medical', d.medical && h('span', { class: 'edr-row' }, tag(d.medical.status, /^completed$/i.test(d.medical.status) ? 'is-ok' : 'is-warn'),
+        d.medical.expiry ? h('span', { class: 'edr-muted' }, 'expires ' + dmy(d.medical.expiry)) : null)]
+    ].filter(([, v]) => v);
+    return view(head('Demographic information', [d.name ? h('strong', null, d.name) : null, d.name && d.residency ? ' · ' : '', d.residency || '', '.']),
+      h('div', { class: 'edr-profile' },
+        photo ? h('img', { class: 'edr-photo', src: photo, alt: 'Your student photo' }) : null,
+        h('dl', { class: 'edr-profile-facts' }, rows.map(([l, v]) => fact(l, v)))),
+      foot('Citizenship, residency or name changed? Update them through MyInfo with Singpass.', myInfo ? btn(myInfo.label, myInfo.run) : null));
+  }
+
+  // Records pages (names, contacts, addresses). Each section lists EduRec's rows;
+  // `edit` and `add` hand the click to EduRec's own row or button.
+  // section: { title, items: [{ main, sub, tag, edit }], empty, add: { label, run } }
+  function records(title, lede, sections, ...notes) {
+    return view(head(title, lede),
+      sections.map((s) => [
+        s.title || s.add ? h('div', { class: 'edr-rec-head' }, s.title ? h('h3', { class: 'edr-view-sub' }, s.title) : h('span'), s.add ? btn(s.add.label, s.add.run) : null) : null,
+        s.items.length
+          ? h('ol', { class: 'edr-rows' }, s.items.map((r) =>
+            h('li', { class: 'edr-rec' },
+              h('div', { class: 'edr-exam-main' },
+                h('p', { class: 'edr-exam-course' }, r.main),
+                r.sub ? h('p', { class: 'edr-muted' }, r.sub) : null),
+              h('span', { class: 'edr-tags' }, r.tag ? tag(r.tag) : null, r.edit ? btn('Edit', r.edit, 'edr-rec-edit') : null))))
+          : h('p', { class: 'edr-rec-empty edr-muted' }, s.empty || 'None on record.')]),
+      foot(...notes));
+  }
+
+  function names(n, edit) {
+    const shown = n.names.find((x) => x.type === 'Preferred') || n.names[0];
+    return records('Names', shown ? ['EduRec shows your name as ', h('strong', null, shown.name), '.'] : 'No names on record.',
+      [{ items: n.names.map((x, i) => ({ main: x.name, sub: x.official !== x.name ? 'Official name: ' + x.official : null, tag: x.type, edit: edit(i) })) }],
+      'Your preferred name is the one Outlook, Canvas and other NUS systems show.');
+  }
+
+  function contact(c, edit, add) {
+    const nus = c.emails.find((e) => e.type === 'NUS');
+    return records('Contact details', nus ? ['University email goes to ', h('strong', null, nus.address.toLowerCase()), '.'] : null, [
+      { title: 'Email', add: add('Add Email'), empty: 'No email on record.',
+        items: c.emails.map((e, i) => ({ main: e.address.toLowerCase(), tag: e.type, edit: edit('Email', i) })) },
+      { title: 'Phone', add: add('Add Phone'), empty: 'No phone number on record.',
+        items: c.phones.map((p, i) => ({ main: p.number, tag: p.type, edit: edit('Phone', i) })) },
+      c.social ? { title: 'Social media', add: add('Add Social Account'), empty: 'No social media accounts.', items: [] } : null
+    ].filter(Boolean));
+  }
+
+  const oneLine = (a) => a.lines.join(', ');
+  const place = (a) => [a.country, a.postal].filter(Boolean).join(' ');
+  function addresses(d, edit, add) {
+    const payment = d.kinds.length === 1 && d.kinds[0].title === 'Payment Address';
+    const all = d.kinds.flatMap((k) => k.addresses);
+    const same = all.length > 1 && all.every((a) => oneLine(a) + place(a) === oneLine(all[0]) + place(all[0]));
+    // "Your mailing and home addresses are the same."
+    const kinds = d.kinds.filter((k) => k.addresses.length).map((k) => k.title.replace(/ Address$/, '').toLowerCase());
+    const lede = payment
+      ? (all[0] ? [h('strong', null, oneLine(all[0])), ', ' + place(all[0]) + '.'] : 'No payment address on record.')
+      : same ? 'Your ' + kinds.slice(0, -1).join(', ') + ' and ' + kinds[kinds.length - 1] + ' addresses are the same.'
+        : all.length === 1 ? '1 address on record.' : all.length + ' addresses on record.';
+    return records(payment ? 'Payment address' : 'Addresses', lede, d.kinds.map((k) => ({
+      title: payment ? null : k.title[0] + k.title.slice(1).toLowerCase(), add: add('Add ' + k.title), empty: 'No ' + k.title.toLowerCase() + '.',
+      items: k.addresses.map((a, i) => ({ main: h('span', { class: 'edr-addr' }, a.lines.map((l) => h('span', null, l))), sub: place(a),
+        tag: a.from === 'Current' ? null : 'From ' + dmy(a.from), edit: edit(payment ? null : k.title, i) }))
+    })));
+  }
+
+  function emergency(e, edit, add) {
+    return records('Emergency contacts', e.contacts.length === 1 ? '1 emergency contact on record.' : e.contacts.length + ' emergency contacts on record.',
+      [{ add: add('Add Contact'), empty: 'No emergency contacts.', items: e.contacts.map((c, i) => ({ main: c.name, sub: c.phone, edit: edit('Emergency Contacts', i) })) }]);
+  }
+
   // ---- Dead ends and form intros ----
 
   // spec: { icon, title, body, actions: [{ label, run, primary }] }; message is
@@ -280,5 +382,6 @@
       spec.points && spec.points.length ? h('ul', { class: 'edr-task-points' }, spec.points.map((p) => h('li', null, p))) : null);
   }
 
-  EDR.views = { examSchedule, results, suHistory, programme, courses, transferCredit, milestones, classesByDate, classesByClass, deadEnd, intro };
+  EDR.views = { examSchedule, results, suHistory, programme, courses, transferCredit, milestones, classesByDate, classesByClass,
+    demographic, names, contact, addresses, emergency, deadEnd, intro };
 })();

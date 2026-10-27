@@ -88,3 +88,17 @@ error.
 | Apply for Leave of Absence | form | Intro with three rules from EduRec's notes: semester-leave deadline (last day of Recess Week), fees after Instructional Week 2, closed from Reading Week to results. EduRec's entry pop-up, notes and Next stay as they are. |
 | EP Eligibility Letter | dead end | "The EP eligibility letter is for international students" + Student status letter. |
 | Student Requests | form | Intro: submit a new request or view past ones. Same wording as Review Exam Results, so both intros are gated on the selected page-list item. |
+
+## Personal Info
+
+These grids are where students edit their details: every row opens EduRec's edit page, and each grid has an Add button. The views replace the grids but offer the same controls. Each Edit and Add button hands the click to EduRec's own row or button, so EduRec's edit pages open as before. Nothing on these pages is saved for the Overview.
+
+| Sub-page | Type | Design |
+|---|---|---|
+| Demographic Information | data | Lede: official name and residency status. EduRec's photo beside a grid of facts: student ID, date of birth (spelled out), gender, marital status, national ID (masked to its last four characters, with Show), citizenship, birth country, and pre-admission medical as a tag. Foot: changes go through MyInfo with Singpass, with a button that opens that page. Fields EduRec hides (birth state, military status, ethnicity) stay hidden. |
+| Names | data | Lede: the name EduRec shows (the Preferred row). One row per name type: display name, the official name when it differs, a type tag, Edit. Foot: the preferred name is the one Outlook and Canvas show. |
+| Contact Details | data | Lede: where university email goes (the NUS address). Email, Phone and Social media sections, each with EduRec's Add. Rows: address or number, type tag, Edit. The preferred flag is an image with no text, so it isn't shown. |
+| Addresses | data | Lede: whether the addresses on record are the same ("Your mailing and home addresses are the same"), or how many there are. One section per kind of address with its Add. Each address shows its lines, then country and postal code. A From date shows as a tag only when it isn't "Current". An empty kind reads "No billing address." |
+| Emergency Contacts | data | Lede: how many contacts. Rows: name, phone, Edit; Add contact in the section head. |
+| Payment Address | data | Lede: the address in one line. Same rows as Addresses, with Add payment address. |
+| MyInfo Demographic Information | form | Intro: copy Singpass changes into EduRec (tick the box, then Retrieve MyInfo with Singpass). Points: a new citizenship or residency status shows within 3 working days if submitted before Instructional Week 3; a changed official name needs the preferred name updated under Names. The checkbox, fields, Reset and Save stay EduRec's. |

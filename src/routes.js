@@ -9,7 +9,7 @@
   const TILES = [
     { id: 'profile', comp: 'SCC_PROFILE_FL', label: 'Personal information', section: 'profile',
       path: C + 'SCC_PROFILE_FL.SCC_PROFILE_FL.GBL?GMenu=SCC_PROFILE_FL&GComp=SCC_PROFILE_FL&GPage=SCC_START_PAGE_FL&scname=CS_PERSON_PROFILE',
-      pages: ['Demographic information', 'Names', 'Contact details', 'Addresses', 'Emergency contacts', 'Payment advice', 'MyInfo demographic information'] },
+      pages: ['Demographic information', 'Names', 'Contact details', 'Addresses', 'Emergency contacts', 'Payment address', 'MyInfo demographic information'] },
     { id: 'acadrec', comp: 'SSR_SP_ACAD_REC_FL', label: 'Academic records', section: 'timetable',
       path: C + 'SSR_STUDENT_ACAD_REC_FL.SSR_SP_ACAD_REC_FL.GBL?GMenu=SSR_STUDENT_ACAD_REC_FL&GComp=SSR_SP_ACAD_REC_FL&GPage=SCC_START_PAGE_FL&scname=CS_SSR_ACADEMIC_RECORDS_FL',
       pages: ['Academic programme', 'Student status letter', 'View courses', 'Term and course enrolment', 'View classes', 'Milestones', 'Transfer credit report', 'Leave of absence', 'EP eligibility letter', 'Student requests'] },

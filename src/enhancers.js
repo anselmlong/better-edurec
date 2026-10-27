@@ -75,6 +75,52 @@
       hide: ['Milestone Complete'],
       render: (d) => EDR.views.milestones(d, [openPage('View Academic Programme', 'View your programme')])
     },
+    // Personal Info: nothing here is saved for the Overview. These grids are how
+    // students edit their details, so the views offer EduRec's Edit and Add
+    // themselves and may hide the blocks that hold those buttons.
+    {
+      key: 'demographic', anchor: 'Pre-Admission Medical Examination', snapshot: false, ownsButtons: true,
+      // The photo has no text to find it by; the view shows it instead.
+      hideAlso: '.ps_box-img.psc_data-image',
+      test: (t) => t.includes('Pre-Admission Medical Examination'),
+      parse: (t) => EDR.parsers.parseDemographic(t),
+      useful: (d) => d && (d.id || d.name),
+      hide: ['Demographic Information', 'Current Residency Status', 'Identification Type/Number', 'National ID Type', 'Citizenship Information',
+        'Pre-Admission Medical Examination', 'Expiry Date (If any)'],
+      render: (d) => EDR.views.demographic(d, photo(), navLink('MyInfo Demographic Information') ? openPage('MyInfo Demographic Information', 'Update with MyInfo') : null)
+    },
+    {
+      key: 'names', anchor: 'Official Name', snapshot: false, ownsButtons: true,
+      test: (t) => t.includes('Official Name'),
+      parse: (t) => EDR.parsers.parseNames(t),
+      useful: (d) => d && d.names.length,
+      hide: ['Names', 'Official Name'],
+      render: (d) => EDR.views.names(d, (i) => gridRow('Names', i))
+    },
+    {
+      key: 'contact', anchor: 'Social Media Links', snapshot: false, ownsButtons: true,
+      test: (t) => t.includes('Social Media Links'),
+      parse: (t) => EDR.parsers.parseContact(t),
+      useful: (d) => d && (d.emails.length || d.phones.length),
+      hide: ['Contact Details', 'Email', 'Phone', 'Preferred', 'Social Media Links', 'No Social Media Accounts are defined.'],
+      render: (d) => EDR.views.contact(d, gridRow, addButton)
+    },
+    {
+      key: 'addresses', anchor: 'Address', snapshot: false, ownsButtons: true,
+      test: (t) => /\nAddress\nFrom\n/.test(t),
+      parse: (t) => EDR.parsers.parseAddresses(t),
+      useful: (d) => !!d,
+      hide: ['Addresses', /^[A-Z][a-z]+ Address$/, 'From', 'No address defined'],
+      render: (d) => EDR.views.addresses(d, gridRow, addButton)
+    },
+    {
+      key: 'emergency', anchor: 'Emergency Contacts', snapshot: false, ownsButtons: true,
+      test: (t) => /\nContact\nPhone\nPrimary\n/.test(t),
+      parse: (t) => EDR.parsers.parseEmergency(t),
+      useful: (d) => !!d,
+      hide: ['Emergency Contacts', 'Primary'],
+      render: (d) => EDR.views.emergency(d, gridRow, addButton)
+    },
     {
       key: 'classes', anchor: 'Class Type',
       test: (t) => t.includes('Class Type'),
@@ -118,6 +164,22 @@
   const selectedPage = () => { const li = document.querySelector('ul.psa_list-linkmenu li.psc_selected'); return li ? li.textContent.trim() : null; };
   const navLink = (label) => [...document.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label);
   const openPage = (label, text) => ({ label: text, run: () => { const a = navLink(label); if (a) a.click(); } });
+  // Personal Info's Edit and Add: the click goes to EduRec's own row or button,
+  // found when it's pressed (PeopleSoft replaces them on every postback).
+  const gridRow = (title, i) => () => {
+    const grids = [...document.querySelectorAll('#PT_MAIN .ps_box-grid-flex')];
+    const named = grids.filter((g) => { const t = g.querySelector('.ps_grid-title'); return t && t.textContent.trim() === title; });
+    const row = (named.length ? named : grids)[0];
+    const tr = row && row.querySelectorAll('tbody tr.ps_grid-row')[i];
+    if (tr) tr.click();
+  };
+  const buttonFor = (label) => [...document.querySelectorAll('#PT_MAIN a.ps-button')]
+    .find((a) => a.textContent.trim() === label || [...a.querySelectorAll('img')].some((img) => img.alt === label));
+  // "Add Mailing Address" → an "Add mailing address" button, when EduRec has one.
+  const addButton = (label) => (buttonFor(label)
+    ? { label: label[0] + label.slice(1).toLowerCase(), run: () => { const a = buttonFor(label); if (a) a.click(); } }
+    : null);
+  const photo = () => { const img = document.querySelector('#PT_MAIN img[id^="EMPL_PHOTO"]'); return img && img.src ? img.src : null; };
   const changeTerm = { label: 'Choose another term', run: () => { const a = document.getElementById('DERIVED_ACRD_FL_SSR_CHANGE_TERM'); if (a) a.click(); } };
 
   // match: EduRec's message (exact text or a pattern for its first line); anchor:
@@ -162,6 +224,10 @@
       points: ['Apply for semester leave by the last day of Recess Week. Short-term leave can still be applied for after that.',
         'You pay fees for the semester if you apply after Instructional Week 2.',
         'Applications are closed from Reading Week until exam results are released.'] },
+    { id: 'myinfo', page: 'MyInfo Demographic Information', when: ['Retrieve MyInfo with Singpass', 'Important Notes:'], before: /^If you have Personal Information changes/,
+      lede: 'Copy changes you made through Singpass, such as a new citizenship or mailing address, into EduRec: tick the box, then choose Retrieve MyInfo with Singpass.',
+      points: ['A new citizenship or residency status shows on Demographic Information within 3 working days if you submit before Instructional Week 3; otherwise from next semester.',
+        'Changed your official name? Update your preferred name under Names too, so Outlook and Canvas show it.'] },
     { id: 'transcript', when: ['View All Requested Reports', 'Report Type'], before: 'View Report',
       lede: 'Generate an unofficial transcript: choose a report type for your programme, then Submit.' },
     { id: 'suletter', when: ['View S/U Original Grade Letter'], before: 'View S/U Original Grade Letter',
@@ -253,16 +319,19 @@
 
   // Marks the EduRec blocks a view replaces (CSS hides them; nothing moves).
   // A block that holds a control or the page list is never hidden.
+  // A view that offers EduRec's buttons itself (ownsButtons) may hide blocks with buttons.
   const CONTROLS = 'input, select, textarea, .ps-button, ul.psa_list-linkmenu, #DERIVED_ACRD_FL_SSR_CHANGE_TERM';
+  const FIELDS = 'input, select, textarea, ul.psa_list-linkmenu';
   function mark(e) {
     const blocks = new Set();
     for (const m of e.hide) {
       for (const node of findAll(m)) {
         const block = (e.block && node.closest(e.block)) || node.closest('.ps_box-grid-flex') || node.closest('#alertmsg, .ps_box-htmlarea, .ps_box-longedit, .ps_box-group');
-        if (!block || block.closest('#PT_SIDE') || block.querySelector(CONTROLS)) continue;
+        if (!block || block.closest('#PT_SIDE') || block.querySelector(e.ownsButtons ? FIELDS : CONTROLS)) continue;
         blocks.add(block);
       }
     }
+    if (e.hideAlso) for (const n of document.querySelectorAll('#PT_MAIN ' + e.hideAlso)) blocks.add(n);
     for (const b of blocks) {
       b.classList.add('edr-orig');
       b.setAttribute('data-edr-orig', e.key);

@@ -388,6 +388,94 @@
     return { models: filled, noTests: ls.includes('No test credits found.') };
   }
 
+  // ---- Personal Info ----
+
+  // A grid reads as its column labels, then one line per filled cell. Returns the
+  // lines after the first run of `cols`, up to the first line in `stop`.
+  function cellsAfter(ls, cols, stop) {
+    const at = ls.findIndex((l, i) => cols.every((c, k) => ls[i + k] === c));
+    if (at < 0) return null;
+    const rest = ls.slice(at + cols.length);
+    const end = rest.findIndex((l) => (stop || []).includes(l));
+    return end < 0 ? rest : rest.slice(0, end);
+  }
+  const chunks = (xs, n) => { const out = []; for (let i = 0; i + n <= xs.length; i += n) out.push(xs.slice(i, i + n)); return out; };
+  const DMY = /^\d{2}\/\d{2}\/\d{4}$/;
+
+  // "Demographic Information": label lines each followed by their value, then the
+  // national ID, citizenship and pre-admission medical grids. MyInfo repeats the
+  // labels but has no residency status or medical grid.
+  const DEMO = { 'Student ID': 'id', 'Official Name': 'name', 'Gender': 'gender', 'Date of Birth': 'dob', 'Marital Status': 'marital', 'Current Residency Status': 'residency' };
+  function parseDemographic(text) {
+    const ls = lines(text);
+    if (!ls.includes('Current Residency Status') || !ls.includes('Pre-Admission Medical Examination')) return null;
+    const out = {};
+    for (const [label, key] of Object.entries(DEMO)) {
+      const v = ls[ls.indexOf(label) + 1];
+      out[key] = ls.includes(label) && v && !DEMO[v] && v !== 'Identification Type/Number' ? v : null;
+    }
+    out.ids = chunks(cellsAfter(ls, ['National ID Type', 'National ID'], ['Citizenship Information']) || [], 2).map(([type, number]) => ({ type, number }));
+    out.citizenship = chunks(cellsAfter(ls, ['Country', 'Description', 'Birth Country'], ['Pre-Admission Medical Examination']) || [], 3)
+      .map(([country, status, birth]) => ({ country, status, birth }));
+    const med = cellsAfter(ls, ['Status', 'Expiry Date (If any)']) || [];
+    out.medical = med[0] ? { status: med[0], expiry: DMY.test(med[1] || '') ? med[1] : null } : null;
+    return out;
+  }
+
+  // "Names": Official Name, Name and Type per row.
+  function parseNames(text) {
+    const cells = cellsAfter(lines(text), ['Official Name', 'Name', 'Type']);
+    if (!cells) return null;
+    return { names: chunks(cells, 3).filter((r) => /^[A-Z][a-z]+$/.test(r[2])).map(([official, name, type]) => ({ official, name, type })) };
+  }
+
+  // "Contact Details": an Email grid, social media links, a Phone grid. Which
+  // entry is preferred is an image, so it isn't read.
+  function parseContact(text) {
+    const ls = lines(text);
+    const emails = cellsAfter(ls, ['Email', 'Type', 'Preferred'], ['Social Media Links', 'Phone']);
+    const phones = cellsAfter(ls, ['Phone', 'Type', 'Preferred']);
+    if (!emails && !phones) return null;
+    return {
+      emails: chunks(emails || [], 2).filter(([a]) => a.includes('@')).map(([address, type]) => ({ address, type })),
+      phones: chunks(phones || [], 2).filter(([n]) => /\d/.test(n)).map(([number, type]) => ({ number, type })),
+      social: ls.includes('No Social Media Accounts are defined.') ? [] : null
+    };
+  }
+
+  // "Addresses" and "Payment Address": per kind of address, a title, then
+  // Address and From columns. An address reads country, postal code, its lines
+  // (Addresses repeats the city), then From ("Current" or a date).
+  const FROM = /^(Current|Future|\d{2}\/\d{2}\/\d{4})$/;
+  const isTitle = (ls, i) => /Address$/.test(ls[i]) && ((ls[i + 1] === 'Address' && ls[i + 2] === 'From') || ls[i + 1] === 'No address defined');
+  function parseAddresses(text) {
+    const ls = lines(text);
+    const kinds = [];
+    for (let i = 0; i < ls.length; i++) {
+      if (!isTitle(ls, i)) continue;
+      const kind = { title: ls[i], addresses: [] };
+      kinds.push(kind);
+      let cells = [];
+      for (let j = i + 1; j < ls.length && !isTitle(ls, j); j++) {
+        if (j <= i + 2 && ls[i + 1] === 'Address') continue;
+        if (!FROM.test(ls[j])) { cells.push(ls[j]); continue; }
+        const [country, ...rest] = cells;
+        const postal = /\d/.test(rest[0] || '') && /^[A-Z0-9 -]{3,10}$/i.test(rest[0]) ? rest.shift() : null;
+        if (rest.length > 1 && rest[rest.length - 1].toUpperCase() === String(country).toUpperCase()) rest.pop();
+        kind.addresses.push({ country, postal, lines: rest, from: ls[j] });
+        cells = [];
+      }
+    }
+    return kinds.length ? { kinds } : null;
+  }
+
+  // "Emergency Contacts": Contact and Phone per row; Primary is an image.
+  function parseEmergency(text) {
+    const cells = cellsAfter(lines(text), ['Contact', 'Phone', 'Primary']);
+    if (!cells) return null;
+    return { contacts: chunks(cells, 2).filter(([, p]) => /\d/.test(p)).map(([name, phone]) => ({ name, phone })) };
+  }
+
   // "View Milestones": a grid whose cells repeat their label ("Milestone", then
   // its value if any). A record with nothing filled in is an empty row.
   const MILESTONE_COLS = { 'Milestone': 'name', 'Milestone Level': 'level', 'Milestone Complete': 'complete', 'How Completed': 'how',
@@ -479,5 +567,6 @@
   }
 
   EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName,
-    parseExamSchedule, examWhen, parseSuHistory, parseProgramme, parseCourses, parseTransferCredit, parseMilestones, parseClassList };
+    parseExamSchedule, examWhen, parseSuHistory, parseProgramme, parseCourses, parseTransferCredit, parseMilestones, parseClassList,
+    parseDemographic, parseNames, parseContact, parseAddresses, parseEmergency };
 })();

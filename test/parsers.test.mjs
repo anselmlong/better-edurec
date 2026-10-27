@@ -675,3 +675,120 @@ Status: Enrolled`);
   assert.deepEqual(Object.keys(s.sessions[0]), ['date', 'start', 'code', 'type', 'room', 'status']);
   assert.equal(s.sessions[0].code, 'CD1001');
 });
+
+// ---- Personal Info (layouts from the 27 Oct 2026 crawl; values invented) ----
+
+const PI_HEAD = 'Skip to Main Content\nMy Homepage\nActions\nPersonal Info\nStudent ID\nA0000000X\n';
+
+test('parseDemographic reads the facts and the ID, citizenship and medical grids', () => {
+  const { parseDemographic } = globalThis.EDR.parsers;
+  const d = parseDemographic(PI_HEAD + `Demographic Information
+Student ID
+A0000000X
+Official Name
+EXAMPLE STUDENT NAME
+Gender
+Female
+Date of Birth
+01/02/2003
+Marital Status
+Single
+Current Residency Status
+Permanent Resident
+Identification Type/Number
+National ID Type
+National ID
+NRIC
+S0000000Z
+Citizenship Information
+Country
+Description
+Birth Country
+Exampleland
+Citizen
+Exampleland
+Pre-Admission Medical Examination
+Status
+Expiry Date (If any)
+Completed`);
+  assert.deepEqual(d, {
+    id: 'A0000000X', name: 'EXAMPLE STUDENT NAME', gender: 'Female', dob: '01/02/2003', marital: 'Single', residency: 'Permanent Resident',
+    ids: [{ type: 'NRIC', number: 'S0000000Z' }],
+    citizenship: [{ country: 'Exampleland', status: 'Citizen', birth: 'Exampleland' }],
+    medical: { status: 'Completed', expiry: null }
+  });
+  // MyInfo repeats the labels but is a form.
+  assert.equal(parseDemographic('MyInfo Demographic Information\nStudent ID\nA0000000X\nOfficial Name\nEXAMPLE\nGender\nFemale\nReset\nSave'), null);
+});
+
+test('parseNames reads one row per name type', () => {
+  const { parseNames } = globalThis.EDR.parsers;
+  assert.deepEqual(parseNames(PI_HEAD + 'Names\nNames\nOfficial Name\nName\nType\nEXAMPLE STUDENT NAME\nMs EXAMPLE NAME\nPrimary\nEXAMPLE STUDENT NAME\nMs EXAMPLE NAME\nPreferred').names, [
+    { official: 'EXAMPLE STUDENT NAME', name: 'Ms EXAMPLE NAME', type: 'Primary' },
+    { official: 'EXAMPLE STUDENT NAME', name: 'Ms EXAMPLE NAME', type: 'Preferred' }]);
+  assert.equal(parseNames('Contact Details\nEmail'), null);
+});
+
+test('parseContact reads emails, phones and the empty social list', () => {
+  const { parseContact } = globalThis.EDR.parsers;
+  const c = parseContact(PI_HEAD + `Contact Details
+Email
+Email
+Type
+Preferred
+E0000000@U.NUS.EDU
+NUS
+student@example.com
+Personal
+Social Media Links
+No Social Media Accounts are defined.
+Add Social Account
+Phone
+Phone
+Type
+Preferred
++65 90000000
+Mobile (Singapore)
++65 60000000
+Home`);
+  assert.deepEqual(c.emails, [{ address: 'E0000000@U.NUS.EDU', type: 'NUS' }, { address: 'student@example.com', type: 'Personal' }]);
+  assert.deepEqual(c.phones, [{ number: '+65 90000000', type: 'Mobile (Singapore)' }, { number: '+65 60000000', type: 'Home' }]);
+  assert.deepEqual(c.social, []);
+});
+
+test('parseAddresses reads each kind, its lines and the empty ones', () => {
+  const { parseAddresses } = globalThis.EDR.parsers;
+  const a = parseAddresses(PI_HEAD + `Addresses
+Mailing Address
+Address
+From
+Singapore
+100001
+Block 1
+Example Avenue 2
+#01-01
+SINGAPORE
+Current
+Home Address
+Address
+From
+Singapore
+100002
+2 Example Road
+01/07/2026
+Billing Address
+No address defined
+Add Billing Address`);
+  assert.deepEqual(a.kinds, [
+    { title: 'Mailing Address', addresses: [{ country: 'Singapore', postal: '100001', lines: ['Block 1', 'Example Avenue 2', '#01-01'], from: 'Current' }] },
+    { title: 'Home Address', addresses: [{ country: 'Singapore', postal: '100002', lines: ['2 Example Road'], from: '01/07/2026' }] },
+    { title: 'Billing Address', addresses: [] }]);
+  const p = parseAddresses(PI_HEAD + 'Payment Address\nAddress\nFrom\nSingapore\n100001\nBlock 1\nExample Avenue 2\n#01-01\nCurrent');
+  assert.deepEqual(p.kinds, [{ title: 'Payment Address', addresses: [{ country: 'Singapore', postal: '100001', lines: ['Block 1', 'Example Avenue 2', '#01-01'], from: 'Current' }] }]);
+  assert.equal(parseAddresses('Names\nOfficial Name'), null);
+});
+
+test('parseEmergency reads contacts and phones', () => {
+  const { parseEmergency } = globalThis.EDR.parsers;
+  assert.deepEqual(parseEmergency(PI_HEAD + 'Emergency Contacts\nContact\nPhone\nPrimary\nEXAMPLE PARENT NAME\n65 90000001').contacts, [{ name: 'EXAMPLE PARENT NAME', phone: '65 90000001' }]);
+});

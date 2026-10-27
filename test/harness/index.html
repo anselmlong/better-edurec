@@ -249,6 +249,47 @@
         + '<tr class="ps_grid-row"><td class="ps_grid-cell"></td><td class="ps_grid-cell">' + val('03/08/2026 - 05/12/2026') + '</td><td class="ps_grid-cell">' + val('Schedule: To be Announced') + '</td><td class="ps_grid-cell">' + val('To be Announced') + '</td></tr>')
       + '</div></div>', 'psc_label-none'))));
   })();
+  // Personal Info pages with EduRec's nesting (crawled 27 Oct 2026, values invented).
+  // Rows and Add buttons count their clicks in data-clicks, to check Edit and Add.
+  const PROF = '/psc/cs90prd_5/EMPLOYEE/SA/c/SCC_PROFILE_FL.SCC_PROFILE_MD_FL.GBL?Action=U&MD=Y&GMenu=SCC_PROFILE_FL&GComp=SCC_PROFILE_FL';
+  const PROF_NAV = ['Demographic Information', 'Names', 'Contact Details', 'Addresses', 'Emergency Contacts', 'Payment Address', 'MyInfo Demographic Information'];
+  const prof = (sel, html) => ({ url: PROF, nav: PROF_NAV, sel, html: '<div class="ps_box-group psc_layout">' + group('<h1 id="PANEL_TITLE"><span class="ps-text">' + sel + '</span></h1>', 'ps_box-title ps_box-mdtitle psa_pagetitle') + html + '</div>' });
+  const clicks = 'this.dataset.clicks=(+this.dataset.clicks||0)+1';
+  const addBtn = (alt) => '<div class="ps_box-button psc_image_only"><span class="ps-button-wrapper"><a class="ps-button" href="#" onclick="' + clicks + ';return false"><img class="ps-img" alt="' + alt + '" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="></a></span></div>';
+  const helpBtn = '<div class="ps_box-button psc_image_only" style="display:none"><a class="ps-button" href="#"><img alt="Help"></a></div>';
+  const pgrid = (title, cols, rows, add, showTitle) => '<div class="ps_box-grid-flex psc_show-actionable"><div class="ps_box-grid-header"><div class="ps_box-grid-title">'
+    + (title ? '<h2 class="ps_grid-title"' + (showTitle ? '' : ' style="display:none"') + '><span class="ps-text">' + title + '</span></h2>' : '') + '</div>'
+    + (add ? '<div class="ps_box-grid-header_bar"><div class="ps_header-grid-custom">' + addBtn(add) + '</div></div>' : '') + '</div>'
+    + '<div class="ps_box-gridc"><table class="ps_grid-flex"><thead class="ps_grid-head"><tr class="ps_grid-head-row">' + cols.map((c) => '<th class="ps_grid-col"><div class="ps_box_grid-col"><div class="ps_grid-col-label">' + c + '</div></div></th>').join('')
+    + '</tr></thead><tbody class="ps_grid-body">' + rows.map((r) => '<tr class="ps_grid-row psc_rowact" onclick="' + clicks + '">' + r.map((c) => '<td class="ps_grid-cell">' + [].concat(c).map((x) => val(x)).join('') + '</td>').join('') + '</tr>').join('')
+    + '</tbody></table></div></div>';
+  const sect = (title) => group('<span class="ps-text">' + title + '</span>' + helpBtn, 'psa_pagetitle psc_border-headernone');
+  const label = (l, v) => '<div class="ps_box-edit psc_disabled"><div class="ps_box-label"><span class="ps-label">' + l + '</span></div><span class="ps_box-value">' + v + '</span></div>';
+  const hiddenLabel = (l, v) => '<div class="ps_box-edit" style="display:none"><div class="ps_box-label"><span class="ps-label">' + l + '</span></div><span class="ps_box-value">' + v + '</span></div>';
+  const PHOTO = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 45"><rect width="34" height="45" fill="#c9d3df"/><circle cx="17" cy="17" r="7" fill="#9aa8b8"/><path d="M4 45c1-9 6-14 13-14s12 5 13 14z" fill="#9aa8b8"/></svg>');
+  PAGES.demographic = prof('Demographic Information', group(group('<div class="ps_box-img psc_data-image"><img class="ps-img" id="EMPL_PHOTO_EMPLOYEE_PHOTO$52$" alt="Employee Photograph" src="' + PHOTO + '"></div>', 'psc_float-left psc_width-20pct')
+      + group(label('Student ID', 'A0000000X') + label('Official Name', 'EXAMPLE STUDENT NAME') + label('Gender', 'Female') + label('Date of Birth', '01/02/2003')
+        + hiddenLabel('Birth Country', 'Exampleland') + label('Marital Status', 'Single') + hiddenLabel('Military Status', '') + label('Current Residency Status', 'Permanent Resident'), 'psc_float-left psc_width-70pct'))
+    + sect('Identification Type/Number') + pgrid('National Identification Number', ['National ID Type', 'National ID', ''], [['NRIC', 'S0000000Z', '']])
+    + '<div style="display:none">' + sect('Ethnicity') + pgrid('Ethnicity', ['Ethnic Group', 'Description', 'Primary Indicator for Multiple'], [['X', 'Example', 'Y']]) + '</div>'
+    + sect('Citizenship Information') + pgrid('Citizenship Information', ['Country', 'Description', 'Birth Country', ''], [['Exampleland', 'Citizen', 'Exampleland', '']])
+    + sect('Pre-Admission Medical Examination') + pgrid('Visa or Permit Data', ['Status', 'Expiry Date (If any)', ''], [['Completed', '', '']]));
+  PAGES.names = prof('Names', sect('Names') + pgrid('Names', ['Official Name', 'Name', 'Type'], [['EXAMPLE STUDENT NAME', 'Ms EXAMPLE NAME', 'Primary'], ['EXAMPLE STUDENT NAME', 'Ms EXAMPLE NAME', 'Preferred']]));
+  PAGES.contact = prof('Contact Details', group(sect('Email') + pgrid('Email', ['Email', 'Type', 'Preferred'], [['E0000000@U.NUS.EDU', 'NUS', ''], ['student@example.com', 'Personal', '']], 'Add Email')
+      + sect('Social Media Links') + group('<span class="ps-text">No Social Media Accounts are defined.</span><div class="ps_box-button"><a class="ps-button" href="#" onclick="' + clicks + ';return false">Add Social Account</a></div>'))
+    + sect('Phone') + pgrid('Phone', ['Phone', 'Type', 'Preferred'], [['+65 90000000', 'Mobile (Singapore)', ''], ['+65 60000000', 'Home', '']], 'Add Phone'));
+  const ADDR = ['Singapore', '100001', 'Block 1', 'Example Avenue 2', '#01-01'];
+  PAGES.addresses = prof('Addresses', group(pgrid('Mailing Address', ['Address', 'From', ''], [[ADDR.concat('SINGAPORE'), 'Current', '']], 'Add Mailing Address', true)
+      + pgrid('Home Address', ['Address', 'From', ''], [[ADDR.concat('SINGAPORE'), 'Current', '']], 'Add Home Address', true), 'psc_width-80pct')
+    + group('<span class="ps-text">Billing Address</span><span class="ps-text">No address defined</span><div class="ps_box-button"><a class="ps-button" href="#" onclick="' + clicks + ';return false">Add Billing Address</a></div>', 'psc_halign-left psc_margin-top1em'));
+  PAGES.emergency = prof('Emergency Contacts', pgrid('Emergency Contacts', ['Contact', 'Phone', 'Primary'], [['EXAMPLE PARENT NAME', '65 90000001', '']], 'Add Contact'));
+  PAGES.payment = prof('Payment Address', pgrid(null, ['Address', 'From', ''], [[ADDR, 'Current', '']], 'Add Payment Address'));
+  PAGES.myinfo = prof('MyInfo Demographic Information', group('<p>If you have Personal Information changes (e.g. Citizenship, Mailing Address) updated via your Singpass account, you can update the same changes for your Personal Information records in myEduRec.</p>'
+      + '<p>Please check the box below and click \'Retrieve MyInfo with Singpass\' to proceed with the update.</p>', 'psc_float-left psc_width-25pct')
+    + group('<input type="checkbox" id="myi"><label for="myi"><b>Yes, I wish to edit my particulars</b></label>')
+    + group('<a class="ps-link" href="#">Important Notes:</a><ul><li>Your updated citizenship or residency status will appear in the “Demographic Information” page within 3 working days.</li></ul>', 'psc_collapsible')
+    + group(label('Student ID', 'A0000000X') + label('Official Name', 'EXAMPLE STUDENT NAME') + label('Gender', 'Female'))
+    + group('<div class="ps_box-button"><a class="ps-button" href="#">Reset</a></div><div class="ps_box-button"><a class="ps-button" href="#">Save</a></div>'));
   const key = new URLSearchParams(location.search).get('page') || 'home';
   const page = PAGES[key];
 
