@@ -223,5 +223,87 @@
     });
   }
 
-  EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName };
+  // View Exam Schedule, "By Class" layout. Each row starts at an "AB 1234-L2" line
+  // and runs to the next one: "(1111)", the title cut to 30 characters with " (L)",
+  // then mode, date (DD-MM-YYYY), time range, venue, seat and an optional e-exam
+  // tool. Exams not yet scheduled read "TBA" and have no date.
+  function parseExamSchedule(text) {
+    const ls = lines(text);
+    if (!ls.includes('Exam Seat Nbr') || !ls.includes('Exam Venue')) return null;
+    const ROW = /^([A-Z]{2,4}) ?(\d{4}[A-Z]{0,3})-([A-Z0-9]+)$/;
+    const stop = ls.findIndex((l) => /^\*E-Exam Tool Description$|^Note:/.test(l));
+    const body = ls.slice(0, stop > 0 ? stop : undefined);
+    const exams = [];
+    for (let i = 0; i < body.length; i++) {
+      const m = ROW.exec(body[i]);
+      if (!m) continue;
+      let j = i + 1;
+      const vals = [];
+      while (j < body.length && !ROW.test(body[j])) vals.push(body[j++]);
+      i = j - 1;
+      const rest = vals.filter((v) => !/^\(\d+\)$/.test(v));
+      const rawTitle = (rest.shift() || '').replace(/\s*\([A-Z]\)$/, '');
+      const exam = { code: m[1] + m[2], cls: m[3], title: rawTitle, cut: rawTitle.length >= 30,
+        mode: null, date: null, start: null, end: null, venue: null, seat: null, tool: null };
+      const d = rest.findIndex((v) => /^\d{2}-\d{2}-\d{4}$/.test(v));
+      if (d >= 0) {
+        const [dd, mm, yyyy] = rest[d].split('-');
+        exam.date = yyyy + '-' + mm + '-' + dd;
+        exam.mode = rest.slice(0, d).join(' ') || null;
+        const t = /^(\d{1,2}:\d{2}\s*[AP]M)\s*-\s*(\d{1,2}:\d{2}\s*[AP]M)$/i.exec(rest[d + 1] || '');
+        if (t) { exam.start = to24(t[1]); exam.end = to24(t[2]); }
+        const field = (v) => (v && v !== 'TBA' && v !== '-' ? v : null);
+        exam.venue = field(rest[d + 2]);
+        exam.seat = field(rest[d + 3]);
+        exam.tool = field(rest[d + 4]);
+      }
+      exams.push(exam);
+    }
+    if (!exams.length) return null;
+    const tools = {};
+    for (const l of ls.slice(stop > 0 ? stop : ls.length)) {
+      const t = /^([A-Z][A-Z0-9_]+) - (.+)$/.exec(l);
+      if (t) tools[t[1]] = t[2];
+    }
+    const updatedM = /generated on (.+)$/.exec(ls.find((l) => /^Information shown on this page is generated on/.test(l)) || '');
+    const termM = TERM_RE.exec(ls.join('\n'));
+    exams.sort((a, b) => (a.date ? 0 : 1) - (b.date ? 0 : 1) || String(a.date + a.start).localeCompare(String(b.date + b.start)));
+    return { term: termM ? termM[1] : null, exams, tools, updated: updatedM ? updatedM[1] : null };
+  }
+
+  // Where an exam stands relative to now: 'past', 'today', 'soon' (within 7 days),
+  // 'later' or 'tba'. `now` is a Date, passed in so this stays testable.
+  function examWhen(exam, now) {
+    if (!exam.date) return 'tba';
+    const [y, m, d] = exam.date.split('-').map(Number);
+    const [eh, em] = (exam.end || '23:59').split(':').map(Number);
+    if (new Date(y, m - 1, d, eh, em) < now) return 'past';
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.round((new Date(y, m - 1, d) - today) / 86400000);
+    return days === 0 ? 'today' : days <= 7 ? 'soon' : 'later';
+  }
+
+  // "View Past S/U Declarations and Balance": one row per declared course, then
+  // "Available S/U Balance: 4".
+  function parseSuHistory(text) {
+    const ls = lines(text);
+    const head = ls.indexOf('Courses Declared S/U');
+    // The balance is on the label's line or the next one.
+    const bi = ls.findIndex((l) => /^Available S\/U Balance/.test(l));
+    const balM = bi >= 0 ? /^Available S\/U Balance:\s*([\d.]+)/.exec(ls[bi]) || /^([\d.]+)$/.exec(ls[bi + 1] || '') : null;
+    if (head < 0 && !balM) return null;
+    const rows = [];
+    for (let i = Math.max(head, 0); i < ls.length; i++) {
+      const t = TERM_RE.exec(ls[i]);
+      if (!t || t[1] !== ls[i]) continue;
+      const [code, title, su, orig, units] = ls.slice(i + 1, i + 6);
+      if (!new RegExp('^' + CODE + '$').test(code || '') || !/^\d+(\.\d+)?$/.test(units || '')) continue;
+      rows.push({ term: t[1], code, title, grade: su, original: orig, units: num(units) });
+      i += 5;
+    }
+    return { rows, balance: balM ? num(balM[1]) : null };
+  }
+
+  EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName,
+    parseExamSchedule, examWhen, parseSuHistory };
 })();

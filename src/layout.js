@@ -44,9 +44,21 @@
     }
   }
 
+  // A group holding only buttons (form actions) aligns left with the content
+  // instead of EduRec's centred stack. EduRec often wraps each button in its own
+  // group, so a group of such groups is one row too (inner groups first).
+  function actionRows(root) {
+    const groups = [...root.querySelectorAll('.ps_apps_content .ps_box-group:not(.edr-filterbar)')].reverse();
+    for (const g of groups) {
+      const kids = [...g.children].filter(shown);
+      if (kids.length && kids.every((k) => k.matches(BUTTON) || k.classList.contains('edr-actions'))) g.classList.add('edr-actions');
+    }
+  }
+
   function run() {
     const main = document.getElementById('PT_MAIN') || document.body;
     filterBars(main);
+    actionRows(main);
     foldNotes(document);
   }
 

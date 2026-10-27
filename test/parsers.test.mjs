@@ -328,3 +328,108 @@ test('schedule parsers ignore unrelated pages', () => {
   assert.equal(parseSessions('Course Grades\nGPA 4.00'), null);
   assert.equal(parseSlots('Course Grades\nGPA 4.00'), null);
 });
+
+const { parseExamSchedule, examWhen, parseSuHistory } = globalThis.EDR.parsers;
+
+const EXAMS = `
+View Exam Schedule
+2025/2026 Semester 2
+By Class
+By Date
+Class
+Description
+Exam Mode
+Exam Date
+Schedule
+Exam Venue
+Exam Seat Nbr
+*E-Exam Tool
+AB 2105-L2
+(1111)
+Introduction to Example Studie (L)
+Closed Book (auth. materials)
+02-05-2026
+9:00AM - 11:00AM
+HALL-A
+19
+CD 1001-L04
+(2222)
+Example Workshop (L)
+TBA
+TBA
+TBA
+-
+EF 4243-L1
+(3333)
+Example Vision Course (L)
+Closed Book (auth. materials)
+30-04-2026
+5:00PM - 7:00PM
+HALL-B
+7
+EXAMTOOL_ONE
+*E-Exam Tool Description
+1
+EXAMTOOL_ONE - Example Online Assessment
+Note: The Exam Seat Number and Exam Venue will only be available nearer the start of the examinations.
+Information shown on this page is generated on 27 Oct 2026 03:52 PM
+`;
+
+test('parseExamSchedule reads rows of any length, day-first dates, and sorts by date', () => {
+  const s = parseExamSchedule(EXAMS);
+  assert.equal(s.term, '2025/2026 Semester 2');
+  assert.equal(s.exams.length, 3);
+  assert.deepEqual(s.exams[0], { code: 'EF4243', cls: 'L1', title: 'Example Vision Course', cut: false, mode: 'Closed Book (auth. materials)',
+    date: '2026-04-30', start: '17:00', end: '19:00', venue: 'HALL-B', seat: '7', tool: 'EXAMTOOL_ONE' });
+  // 02-05-2026 is 2 May, not 5 February.
+  assert.equal(s.exams[1].date, '2026-05-02');
+  assert.equal(s.exams[1].tool, null);
+  assert.equal(s.exams[1].cut, true);
+  assert.equal(s.exams[2].code, 'CD1001');
+  assert.equal(s.exams[2].date, null);
+  assert.equal(s.exams[2].venue, null);
+  assert.deepEqual(s.tools, { EXAMTOOL_ONE: 'Example Online Assessment' });
+  assert.equal(s.updated, '27 Oct 2026 03:52 PM');
+});
+
+test('parseExamSchedule leaves the By Date layout and empty terms alone', () => {
+  assert.equal(parseExamSchedule('By Class\nBy Date\nThursday April 30\n1:00PM\nAB 2105-L2\nVenue: HALL-A\nSeat #: 19'), null);
+  assert.equal(parseExamSchedule('An exam schedule is not available for this term.'), null);
+});
+
+test('examWhen places an exam relative to now', () => {
+  const now = new Date(2026, 3, 30, 12, 0);
+  assert.equal(examWhen({ date: '2026-04-30', end: '11:00' }, now), 'past');
+  assert.equal(examWhen({ date: '2026-04-30', end: '19:00' }, now), 'today');
+  assert.equal(examWhen({ date: '2026-05-02', end: '11:00' }, now), 'soon');
+  assert.equal(examWhen({ date: '2026-06-02', end: '11:00' }, now), 'later');
+  assert.equal(examWhen({ date: null }, now), 'tba');
+});
+
+test('parseSuHistory reads declared courses and the balance', () => {
+  const r = parseSuHistory(`Instructions:
+Courses Declared S/U
+Semester
+Course Code
+Title
+S/U Grade
+Original Grade
+Number of Units
+2023/2024 Semester 1
+AB1101
+Example Methods
+S
+B+
+4.00
+2024/2025 Semester 2
+CD2218
+Example Platforms
+S
+B
+4.00
+Available S/U Balance: 4`);
+  assert.equal(r.balance, 4);
+  assert.deepEqual(r.rows[1], { term: '2024/2025 Semester 2', code: 'CD2218', title: 'Example Platforms', grade: 'S', original: 'B', units: 4 });
+  assert.equal(parseSuHistory('Course Grades'), null);
+  assert.equal(parseSuHistory('Courses Declared S/U\nAvailable S/U Balance:\n12').balance, 12);
+});

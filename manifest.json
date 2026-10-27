@@ -48,6 +48,7 @@
         "src/shell.js",
         "src/overview.js",
         "src/layout.js",
+        "src/views.js",
         "src/enhancers.js",
         "src/main.js"
       ],

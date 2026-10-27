@@ -123,6 +123,40 @@
       + P('6. Questions about an application go to your faculty office, not the Registrar.') + `</div></div>
     <div class="ps_box-button psc_primary"><a class="ps-button" href="#">Apply</a></div>
     <div class="ps_box-button"><a class="ps-button" href="#">View my applications</a></div>` };
+  // Examinations pages with EduRec's nesting: a term header with Change, then
+  // separate grid boxes and note groups inside the page's own content box.
+  const cell = (t) => '<td class="ps_grid-cell"><span class="ps_box-value">' + t + '</span></td>';
+  const grid = (title, cols, rows) => '<div class="ps_box-grid-flex"><div class="ps_box-grid-header"><span class="ps_grid-title">' + title + '</span></div><div class="ps_box-gridc"><table class="ps_grid-flex">'
+    + '<tr class="ps_grid-head-row">' + cols.map((c) => '<th class="ps_grid-col"><span class="ps_grid-col-label">' + c + '</span></th>').join('') + '</tr>'
+    + rows.map((r) => '<tr class="ps_grid-row">' + r.map((c) => cell([].concat(c).map((x) => '<div>' + x + '</div>').join(''))).join('') + '</tr>').join('') + '</table></div></div>';
+  const termHead = (term) => '<div class="ps_box-group ps_apps_pageheader"><div>Example Student</div><div class="ps_box-group"><span id="TERM_TBL_DESCR">' + term + '</span>'
+    + '<div>National University of Singapore</div><div>Undergraduate</div><div class="ps_box-button"><a class="ps-button" id="DERIVED_ACRD_FL_SSR_CHANGE_TERM" href="#">Change</a></div></div></div>';
+  const note = (t) => '<div class="ps_box-group"><div>' + t + '</div></div>';
+  const soon = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return [d.getDate(), d.getMonth() + 1, d.getFullYear()].map((x, i) => i < 2 ? String(x).padStart(2, '0') : x).join('-'); };
+  PAGES.examschedule = { url: PAGES.results.url, html: termHead('2026/2027 Semester 1')
+    + '<div class="ps_box-group"><div class="ps_box-radio"><input class="ps-radio" type="radio" name="v" checked id="bc"><label class="ps-label" for="bc">By Class</label><input class="ps-radio" type="radio" name="v" id="bd"><label class="ps-label" for="bd">By Date</label></div></div>'
+    + '<div class="ps_apps_content">'
+    + grid('', ['Class', 'Description', 'Exam Mode', 'Exam Date', 'Schedule', 'Exam Venue', 'Exam Seat Nbr', '*E-Exam Tool'], [
+      [['AB 2105-L2', '(1111)'], 'Introduction to Example Studie (L)', 'Closed Book (auth. materials)', soon(-2), '9:00AM - 11:00AM', 'HALL-A', '19', ''],
+      [['CD 1001-L04', '(2222)'], 'Example Workshop (L)', 'TBA', 'TBA', 'TBA', '', '-', ''],
+      [['EF 4243-L1', '(3333)'], 'Example Vision and Patterns Co (L)', 'Closed Book (auth. materials)', soon(3), '5:00PM - 7:00PM', 'HALL-B', '7', 'EXAMTOOL_ONE'],
+      [['GH 3230-L1', '(4444)'], 'Example Algorithms (L)', 'Open Book', soon(12), '1:00PM - 3:00PM', 'HALL-C', '112', '']])
+    + grid('', ['', '*E-Exam Tool Description'], [['1', 'EXAMTOOL_ONE - Example Online Assessment']])
+    + '<div class="ps_box-group">' + '<div>Note: The Exam Seat Number and Exam Venue will only be available nearer the start of the examinations.</div><div>Information shown on this page is generated on 27 Oct 2026 03:52 PM</div></div>'
+    + '</div>' };
+  PAGES.examsempty = { url: PAGES.results.url, html: termHead('2027/2028 Semester 1') + '<div class="ps_apps_content">' + note('An exam schedule is not available for this term.') + '</div>' };
+  PAGES.suhistory = { url: PAGES.results.url, html: '<div class="ps_apps_content">'
+    + '<div class="ps_box-longedit psc_label-none"><div class="ps_box-value"><div>Instructions:</div><div>The table below shows the course(s) that you had exercised the Satisfactory(S)/Unsatisfactory(U) option on for the past semesters/terms.</div></div></div>'
+    + grid('Courses Declared S/U', ['Semester', 'Course Code', 'Title', 'S/U Grade', 'Original Grade', 'Number of Units'], [
+      ['2024/2025 Semester 1', 'AB1101', 'Example Methods', 'S', 'B+', '4.00'],
+      ['2025/2026 Semester 2', 'CD2218', 'Example Platforms for Business', 'S', 'B', '4.00']])
+    + note('Available S/U Balance: 12') + '</div>' };
+  PAGES.suclosed = { url: PAGES.results.url, html: '<div class="ps_apps_content"><div class="ps_box-group psc_halign-center"><div class="ps_box-htmlarea"><div class="ps-htmlarea"><b>The S/U Declaration System is currently unavailable. Please refer to the University timeline on the opening and closing of the S/U Declaration Period.</b></div></div></div></div>' };
+  PAGES.specialcons = { url: PAGES.results.url, html: '<div class="ps_apps_content">'
+    + '<div class="ps_box-group"><div class="ps_box-longedit psc_label-none"><div class="ps_box-label"><span class="ps-label">Instructions:</span></div><div class="ps_box-value">'
+    + P('1. The system does not allow amendments to be made once an application is submitted.') + P('2. For help with an application, contact your faculty office.') + P('3. The outcome is made known upon results release.') + '</div></div></div>'
+    + '<div class="ps_box-group psc_halign-center"><div class="ps_box-button"><span class="ps-button-wrapper"><a class="ps-button" href="#">View History / Past Submission</a></span></div>'
+    + '<div class="ps_box-button"><span class="ps-button-wrapper"><a class="ps-button" href="#">Make Submission for Current Semester</a></span></div></div></div>' };
   const key = new URLSearchParams(location.search).get('page') || 'home';
   const page = PAGES[key];
 
@@ -220,6 +254,7 @@
 <script src="../../src/shell.js"></script>
 <script src="../../src/overview.js"></script>
 <script src="../../src/layout.js"></script>
+<script src="../../src/views.js"></script>
 <script src="../../src/enhancers.js"></script>
 <script src="../../src/main.js"></script>
 </body>
