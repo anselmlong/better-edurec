@@ -179,7 +179,7 @@
   const addButton = (label) => (buttonFor(label)
     ? { label: label[0] + label.slice(1).toLowerCase(), run: () => { const a = buttonFor(label); if (a) a.click(); } }
     : null);
-  const photo = () => { const img = document.querySelector('#PT_MAIN img[id^="EMPL_PHOTO"]'); return img && img.src ? img.src : null; };
+  const photo = () => { const img = [...document.querySelectorAll('img[id^="EMPL_PHOTO"]')].find((i) => !i.closest('#PT_HEADER')); return img && img.src ? img.src : null; };
   const changeTerm = { label: 'Choose another term', run: () => { const a = document.getElementById('DERIVED_ACRD_FL_SSR_CHANGE_TERM'); if (a) a.click(); } };
 
   // match: EduRec's message (exact text or a pattern for its first line); anchor:
@@ -327,11 +327,12 @@
     for (const m of e.hide) {
       for (const node of findAll(m)) {
         const block = (e.block && node.closest(e.block)) || node.closest('.ps_box-grid-flex') || node.closest('#alertmsg, .ps_box-htmlarea, .ps_box-longedit, .ps_box-group');
-        if (!block || block.closest('#PT_SIDE') || block.querySelector(e.ownsButtons ? FIELDS : CONTROLS)) continue;
+        if (!block || block.closest('#PT_SIDE, #PT_HEADER') || block.querySelector(e.ownsButtons ? FIELDS : CONTROLS)) continue;
         blocks.add(block);
       }
     }
-    if (e.hideAlso) for (const n of document.querySelectorAll('#PT_MAIN ' + e.hideAlso)) blocks.add(n);
+    // EduRec's page header repeats some content (the Personal Info photo); it stays as it is.
+    if (e.hideAlso) for (const n of document.querySelectorAll(e.hideAlso)) if (!n.closest('#PT_HEADER, #PT_SIDE')) blocks.add(n);
     for (const b of blocks) {
       b.classList.add('edr-orig');
       b.setAttribute('data-edr-orig', e.key);
