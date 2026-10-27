@@ -883,9 +883,8 @@ html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-su
 .edr-setup-close { position: absolute; top: 10px; right: 10px; }
 .edr-checklist .edr-setup-copy { padding-right: 32px; }
 .edr-checklist-steps { list-style: none; margin: 0; padding: 0; flex: 1 1 100%; display: grid; grid-template-columns: 1fr; gap: 0 24px; }
-/* Four steps: 4 across, else 2×2, else stacked, so none is left alone on a row. */
-@container (min-width: 440px) { .edr-checklist-steps { grid-template-columns: repeat(2, 1fr); } }
-@container (min-width: 820px) { .edr-checklist-steps { grid-template-columns: repeat(4, 1fr); } }
+/* Three steps: all in a row, or stacked, so none is left alone on a row. */
+@container (min-width: 620px) { .edr-checklist-steps { grid-template-columns: repeat(3, 1fr); } }
 .edr-checklist-steps li {
   /* Second row holds the button, pinned to the bottom so every step's button lines up. */
   display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr auto; gap: 14px 12px; align-items: start;

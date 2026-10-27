@@ -20,13 +20,15 @@
     classes: { label: 'Class groups', tile: 'coursereg', nav: 'View My Classes@CourseReg', keys: ['classes'],
       about: 'Lets you open your timetable in NUSMods', optional: true }
   };
-  const ORDER = ['results', 'audit', 'timetable', 'classes'];
+  // The Overview's checklist. Class groups is a step too, but only the timetable
+  // card's NUSMods link starts it.
+  const ORDER = ['results', 'audit', 'timetable'];
   const KEY = 'edr:guide';
   const TTL = 20 * 60 * 1000;
   const STEP_FOR = { results: 'results', audit: 'audit', sessions: 'timetable', slots: 'timetable', classes: 'classes' };
 
   const href = (key) => EDR.routes.shortcutHref({ tile: STEPS[key].tile, open: STEPS[key].nav });
-  const isStepLabel = (label) => ORDER.some((k) => STEPS[k].nav === label);
+  const isStepLabel = (label) => Object.values(STEPS).some((s) => s.nav === label);
   const isDone = (key, data) => STEPS[key].keys.every((k) => data && data[k]);
 
   function begin(key) {
@@ -111,11 +113,8 @@
         end();
         const data = await EDR.store.getData();
         const next = nextMissing(data, g.key);
-        const nextIsOptional = next && STEPS[next].optional;
-        show('done', step.label + ' saved', next
-          ? (nextIsOptional ? 'Your Overview is ready. One optional extra: class groups, for opening your timetable in NUSMods.' : 'It’s on your Overview now.')
-          : 'Your Overview is ready.', [
-          next ? link(next, { class: 'edr-btn is-small' }, (nextIsOptional ? 'Add class groups' : 'Next: ' + STEPS[next].label), EDR.icon('M5 12h14M13 6l6 6-6 6', 14)) : null,
+        show('done', step.label + ' saved', next ? 'It’s on your Overview now.' : 'Your Overview is ready.', [
+          next ? link(next, { class: 'edr-btn is-small' }, 'Next: ' + STEPS[next].label, EDR.icon('M5 12h14M13 6l6 6-6 6', 14)) : null,
           h('a', { class: 'edr-btn is-small' + (next ? ' is-ghost' : ''), href: EDR.routes.HOME + '#overview' }, 'Back to Overview')
         ].filter(Boolean));
         return;

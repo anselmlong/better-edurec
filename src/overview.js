@@ -94,19 +94,18 @@
   }
 
   const KEYS = ['results', 'audit', 'sessions'];
-  const REQUIRED = ['results', 'audit', 'timetable'];
 
   // Checklist: open each page once and the Overview fills itself. Never blocks:
   // it can be dismissed, and every card works on its own.
   function setupPrompt(data) {
     const G = EDR.guide;
-    const missing = REQUIRED.filter((k) => !G.isDone(k, data));
+    const missing = G.ORDER.filter((k) => !G.isDone(k, data));
     if (!missing.length || prefs.setupDismissed) return null;
     const dismiss = () => { prefs.setupDismissed = true; EDR.store.setPrefs({ setupDismissed: true }); render(); };
     const first = missing[0];
     return h('section', { class: 'edr-setup edr-checklist', 'aria-labelledby': 'edr-setup-title' },
       h('div', { class: 'edr-setup-copy' },
-        h('h2', { class: 'edr-h2', id: 'edr-setup-title' }, missing.length === REQUIRED.length ? 'Fill in your Overview' : 'Finish your Overview'),
+        h('h2', { class: 'edr-h2', id: 'edr-setup-title' }, missing.length === G.ORDER.length ? 'Fill in your Overview' : 'Finish your Overview'),
         h('p', { class: 'edr-muted' }, 'Open each page once and its summary appears here. A guide on each page shows what to click. Takes about a minute.')),
       h('button', { type: 'button', class: 'edr-icon-btn is-dark edr-setup-close', 'aria-label': 'Dismiss', title: 'Dismiss', onclick: dismiss },
         EDR.icon('M6 6l12 12M18 6L6 18', 16)),
@@ -116,7 +115,7 @@
         return h('li', { class: done ? 'is-done' : k === first ? 'is-next' : '' },
           h('span', { class: 'edr-check-mark', 'aria-hidden': 'true' }, done ? EDR.icon('M5 12.5l4.5 4.5L19 7.5', 13) : String(i + 1)),
           h('span', { class: 'edr-check-text' },
-            h('strong', null, step.label + (step.optional ? ' (optional)' : '')),
+            h('strong', null, step.label),
             h('span', null, step.about)),
           done
             ? h('span', { class: 'edr-check-state' }, 'Done')
