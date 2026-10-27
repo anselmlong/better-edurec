@@ -136,7 +136,16 @@
     try { ACTIONS[r.binding.action](r.binding); } catch (err) { console.warn('[Better EduRec] key action failed', r.binding.action, err); }
   }
 
+  // EduRec focuses the first row of a list on load, which the browser counts as
+  // keyboard focus. Focus styling waits until a key is actually used (theme.css).
+  function trackKeyboard() {
+    const root = document.documentElement;
+    document.addEventListener('keydown', (e) => { if (!e.metaKey && !e.ctrlKey) root.setAttribute('data-edr-kbd', ''); }, true);
+    document.addEventListener('pointerdown', () => root.removeAttribute('data-edr-kbd'), true);
+  }
+
   function start() {
+    trackKeyboard();
     document.addEventListener('keydown', onKey);
   }
 

@@ -96,12 +96,15 @@ html[data-edr-on] *:focus:not(:focus-visible) *,
 html[data-edr-on] .psc_focus,
 html[data-edr-on] .psc_focus * { outline: none !important; }
 html[data-edr-on] .psc_button-transparent .ps-button:hover { border-style: solid !important; border-color: transparent !important; }
-html[data-edr-on] #PT_WRAPPER :focus-visible { outline: 2px solid var(--edr-blue) !important; outline-offset: 2px !important; }
-/* EduRec focuses the first row of a list on load; an outline there gets clipped by
-   the list and ignores the card's radius, so rows show focus as their border. */
+/* EduRec focuses the first row of a list on load, and the browser treats that as
+   keyboard focus. Focus shows only once a key has been used (data-edr-kbd, keys.js). */
+html[data-edr-on]:not([data-edr-kbd]) #PT_WRAPPER :focus-visible { outline: none !important; }
+html[data-edr-on][data-edr-kbd] #PT_WRAPPER :focus-visible { outline: 2px solid var(--edr-blue) !important; outline-offset: 2px !important; }
+/* An outline on a list row gets clipped by the list and ignores the card's
+   radius, so rows show focus as their border. */
 html[data-edr-on] #PT_WRAPPER li.ps_grid-row:focus-visible,
 html[data-edr-on] #PT_WRAPPER li.ps_grid-row:focus { outline: none !important; }
-html[data-edr-on] #PT_WRAPPER li.ps_grid-row:not(.edr-coach-target):focus-visible { border-color: var(--edr-blue) !important; }
+html[data-edr-on][data-edr-kbd] #PT_WRAPPER li.ps_grid-row:not(.edr-coach-target):focus-visible { border-color: var(--edr-blue) !important; }
 
 /* Header: white bar, left-aligned title, our sidebar replaces Home and NavBar. */
 html[data-edr-on] .ps_header_bar,
