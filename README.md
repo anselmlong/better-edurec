@@ -26,7 +26,9 @@ The extension only reads the EduRec page you're looking at. When it recognises o
 
 ## Install
 
-From a release zip (no Chrome Web Store needed):
+Install it from the [Chrome Web Store](https://chromewebstore.google.com/detail/better-edurec-unofficial/jmobagecfhcbemcgglibldglgmneogaf), then sign in to EduRec.
+
+Or from a release zip:
 
 1. Download `better-edurec-<version>.zip` and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode**.
