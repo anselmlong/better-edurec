@@ -157,6 +157,98 @@
     + P('1. The system does not allow amendments to be made once an application is submitted.') + P('2. For help with an application, contact your faculty office.') + P('3. The outcome is made known upon results release.') + '</div></div></div>'
     + '<div class="ps_box-group psc_halign-center"><div class="ps_box-button"><span class="ps-button-wrapper"><a class="ps-button" href="#">View History / Past Submission</a></span></div>'
     + '<div class="ps_box-button"><span class="ps-button-wrapper"><a class="ps-button" href="#">Make Submission for Current Semester</a></span></div></div></div>' };
+  // Academic Records pages with EduRec's nesting (crawled 27 Oct 2026, values invented).
+  const ACAD = '/psc/cs90prd_58/EMPLOYEE/SA/c/SSR_STUDENT_ACAD_REC_FL.SSR_MD_ACAD_REC_FL.GBL?GComp=SSR_SP_ACAD_REC_FL';
+  const ACAD_NAV = ['View Academic Programme', 'View Student Status Letter', 'View Courses', 'Term and Course Enrollment', 'View Classes', 'View Milestones',
+    'View Transfer Credit Report', 'Apply for Leave of Absence', 'EP Eligibility Letter', 'Student Requests'];
+  const acad = (sel, html) => ({ url: ACAD, nav: ACAD_NAV, sel, html });
+  const val = (t, label) => '<div class="ps_box-edit' + (label ? '' : ' psc_label-hide') + '">' + (label ? '<div class="ps_box-label"><span class="ps-label">' + label + '</span></div>' : '') + '<span class="ps_box-value">' + t + '</span></div>';
+  const lgrid = (cols, rows, title) => '<div class="ps_box-grid-flex"><div class="ps_box-grid-header"><div class="ps_box-grid-title">' + (title ? '<h2 class="ps_grid-title"><span class="ps-text">' + title + '</span></h2>' : '')
+    + '<div class="ps_box-text psc_rowcount"><span class="ps-text">' + rows.length + (rows.length === 1 ? ' row' : ' rows') + '</span></div></div></div><div class="ps_box-gridc"><table class="ps_grid-flex">'
+    + '<thead class="ps_grid-head"><tr class="ps_grid-head-row">' + cols.map((c) => '<th class="ps_grid-col"><div class="ps_box_grid-col"><a class="ps_grid-col-label">' + c + '</a></div></th>').join('') + '</tr></thead><tbody class="ps_grid-body">'
+    + rows.map((r) => '<tr class="ps_grid-row">' + r.map((c) => '<td class="ps_grid-cell">' + [].concat(c).map((x) => val(x)).join('') + '</td>').join('') + '</tr>').join('') + '</tbody></table></div></div>';
+  const group = (inner, cls) => '<div class="ps_box-group' + (cls ? ' ' + cls : '') + '">' + inner + '</div>';
+  const pageHead = (bits) => '<div class="ps_box-group ps_apps_pageheader"><div>Example Student</div><div class="ps_box-group">' + bits.map((b) => '<div>' + b + '</div>').join('')
+    + '<div class="ps_box-button"><a class="ps-button" id="DERIVED_ACRD_FL_SSR_CHANGE_TERM" href="#">Change</a></div></div></div>';
+  const PROG_COLS = ['Career', 'Career Nbr', 'Program', 'Plan Type', 'Plan', 'Sub-Plan'];
+  const PROG_ROWS = [['Undergraduate', '0', 'Bachelor of Examples', 'Honors', 'Example Studies (Hons)', 'Example Systems-TRK'], ['Undergraduate', '0', 'Bachelor of Examples', 'Special Plan', 'Example Residential Prog', '']];
+  PAGES.programme = acad('View Academic Programme', '<div class="ps_apps_content">' + group(group(lgrid(PROG_COLS, PROG_ROWS, '[As of Today]'), 'psa_list-grid-anchor')
+    + group('<div class="ps_box-htmlarea"><div class="ps-htmlarea">Below table only reflect data if you have Program/Plan/Sub-Plan changes. If you don\'t find the data below, please refer to \'As of Today\' table for your latest details.</div></div>')
+    + group(lgrid(PROG_COLS, PROG_ROWS, '[Latest Program/Plan/Sub-Plan changes as of March 02, 2026]'), 'psa_list-grid-anchor')) + '</div>');
+  PAGES.statusletter = acad('View Student Status Letter', '<div class="ps_box-group"><div class="ps_box-group ps_box-title psa_pagetitle"><h1 class="ps_pagetitle"><span class="ps-text">Select A Program</span></h1></div></div>'
+    + group('<div class="ps_box-htmlarea"><div class="ps-htmlarea"> </div></div>', 'psa_no-data-to-display')
+    + group('<div class="ps_box-grid-list"><div class="ps_box-gridc"><div class="ps_box-grid"><div class="ps_grid-list"><ul class="ps_grid-body"><li class="ps_grid-row">'
+      + '<div class="ps_box-link"><a class="ps-link" href="#">National University of Singapore</a></div>' + ['Undergraduate', 'Bachelor of Examples', 'Example Studies (Hons)'].map((t) => val(t)).join('')
+      + '</li></ul></div></div></div></div>'));
+  PAGES.courses = acad('View Courses', pageHead(['2025/2026 Semester 2', 'National University of Singapore', 'Undergraduate']) + '<div class="ps_apps_content">'
+    + group(val('2025/2026 Semester 2 | Undergraduate | NUS'), 'psc_label-none') + group('<div class="ps_box-htmlarea"><div class="ps-htmlarea"> </div></div>')
+    + group(lgrid(['Course Code', 'Description', 'Units', 'Grading Basis', 'Status'], [
+      ['AB2101', 'EXAMPLE DESIGN AND ARCHITECTURE', '4.00', 'Graded', 'Enrolled'],
+      ['CD1201X', 'EXAMPLE PLATFORMS FOR BUSINESS', '4.00', 'Satisfactory/Unsatisfactory', 'Enrolled'],
+      ['EF2334', 'EXAMPLE PROBABILITY', '4.00', 'Graded', 'Enrolled'],
+      ['GH1201', 'EXAMPLE LANGUAGE 1', '4.00', 'Graded', 'Drop with ‘Withdrawn (W)’ Grade']], 'Course Grades'), 'psa_list-grid-anchor') + '</div>');
+  PAGES.noenrol = acad('Term and Course Enrollment', group(group('<div class="ps_box-edit psc_label-none psa_no-data-to-display"><div class="ps_box-label"><span class="ps-label"></span></div><span class="ps_box-value">You are not eligible to declare courses. Please contact your home Faculty/School if you need further clarification.</span></div>'
+    + '<div class="ps_box-htmlarea psc_label-none"><div class="ps-htmlarea"> </div></div>')));
+  PAGES.eponly = acad('EP Eligibility Letter', group(group('<div class="ps_box-htmlarea"><div class="ps-htmlarea">This letter is only for international students.</div></div>', 'psc_label-none psa_no-data-to-display')));
+  const MS_COLS = ['Milestone', 'Milestone Level', 'Milestone Complete', 'How Completed', 'Date Attempted', 'Milestone Grade', 'Details', 'Comments'];
+  const msGrid = (rows) => '<div class="ps_box-grid-flex"><div class="ps_box-grid-header" style="display:none"><div class="ps_box-grid-title"><div class="ps_box-text"><span class="ps-text">' + rows.length + ' row</span></div></div></div><div class="ps_box-gridc"><table class="ps_grid-flex"><thead class="ps_grid-head"><tr class="ps_grid-head-row">'
+    + MS_COLS.concat('', 'Dummy Field').map((c) => '<th class="ps_grid-col"><div class="ps_grid-col-label">' + c + '</div></th>').join('') + '</tr></thead><tbody class="ps_grid-body">'
+    + rows.map((r) => '<tr class="ps_grid-row">' + MS_COLS.map((c, i) => '<td class="ps_grid-cell">' + val(r[i] || '', c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div></div>';
+  PAGES.milestones = acad('View Milestones', pageHead(['National University of Singapore', 'Undergraduate', 'Bachelor of Examples']) + group(group(val(''), '') + group(msGrid([[]]), 'psa_list-grid-anchor')));
+  PAGES.milestone = acad('View Milestones', pageHead(['National University of Singapore', 'Graduate', 'Doctor of Examples']) + group(group(msGrid([['Example Qualifying Exam', '', 'Yes', 'Examination', '12/05/2026', 'Pass']]), 'psa_list-grid-anchor')));
+  const TR_COLS = ['Transfer Term', 'Incoming Course', 'Units Taken', 'Grade Input', 'Status', 'Equivalent Subject / Catlg Nbr', 'Units', 'Grade', 'Notes'];
+  PAGES.transfer = acad('View Transfer Credit Report', group('<div class="ps_box-group ps_apps_content">' + group('<a class="ps-link" href="#">Course Credits</a><div class="ps_box-scrollarea"><div class="ps_box-scrollarea-row">'
+      + [['Model Nbr', '1'], ['', 'Posted'], ['Institution', 'NUS'], ['Credit Source Type', 'External'], ['Career', 'Undergraduate'], ['Source Institution', 'Example State University'], ['Program', 'Bachelor of Examples']].map(([l, v]) => val(v, l || ' ')).join('')
+      + lgrid(TR_COLS, [
+        ['2025/2026 Semester 1', 'EXMP 3250', '3.00', 'A', 'Posted', 'AB 3240', '4.000', 'OVS', ''],
+        ['2025/2026 Semester 1', 'EXMP 6610', '3.00', 'B+', 'Posted', 'AB 3230', '4.000', 'OVS', ''],
+        ['2025/2026 Semester 1', 'EXMP 2810', '3.00', 'B', 'Posted', 'CD 5242', '4.000', 'OVS', '']])
+      + '<div class="ps_box-hr"></div></div></div>') + '</div>')
+    + group('<div class="ps_box-group ps_apps_content">' + group('<a class="ps-link" href="#">Test Credits</a>' + val('No test credits found.')) + '</div>'));
+  PAGES.loa = acad('Apply for Leave of Absence', group(group('<div class="ps_box-group ps_apps_content">'
+      + group('<span class="ps-text">Important Notes:</span><div class="ps_box-htmlarea"><div class="ps-htmlarea">1. Refer <a href="#">here</a> for more information on the LOA policies.</div></div>')
+      + group('<a class="ps-link" href="#">More Details..</a><div class="ps_box-htmlarea" style="display:none"><div class="ps-htmlarea">2. Example policy note.</div></div>', 'psa_groupbox_headercolor') + '</div>'))
+    + group('<div class="ps_box-group ps_apps_content">' + group('<div class="ps_box-button"><span class="ps-button-wrapper"><a class="ps-button" href="#">Next</a></span></div>') + '</div>'));
+  const radio = (id, label, on) => '<div class="ps_box-radio' + (on ? ' psc_selected' : '') + '"><div class="ps_box-control"><input type="radio" class="ps-radio" name="r" id="' + id + '"' + (on ? ' checked' : '') + '></div><div class="ps_box-label"><label class="ps-label" for="' + id + '">' + label + '</label></div></div>';
+  PAGES.requests = acad('Student Requests', group(group(radio('rq1', 'View all Request(s) Submitted', true) + radio('rq2', 'Submit New Request'))
+    + group('<div class="ps_box-group ps_apps_content"><div class="ps_box-group ps_box-title psa_pagetitle"><span class="ps-text">Previous Requests</span></div><div class="ps_box-group ps_apps_content">'
+      + group('<div class="ps_box-htmlarea"><div class="ps-htmlarea"><b>You do not have any previously sumbitted request(s).</b></div></div>') + '</div></div>')));
+  // View Classes as EduRec renders it: no term line, the list in one scroll area.
+  const viewOpts = (byDate) => group(radio('DERIVED_SSR_FL_SSR_VW_CLSCHD_OPT', 'By Class', !byDate) + radio('DERIVED_SSR_FL_SSR_VW_CLSCHD_OPT$81$', 'By Date', byDate));
+  const notes = group('<div class="ps_box-text"><span class="ps-text">Please note that there will be no classes on public holidays.</span></div>', 'psc_label-none')
+    + group('<div class="ps_box-text"><span class="ps-text">The course instructor(s) will advise on make up classes, if any.</span></div>', 'psc_label-none');
+  (function () {
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const mon = new Date(); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7) - 14);
+    const plan = [[0,'10:00AM','AB 1001  Lecture','LT1'],[1,'2:00PM','CD 2002  Tutorial','COM1-02'],[3,'12:00PM','CD 2002  Lecture','LT19']];
+    let days = '';
+    for (let w = 0; w < 5; w++) for (const [d, t, c, r] of plan) {
+      const day = new Date(mon); day.setDate(mon.getDate() + d + 7 * w);
+      days += '<div class="ps_box-scrollarea-row">' + group(group(val(DAYS[day.getDay()] + ' ' + MONTHS[day.getMonth()] + ' ' + day.getDate()), 'psc_halign-left')
+        + group('<div class="ps_box-grid-flex"><div class="ps_box-grid-header" style="display:none"><div class="ps_box-grid-title"><h2 class="ps_grid-title"><span class="ps-text">Class Details</span></h2></div></div><div class="ps_box-gridc"><table class="ps_grid-flex"><tbody class="ps_grid-body"><tr class="ps_grid-row">'
+          + '<td class="ps_grid-cell">' + val(t) + '</td><td class="ps_grid-cell"><div class="ps_box-link"><a class="ps-link" href="#">' + c + '</a></div></td><td class="ps_grid-cell">' + val('Room: ' + r) + '</td><td class="ps_grid-cell">' + val('Status: Enrolled') + '</td></tr></tbody></table></div></div>')) + '</div>';
+    }
+    PAGES.bydate = acad('View Classes', viewOpts(true) + group(group(group(group('<div class="ps_box-text"><span class="ps-text">From</span></div><div class="ps_box-edit psc_label-none"><div class="ps_box-control"><input class="ps-edit" type="text"></div></div>'
+      + '<div class="ps_box-text"><span class="ps-text">To</span></div><div class="ps_box-edit psc_label-none"><div class="ps_box-control"><input class="ps-edit" type="text"></div></div>' + notes, 'psc_label-none')
+      + '<div class="ps_box-scrollarea">' + days + '</div>', 'psc_label-none'))));
+    const dd = (n) => { const d = new Date(mon); d.setDate(mon.getDate() + n); return [d.getDate(), d.getMonth() + 1].map((x) => String(x).padStart(2, '0')).join('/') + '/' + d.getFullYear(); };
+    const comp = (offset, day, times, room) => {
+      const ds = [0, 1, 2, 3, 4].map((w) => dd(offset + 7 * w));
+      return '<tr class="ps_grid-row"><td class="ps_grid-cell"><div class="ps_box-link"><a class="ps-link" href="#"></a></div></td>'
+        + '<td class="ps_grid-cell">' + ds.map((x) => val(x + ' - ' + x)).join('') + '</td>'
+        + '<td class="ps_grid-cell">' + ds.map(() => val('Days: ' + day) + val('Times: ' + times)).join('') + '</td>'
+        + '<td class="ps_grid-cell">' + ds.map(() => val(room)).join('') + '</td></tr>';
+    };
+    const course = (head, rows) => group('<a class="ps-link" href="#">' + head + '</a><div class="ps_box-scrollarea"><div class="ps_box-scrollarea-row"><div class="ps_box-grid-flex"><div class="ps_box-grid-header" style="display:none"><div class="ps_box-grid-title"><h2 class="ps_grid-title"><span class="ps-text">Component Details</span></h2></div></div><div class="ps_box-gridc"><table class="ps_grid-flex">'
+      + '<thead class="ps_grid-head"><tr class="ps_grid-head-row">' + ['Class', 'Start/End Dates', 'Days and Times', 'Room'].map((c) => '<th class="ps_grid-col"><div class="ps_grid-col-label">' + c + '</div></th>').join('') + '</tr></thead><tbody class="ps_grid-body">' + rows + '</tbody></table></div></div></div></div>');
+    PAGES.byclass = acad('View Classes', viewOpts(false) + group(group(group(notes
+      + '<div class="ps_box-scrollarea"><div class="ps_box-scrollarea-row">'
+      + course('AB 1001   Example Foundations of Comput', comp(0, 'Monday', '10:00AM to 12:00PM', 'LT1'))
+      + course('CD 2002   Example Methods', comp(1, 'Tuesday', '2:00PM to 3:00PM', 'COM1-02') + comp(3, 'Thursday', '12:00PM to 2:00PM', 'LT19')
+        + '<tr class="ps_grid-row"><td class="ps_grid-cell"></td><td class="ps_grid-cell">' + val('03/08/2026 - 05/12/2026') + '</td><td class="ps_grid-cell">' + val('Schedule: To be Announced') + '</td><td class="ps_grid-cell">' + val('To be Announced') + '</td></tr>')
+      + '</div></div>', 'psc_label-none'))));
+  })();
   const key = new URLSearchParams(location.search).get('page') || 'home';
   const page = PAGES[key];
 
@@ -180,7 +272,9 @@
     slot.append(back); header.append(slot);
     const mid = document.createElement('div'); mid.id = 'PT_MID_SECTION'; mid.style.display = 'flex';
     const side = document.createElement('div'); side.id = 'PT_SIDE'; side.style.cssText = 'width:260px;flex:none';
-    side.innerHTML = '<ul class="psa_list-linkmenu"><li class="psc_selected"><a class="ps-link"><span class="ps-text">View Exam Results</span></a></li><li><a class="ps-link"><span class="ps-text">View Exam Schedule</span></a></li></ul>';
+    const navItems = page.nav || ['View Exam Results', 'View Exam Schedule'];
+    const selected = page.sel || navItems[0];
+    side.innerHTML = '<ul class="psa_list-linkmenu">' + navItems.map((t) => '<li' + (t === selected ? ' class="psc_selected"' : '') + '><a class="ps-link"><span class="ps-text">' + t + '</span></a></li>').join('') + '</ul>';
     const content = document.createElement('div'); content.id = 'PT_CONTENT'; content.style.flex = '1';
     // EduRec puts each page's lines inside a grid box, which the restyle draws as a card.
     const main = document.createElement('div'); main.id = 'PT_MAIN';

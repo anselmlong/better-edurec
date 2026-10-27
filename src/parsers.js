@@ -304,6 +304,180 @@
     return { rows, balance: balM ? num(balM[1]) : null };
   }
 
+  // ---- Academic Records ----
+
+  // "View Academic Programme": an "[As of Today]" grid and a "[Latest … changes as
+  // of <date>]" grid with the same columns. A row starts at a career followed by
+  // its career number; empty cells (no sub-plan) leave no line.
+  function parseProgramme(text) {
+    const ls = lines(text);
+    const today = ls.indexOf('[As of Today]');
+    if (today < 0) return null;
+    const latestAt = ls.findIndex((l) => /^\[Latest Program\/Plan\/Sub-Plan changes/.test(l));
+    const rows = (from, to) => {
+      const out = [];
+      const part = ls.slice(from, to < 0 ? undefined : to);
+      const starts = part.map((l, i) => (/^\d+$/.test(part[i + 1] || '') && !/^\d+ rows?$/.test(l) ? i : -1)).filter((i) => i >= 0);
+      starts.forEach((s, k) => {
+        const end = k + 1 < starts.length ? starts[k + 1] : part.findIndex((l, i) => i > s && /^Below table only|^\[/.test(l));
+        const [career, , program, type, plan, subplan] = part.slice(s, end > s ? end : undefined);
+        if (program && plan) out.push({ career, program, type: type || '', plan, subplan: subplan || '' });
+      });
+      return out;
+    };
+    const asOf = latestAt >= 0 ? (/as of (.+?)\]$/.exec(ls[latestAt]) || [])[1] || null : null;
+    return { current: rows(today + 1, latestAt), latest: latestAt >= 0 ? { asOf, rows: rows(latestAt + 1, -1) } : null };
+  }
+
+  // "View Courses" for one term: "2024/2025 Semester 2 | Undergraduate | NUS", then
+  // Course Code, Description, Units, Grading Basis, Status per row (no grades).
+  function parseCourses(text) {
+    const ls = lines(text);
+    const head = ls.indexOf('Grading Basis');
+    if (head < 0 || !ls.includes('Course Code')) return null;
+    const key = /^(.+?) \| (.+?) \| (.+)$/.exec(ls.find((l) => TERM_RE.test(l) && l.includes(' | ')) || '');
+    const IS_CODE = new RegExp('^' + CODE + '$');
+    const courses = [];
+    for (let i = head + 1; i < ls.length; i++) {
+      if (!IS_CODE.test(ls[i]) || !/^\d+\.\d+$/.test(ls[i + 2] || '')) continue;
+      const [code, title, units, basis, status] = ls.slice(i, i + 5);
+      courses.push({ code, title: titleCase(title), units: num(units), basis: basis || '', status: status || '' });
+      i += 4;
+    }
+    return { term: key ? key[1] : null, career: key ? key[2] : null, courses };
+  }
+
+  // "View Transfer Credit Report": per model a block of labelled facts (source
+  // institution, program…), then rows of Transfer Term, Incoming Course, Units
+  // Taken, Grade Input, Status, Equivalent, Units, Grade and Notes, some empty.
+  const TRCR_COLS = new Set(['Transfer Term', 'Incoming Course', 'Units Taken', 'Grade Input', 'Status', 'Equivalent Subject / Catlg Nbr', 'Units', 'Grade', 'Notes']);
+  function parseTransferCredit(text) {
+    const ls = lines(text);
+    if (!ls.includes('Credit Source Type') && !ls.includes('Equivalent Subject / Catlg Nbr')) return null;
+    const SPACED = /^[A-Z]{2,4} ?\d{4}[A-Z]{0,3}$/;
+    const UNITS = /^\d+\.\d+$/;
+    const after = (i, label) => { const j = ls.indexOf(label, i); return j >= 0 ? ls[j + 1] : null; };
+    const models = [];
+    let cur = null;
+    for (let i = 0; i < ls.length; i++) {
+      if (ls[i] === 'Model Nbr') {
+        cur = { status: /^\d+$/.test(ls[i + 1] || '') && !TRCR_COLS.has(ls[i + 2]) && ls[i + 2] !== 'Institution' ? ls[i + 2] : null,
+          source: after(i, 'Source Institution'), type: after(i, 'Credit Source Type'), program: after(i, 'Program'), courses: [] };
+        models.push(cur);
+        continue;
+      }
+      const t = TERM_RE.exec(ls[i]);
+      if (!t || t[1] !== ls[i] || !cur) continue;
+      const vals = [];
+      let j = i + 1;
+      while (j < ls.length && !TERM_RE.test(ls[j]) && !/^(Model Nbr|Test Credits)$/.test(ls[j])) {
+        if (!TRCR_COLS.has(ls[j])) vals.push(ls[j]);
+        j++;
+      }
+      i = j - 1;
+      const nums = vals.map((v, k) => (UNITS.test(v) ? k : -1)).filter((k) => k > 0);
+      if (nums.length < 2 || !SPACED.test(vals[nums[1] - 1] || '')) continue;
+      const [a, b] = nums;
+      const mid = vals.slice(a + 1, b - 1);
+      cur.courses.push({
+        term: t[1], incoming: vals[0], taken: num(vals[a]), gradeIn: mid.length > 1 ? mid[0] : '', status: mid[mid.length - 1] || '',
+        equiv: vals[b - 1].replace(/^([A-Z]+) ?/, '$1'), units: num(vals[b]), grade: vals[b + 1] || '', notes: vals.slice(b + 2).join(' ')
+      });
+    }
+    const filled = models.filter((m) => m.courses.length);
+    return { models: filled, noTests: ls.includes('No test credits found.') };
+  }
+
+  // "View Milestones": a grid whose cells repeat their label ("Milestone", then
+  // its value if any). A record with nothing filled in is an empty row.
+  const MILESTONE_COLS = { 'Milestone': 'name', 'Milestone Level': 'level', 'Milestone Complete': 'complete', 'How Completed': 'how',
+    'Date Attempted': 'date', 'Milestone Grade': 'grade', 'Details': 'details', 'Comments': 'comments' };
+  function parseMilestones(text) {
+    const ls = lines(text);
+    const head = ls.indexOf('Milestone Complete');
+    if (head < 0 || !ls.includes('How Completed')) return null;
+    const body = ls.slice(ls.indexOf('Comments', head) + 1).filter((l) => l !== 'Dummy Field');
+    const rows = [];
+    let cur = null;
+    for (let i = 0; i < body.length; i++) {
+      const field = MILESTONE_COLS[body[i]];
+      if (!field) continue;
+      if (field === 'name') { cur = {}; rows.push(cur); }
+      const next = body[i + 1];
+      if (cur && next != null && !(next in MILESTONE_COLS)) { cur[field] = next; i++; }
+    }
+    return { rows: rows.filter((r) => Object.keys(r).length) };
+  }
+
+  // View Classes, "By Class" layout, for the page view (parseSlots stays the
+  // timetable's source). Per course: an "AB 1234 Title cut at 30" line, then per
+  // component all its dates ("25/08/2026 - 25/08/2026"), then all its
+  // "Days:"/"Times:" pairs, then all its rooms. Unscheduled components read
+  // "Schedule: To be Announced".
+  function parseClassList(text) {
+    const ls = lines(text);
+    if (!ls.includes('Days and Times')) return null;
+    const HEAD = /^([A-Z]{2,4}) ?(\d{4}[A-Z]{0,3}) (.+)$/;
+    const RANGE = /^(\d{2})\/(\d{2})\/(\d{4}) - (\d{2})\/(\d{2})\/(\d{4})$/;
+    const iso = (d, m, y) => y + '-' + m + '-' + d;
+    const courses = [];
+    let course = null;
+    let comp = null;
+    let phase = null;
+    const close = () => {
+      if (!comp || !course) return;
+      const slots = new Map();
+      comp.meet.forEach((m, k) => {
+        const room = comp.rooms[k] || '';
+        const key = [m.day, m.start, m.end, room].join('|');
+        const s = slots.get(key) || { day: m.day, start: m.start, end: m.end, room, first: m.from, last: m.to, count: 0 };
+        if (m.from < s.first) s.first = m.from;
+        if (m.to > s.last) s.last = m.to;
+        s.count++;
+        slots.set(key, s);
+      });
+      course.slots.push(...slots.values());
+      if (comp.tba) course.tba = true;
+      comp = null;
+    };
+    for (let i = 0; i < ls.length; i++) {
+      const l = ls[i];
+      const head = HEAD.exec(l);
+      if (head && ls[i + 1] === 'Class') {
+        close();
+        course = { code: head[1] + head[2], title: head[3], cut: head[3].length >= 30, slots: [], tba: false };
+        courses.push(course);
+        continue;
+      }
+      if (!course) continue;
+      const r = RANGE.exec(l);
+      if (r) {
+        if (phase !== 'dates') { close(); comp = { dates: [], meet: [], rooms: [], tba: false }; }
+        phase = 'dates';
+        comp.dates.push({ from: iso(r[1], r[2], r[3]), to: iso(r[4], r[5], r[6]) });
+        continue;
+      }
+      if (!comp) continue;
+      const d = /^Days:\s*(\w+)/.exec(l);
+      const t = /^Times:\s*(\d{1,2}:\d{2}\s*[AP]M)\s+to\s+(\d{1,2}:\d{2}\s*[AP]M)/i.exec(ls[i + 1] || '');
+      if (d && t) {
+        const at = comp.dates[comp.meet.length] || comp.dates[comp.dates.length - 1];
+        comp.meet.push({ day: d[1], start: to24(t[1]), end: to24(t[2]), from: at.from, to: at.to });
+        phase = 'times';
+        i++;
+        continue;
+      }
+      if (/^Schedule: To be Announced$/i.test(l)) { comp.tba = true; phase = 'times'; continue; }
+      if (phase === 'times' || phase === 'rooms') {
+        if (/^(Class|Start\/End Dates|Days and Times|Room)$/.test(l)) continue;
+        phase = 'rooms';
+        if (!comp.tba) comp.rooms.push(l);
+      }
+    }
+    close();
+    return courses.length ? { courses } : null;
+  }
+
   EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName,
-    parseExamSchedule, examWhen, parseSuHistory };
+    parseExamSchedule, examWhen, parseSuHistory, parseProgramme, parseCourses, parseTransferCredit, parseMilestones, parseClassList };
 })();

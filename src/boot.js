@@ -9,7 +9,7 @@
   const KEY = 'edr:boot';
   const root = document.documentElement;
   const isTop = (() => { try { return window.top === window; } catch (e) { return false; } })();
-  const ATTRS = ['on', 'top', 'home', 'collapsed', 'side-collapsed', 'dark', 'theme'];
+  const ATTRS = ['on', 'top', 'home', 'collapsed', 'side-collapsed', 'dark', 'theme', 'pending'];
 
   function read() {
     try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; }
@@ -39,6 +39,10 @@
   if (!state || !state.on || /[?&]cmd=(login|logout|expire)\b/.test(location.search)) return;
 
   root.setAttribute('data-edr-on', '');
+  // EduRec's content waits for the enhancers' first pass (enhancers.start), so a
+  // grid they replace never flashes; shown anyway if that pass never comes.
+  root.setAttribute('data-edr-pending', '');
+  setTimeout(() => root.removeAttribute('data-edr-pending'), 2000);
   if (state.theme) root.setAttribute('data-edr-theme', state.theme);
   if (state.dark) root.setAttribute('data-edr-dark', '');
   if (isTop) {

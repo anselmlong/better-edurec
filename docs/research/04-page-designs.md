@@ -71,3 +71,20 @@ error.
 | Declare S/U (closed) | dead end | "S/U declaration is closed" + View past declarations. |
 | View Unofficial Transcript | form | Intro: choose a report type for your programme, then Submit. No guess at which type. |
 | S/U Original Grade Letter | form | Intro: one sentence; single button. |
+
+## Academic Records
+
+| Sub-page | Type | Design |
+|---|---|---|
+| View Academic Programme | data | Lede: programme, main plan and sub-plan in one sentence ("-TRK" reads "track"). One row per plan: plan name, programme · sub-plan, plan type as a quiet tag. The "Latest changes" grid shows as a second section only when it differs from "As of Today"; otherwise one foot line with its date. Career in the foot. |
+| View Student Status Letter | form | Intro: "Select a programme to get your student status letter." The programme list stays EduRec's (the row starts the letter, so the intro says nothing about what it produces). |
+| View Courses, term list | picker | Left as EduRec's "Select A Term" list; it is navigation, not data. |
+| View Courses, one term | data | Title "Courses · term" (not "Course Grades": there are no grades here). Lede: courses and units still on, then withdrawn and S/U counts. Rows: code, title, units, tags for S/U grading and any status other than Enrolled ("Withdrawn (W)" as a warn tag, the row muted and struck through). |
+| Term and Course Enrollment, not eligible | dead end | "You can’t declare courses here" + View your courses. |
+| View Classes, By Date | data | Lede: the next class, day, time and room. Rows from now on: date block, course and class type, start time and room; earlier meetings fold under "Earlier this term (N)". Feeds the Overview as before (same parser and snapshot, Summary badge). |
+| View Classes, By Class | data | Lede: courses and classes a week. Per course: each weekly slot as day and time, room, and the weeks it runs ("12 weeks, 11 Aug – 3 Nov"); a TBA component gets one muted line. No Lecture/Tutorial label: EduRec's By Class text has none. The timetable snapshot stays parseSlots' output. |
+| View Milestones | data / dead end | Rows with milestone, level, how and when completed, grade, and a Complete tag. An all-empty grid is "No milestones on your record" + View your programme, with EduRec's grid behind the toggle. |
+| View Transfer Credit Report | data | Lede: units transferred, source institution, course count and whether all are posted. Rows: NUS equivalent (mono) "for" the incoming course, term and units taken with the grade input, NUS units and the grade badge (e.g. OVS). "No test credits found." in the foot; test credits, when present, stay visible as EduRec's. |
+| Apply for Leave of Absence | form | Intro with three rules from EduRec's notes: semester-leave deadline (last day of Recess Week), fees after Instructional Week 2, closed from Reading Week to results. EduRec's entry pop-up, notes and Next stay as they are. |
+| EP Eligibility Letter | dead end | "The EP eligibility letter is for international students" + Student status letter. |
+| Student Requests | form | Intro: submit a new request or view past ones. Same wording as Review Exam Results, so both intros are gated on the selected page-list item. |

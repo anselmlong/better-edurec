@@ -132,6 +132,134 @@
       foot('Declarations made this semester show here three working days after the S/U exercise closes.'));
   }
 
+  // ---- Academic Records ----
+
+  const tag = (text, kind) => h('span', { class: 'edr-tag ' + (kind || 'is-quiet') }, text);
+  const unitsText = (n) => +n.toFixed(2) + (n === 1 ? ' unit' : ' units');
+  // "Example Systems-TRK" → "Example Systems track"
+  const subplan = (s) => String(s || '').replace(/-TRK$/, ' track');
+  // "August 04, 2025" → "4 August 2025"
+  const longDate = (s) => { const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' }); };
+
+  function planRows(rows) {
+    return h('ol', { class: 'edr-rows' }, rows.map((r) =>
+      h('li', { class: 'edr-course' },
+        h('div', { class: 'edr-exam-main' },
+          h('p', { class: 'edr-exam-course' }, h('strong', null, r.plan)),
+          h('p', { class: 'edr-muted' }, [r.program, subplan(r.subplan)].filter(Boolean).join(' · '))),
+        r.type ? tag(r.type) : null)));
+  }
+
+  function programme(p) {
+    const main = p.current.find((r) => /honou?rs|major/i.test(r.type)) || p.current[0];
+    const lede = [h('strong', null, main.program), ', ' + [main.plan, subplan(main.subplan)].filter(Boolean).join(', ') + '.'];
+    const same = p.latest && JSON.stringify(p.latest.rows) === JSON.stringify(p.current);
+    const latest = p.latest && p.latest.rows.length && !same
+      ? [h('h3', { class: 'edr-view-sub' }, 'Latest changes' + (p.latest.asOf ? ', as of ' + longDate(p.latest.asOf) : '')), planRows(p.latest.rows)]
+      : null;
+    return view(head('Academic programme', lede), planRows(p.current), latest,
+      foot(main.career ? main.career + ' career.' : null,
+        same && p.latest.asOf ? 'Last programme change on record: ' + longDate(p.latest.asOf) + '.' : null));
+  }
+
+  const WITHDRAWN = /withdrawn|drop/i;
+  function courses(c) {
+    const active = c.courses.filter((x) => !WITHDRAWN.test(x.status));
+    const units = active.reduce((s, x) => s + x.units, 0);
+    const su = active.filter((x) => /^Satisfactory\/Unsatisfactory$/i.test(x.basis)).length;
+    const gone = c.courses.length - active.length;
+    const lede = [h('strong', null, String(active.length)), active.length === 1 ? ' course, ' : ' courses, ', h('strong', null, unitsText(units)),
+      gone ? ' · ' + gone + ' withdrawn' : '', su ? ' · ' + su + ' on S/U' : '', '.'];
+    return view(head(c.term ? 'Courses · ' + c.term : 'Courses', lede),
+      h('ol', { class: 'edr-rows' }, c.courses.map((x) => {
+        const out = WITHDRAWN.test(x.status);
+        const basis = /^Graded$/i.test(x.basis) ? null : /^Satisfactory\/Unsatisfactory$/i.test(x.basis) ? 'S/U' : x.basis;
+        const status = out ? tag((/\(W\)/.test(x.status) ? 'Withdrawn (W)' : x.status), 'is-warn') : /^Enrolled$/i.test(x.status) ? null : tag(x.status);
+        return h('li', { class: 'edr-course edr-enrol' + (out ? ' is-out' : '') },
+          h('p', { class: 'edr-exam-course' }, code(x.code), ' ', h('span', null, x.title)),
+          h('span', { class: 'edr-muted edr-num' }, unitsText(x.units)),
+          h('span', { class: 'edr-tags' }, basis ? tag(basis) : null, status));
+      })));
+  }
+
+  function transferCredit(t) {
+    const all = t.models.flatMap((m) => m.courses);
+    const units = all.reduce((s, x) => s + x.units, 0);
+    const sources = [...new Set(t.models.map((m) => m.source).filter(Boolean))];
+    const pending = all.filter((x) => x.status && !/^Posted$/i.test(x.status)).length;
+    const lede = [h('strong', null, unitsText(units)), ' transferred', sources.length ? ' from ' + sources.join(' and ') : '',
+      ' · ' + all.length + (all.length === 1 ? ' course' : ' courses') + (pending ? ', ' + pending + ' not posted yet' : ', all posted') + '.'];
+    return view(head('Transfer credit', lede),
+      h('ol', { class: 'edr-rows' }, all.map((x) =>
+        h('li', { class: 'edr-course edr-credit' },
+          h('div', { class: 'edr-exam-main' },
+            h('p', { class: 'edr-exam-course' }, code(x.equiv), ' ', h('span', null, 'for ' + x.incoming)),
+            h('p', { class: 'edr-muted' }, [x.term, unitsText(x.taken) + ' taken' + (x.gradeIn ? ', grade ' + x.gradeIn : ''), x.notes].filter(Boolean).join(' · '))),
+          h('span', { class: 'edr-muted edr-num' }, unitsText(x.units)),
+          h('span', { class: 'edr-tags' }, x.status && !/^Posted$/i.test(x.status) ? tag(x.status, 'is-warn') : null, x.grade ? grade(x.grade) : null)))),
+      foot(t.noTests ? 'No test credits found.' : null));
+  }
+
+  function milestones(m, actions) {
+    if (!m.rows.length) {
+      return deadEnd({ icon: 'info', title: 'No milestones on your record', body: 'EduRec lists no milestones for this programme.', actions });
+    }
+    return view(head('Milestones', m.rows.length === 1 ? '1 milestone on your record.' : m.rows.length + ' milestones on your record.'),
+      h('ol', { class: 'edr-rows' }, m.rows.map((r) =>
+        h('li', { class: 'edr-course' },
+          h('div', { class: 'edr-exam-main' },
+            h('p', { class: 'edr-exam-course' }, h('strong', null, r.name || 'Milestone'), r.level ? h('span', null, ' · ' + r.level) : null),
+            h('p', { class: 'edr-muted' }, [r.how, r.date, r.grade, r.details, r.comments].filter(Boolean).join(' · ') || 'No details yet')),
+          r.complete ? tag(/^y/i.test(r.complete) ? 'Complete' : r.complete, /^y/i.test(r.complete) ? 'is-ok' : 'is-quiet') : null))));
+  }
+
+  // View Classes, By Date. `now` is passed in for tests.
+  function classesByDate(d, now) {
+    now = now || new Date();
+    const stamp = (s) => { const [y, m, dd] = s.date.split('-').map(Number); const [hh, mm] = s.start.split(':').map(Number); return new Date(y, m - 1, dd, hh, mm); };
+    const sorted = d.sessions.slice().sort((a, b) => stamp(a) - stamp(b));
+    // A class that started under an hour ago still counts as current.
+    const upcoming = sorted.filter((s) => stamp(s) > now - 3600000);
+    const past = sorted.slice(0, sorted.length - upcoming.length);
+    const next = upcoming[0];
+    const lede = next
+      ? ['Next: ', h('strong', null, next.code + ' ' + next.type), ' on ' + fmt(next.date, { weekday: 'long', day: 'numeric', month: 'long' }) + ', ' + clock(next.start),
+        next.room ? ' in ' + next.room : '', '.']
+      : 'No more classes this term.';
+    const row = (s) => h('li', { class: 'edr-exam edr-meet', 'data-when': upcoming.includes(s) ? 'later' : 'past' },
+      h('time', { class: 'edr-datebox', datetime: s.date },
+        h('span', null, fmt(s.date, { weekday: 'short' })), h('strong', null, fmt(s.date, { day: 'numeric' })), h('span', null, fmt(s.date, { month: 'short' }))),
+      h('div', { class: 'edr-exam-main' },
+        h('p', { class: 'edr-exam-course' }, code(s.code), ' ', h('span', null, s.type)),
+        s.status && !/^Enrolled$/i.test(s.status) ? h('p', { class: 'edr-muted' }, s.status) : null),
+      h('dl', { class: 'edr-facts edr-facts-2' }, fact('Starts', clock(s.start)), fact('Room', s.room || 'TBA')));
+    return view(head(d.term ? 'Classes · ' + d.term : 'Classes by date', lede, true),
+      upcoming.length ? h('ol', { class: 'edr-rows' }, upcoming.map(row)) : null,
+      past.length ? h('details', { class: 'edr-earlier' },
+        h('summary', null, 'Earlier this term (' + past.length + ')'), h('ol', { class: 'edr-rows' }, past.map(row))) : null,
+      foot('No classes on public holidays. Your instructors will tell you about any make-up classes.'));
+  }
+
+  const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  // View Classes, By Class: each course's weekly slots, with the weeks they run.
+  function classesByClass(list) {
+    const slots = list.courses.reduce((n, c) => n + c.slots.length, 0);
+    const short = (iso) => fmt(iso, { day: 'numeric', month: 'short' });
+    return view(head('Weekly classes', [h('strong', null, String(list.courses.length)), list.courses.length === 1 ? ' course, ' : ' courses, ',
+      h('strong', null, String(slots)), slots === 1 ? ' class a week.' : ' classes a week.'], true),
+      h('ol', { class: 'edr-rows' }, list.courses.map((c) =>
+        h('li', { class: 'edr-weekly' },
+          h('p', { class: 'edr-exam-course' }, code(c.code), ' ', h('span', null, c.title + (c.cut ? '…' : ''))),
+          h('ul', { class: 'edr-slots' },
+            c.slots.slice().sort((a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day) || a.start.localeCompare(b.start)).map((s) =>
+              h('li', null,
+                h('strong', null, s.day + ' ' + span(s.start, s.end)),
+                h('span', null, s.room || 'Room TBA'),
+                h('span', { class: 'edr-muted' }, (s.count === 1 ? short(s.first) : s.count + ' weeks, ' + short(s.first) + ' – ' + short(s.last))))),
+            c.tba ? h('li', null, h('span', { class: 'edr-muted' }, 'One class’s schedule is to be announced.')) : null)))),
+      foot('No classes on public holidays. Your instructors will tell you about any make-up classes.'));
+  }
+
   // ---- Dead ends and form intros ----
 
   // spec: { icon, title, body, actions: [{ label, run, primary }] }; message is
@@ -152,5 +280,5 @@
       spec.points && spec.points.length ? h('ul', { class: 'edr-task-points' }, spec.points.map((p) => h('li', null, p))) : null);
   }
 
-  EDR.views = { examSchedule, results, suHistory, deadEnd, intro };
+  EDR.views = { examSchedule, results, suHistory, programme, courses, transferCredit, milestones, classesByDate, classesByClass, deadEnd, intro };
 })();

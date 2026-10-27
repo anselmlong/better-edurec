@@ -8,6 +8,9 @@
   // the blocks it replaces), a form intro or a dead-end panel. Enhancers with a
   // snapshot save it for the Overview. PeopleSoft swaps content in place, so
   // this re-runs whenever the page changes.
+  // By Class nests a scroll area per course inside the page's own.
+  const OUTER_SCROLL = '.ps_box-scrollarea:not(.ps_box-scrollarea .ps_box-scrollarea)';
+
   const ENHANCERS = [
     {
       key: 'audit', anchor: 'My Graduation Audit Report',
@@ -41,6 +44,38 @@
       render: (d) => EDR.views.suHistory(d)
     },
     {
+      key: 'programme', anchor: '[As of Today]', snapshot: false,
+      test: (t) => t.includes('[As of Today]'),
+      parse: (t) => EDR.parsers.parseProgramme(t),
+      useful: (d) => d && d.current.length,
+      hide: ['[As of Today]', /^\[Latest Program\/Plan\/Sub-Plan changes/, /^Below table only reflect data/],
+      render: (d) => EDR.views.programme(d)
+    },
+    {
+      key: 'courses', anchor: 'Grading Basis', snapshot: false,
+      test: (t) => t.includes('Grading Basis') && t.includes('Course Code'),
+      parse: (t) => EDR.parsers.parseCourses(t),
+      useful: (d) => d && d.courses.length,
+      hide: ['Grading Basis', /^\d{4}\/\d{4} .+ \| .+ \| .+$/],
+      render: (d) => EDR.views.courses(d)
+    },
+    {
+      key: 'transfer', anchor: 'Credit Source Type', snapshot: false,
+      test: (t) => t.includes('Credit Source Type'),
+      parse: (t) => EDR.parsers.parseTransferCredit(t),
+      useful: (d) => d && d.models.length,
+      hide: ['Course Credits', 'No test credits found.'],
+      render: (d) => EDR.views.transferCredit(d)
+    },
+    {
+      key: 'milestones', anchor: 'Milestone Complete', snapshot: false,
+      test: (t) => t.includes('Milestone Complete'),
+      parse: (t) => EDR.parsers.parseMilestones(t),
+      useful: (d) => !!d,
+      hide: ['Milestone Complete'],
+      render: (d) => EDR.views.milestones(d, [openPage('View Academic Programme', 'View your programme')])
+    },
+    {
       key: 'classes', anchor: 'Class Type',
       test: (t) => t.includes('Class Type'),
       parse: (t) => EDR.parsers.parseMyClasses(t),
@@ -52,14 +87,21 @@
       test: (t) => t.includes('By Date') && /\nRoom:/.test(t),
       parse: (t) => EDR.parsers.parseSessions(t),
       useful: (d) => d && d.sessions.length,
-      render: sessionsCard
+      // The By Date list sits in one scroll area; the view goes where it was.
+      hide: [new RegExp('^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday) [A-Z][a-z]+ \\d{1,2}$'),
+        'Please note that there will be no classes on public holidays.', /^The course instructor\(s\) will advise on make up classes/],
+      block: OUTER_SCROLL,
+      render: (d) => EDR.views.classesByDate(d)
     },
     {
       key: 'slots', anchor: 'Please note that there will be no classes on public holidays.',
       test: (t) => /\nTimes: /.test(t),
       parse: (t) => EDR.parsers.parseSlots(t),
       useful: (d) => d && d.slots.length,
-      render: slotsCard
+      hide: ['Days and Times', 'Please note that there will be no classes on public holidays.', /^The course instructor\(s\) will advise on make up classes/],
+      block: OUTER_SCROLL,
+      // The view needs rooms and weeks too; the snapshot stays parseSlots' output.
+      render: (d, t) => { const list = EDR.parsers.parseClassList(t); return list ? EDR.views.classesByClass(list) : slotsCard(d); }
     },
     {
       key: 'finaid', anchor: 'FA Code',
@@ -73,6 +115,7 @@
   // ---- Dead ends and form intros (docs/research/04-page-designs.md) ----
 
   // Read-only ways out: EduRec's own page list, its term picker, its Back.
+  const selectedPage = () => { const li = document.querySelector('ul.psa_list-linkmenu li.psc_selected'); return li ? li.textContent.trim() : null; };
   const navLink = (label) => [...document.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label);
   const openPage = (label, text) => ({ label: text, run: () => { const a = navLink(label); if (a) a.click(); } });
   const changeTerm = { label: 'Choose another term', run: () => { const a = document.getElementById('DERIVED_ACRD_FL_SSR_CHANGE_TERM'); if (a) a.click(); } };
@@ -88,7 +131,13 @@
       actions: () => [openPage('View Exam Results', 'View exam results')] },
     { id: 'suclosed', anchor: 'S/U Declaration System is currently unavailable', match: /^The S\/U Declaration System is currently unavailable/, icon: 'closed',
       title: 'S/U declaration is closed', body: 'It opens during the S/U declaration period on the university timeline. Your past declarations and S/U balance are still available.',
-      actions: () => [openPage('Submit S/U Declarations', 'Back to S/U options')] }
+      actions: () => [openPage('Submit S/U Declarations', 'Back to S/U options')] },
+    { id: 'noenrol', match: 'You are not eligible to declare courses. Please contact your home Faculty/School if you need further clarification.', icon: 'closed',
+      title: 'You can’t declare courses here', body: 'EduRec says you’re not eligible to declare courses. Your home faculty or school can explain why.',
+      actions: () => [openPage('View Courses', 'View your courses')] },
+    { id: 'eponly', match: 'This letter is only for international students.', icon: 'info',
+      title: 'The EP eligibility letter is for international students', body: 'EduRec only issues this letter to international students.',
+      actions: () => [openPage('View Student Status Letter', 'Student status letter')] }
   ];
 
   // Forms: one line on what the page does and the rules that matter before acting,
@@ -100,8 +149,19 @@
     { id: 'su', when: ['Declare S/U for Academic Year'], before: 'Before you declare',
       lede: 'Declare S/U on this academic year’s eligible courses, or check past declarations and how many S/U units you have left.',
       points: ['You can change your declarations as often as you like while the exercise is open.', 'No action is needed if you don’t want to S/U anything.'] },
-    { id: 'review', when: ['Submit New Request', 'Previous Requests'], before: 'View all Request(s) Submitted',
+    // Review Exam Results and Student Requests share their wording; the selected
+    // page-list item tells them apart.
+    { id: 'review', page: 'Review Exam Results Request', when: ['Submit New Request', 'Previous Requests'], before: 'View all Request(s) Submitted',
       lede: 'Ask for an exam result to be reviewed, or check requests you’ve already made.' },
+    { id: 'requests', page: 'Student Requests', when: ['Submit New Request', 'Previous Requests'], before: 'View all Request(s) Submitted',
+      lede: 'Submit a new request, or view the requests you’ve already submitted.' },
+    { id: 'statusletter', page: 'View Student Status Letter', when: ['Select A Program'], before: 'National University of Singapore', block: '.ps_box-grid-list',
+      lede: 'Select a programme to get your student status letter.' },
+    { id: 'loa', page: 'Apply for Leave of Absence', when: ['Important Notes:'], before: 'Important Notes:',
+      lede: 'Apply for a leave of absence: read the notes below, then choose Next.',
+      points: ['Apply for semester leave by the last day of Recess Week. Short-term leave can still be applied for after that.',
+        'You pay fees for the semester if you apply after Instructional Week 2.',
+        'Applications are closed from Reading Week until exam results are released.'] },
     { id: 'transcript', when: ['View All Requested Reports', 'Report Type'], before: 'View Report',
       lede: 'Generate an unofficial transcript: choose a report type for your programme, then Submit.' },
     { id: 'suletter', when: ['View S/U Original Grade Letter'], before: 'View S/U Original Grade Letter',
@@ -120,8 +180,8 @@
   }
   for (const f of INTROS) {
     ENHANCERS.push({
-      key: 'intro-' + f.id, anchor: f.when[0], snapshot: false, place: f.before,
-      test: (t) => f.when.every((w) => t.includes(w)),
+      key: 'intro-' + f.id, anchor: f.when[0], snapshot: false, place: f.before, block: f.block,
+      test: (t) => f.when.every((w) => t.includes(w)) && (!f.page || selectedPage() === f.page),
       parse: () => ({ id: f.id }),
       useful: (x) => !!x,
       render: () => EDR.views.intro(f)
@@ -179,14 +239,14 @@
     const blocks = e.hide ? mark(e) : [];
     if (existing && rendered[e.key] === sig) { addToggle(existing, e.key, blocks); return; }
     rendered[e.key] = sig;
-    const el = e.render(data);
+    const el = e.render(data, text);
     el.id = 'edr-card-' + e.key;
     addToggle(el, e.key, blocks);
     if (existing) existing.replaceWith(el);
     else {
       el.classList.add('is-new');
-      if (blocks.length) blocks[0].before(el);
-      else place(el, e.place || e.anchor);
+      if (blocks.length) ((e.block && blocks.find((b) => b.matches(e.block))) || blocks[0]).before(el);
+      else place(el, e.place || e.anchor, e.block);
     }
     if (snapshot) EDR.store.saveSnapshot(e.key, data).then((changed) => { if (changed) markSaved(el); }).catch(() => {});
   }
@@ -198,7 +258,7 @@
     const blocks = new Set();
     for (const m of e.hide) {
       for (const node of findAll(m)) {
-        const block = node.closest('.ps_box-grid-flex') || node.closest('#alertmsg, .ps_box-htmlarea, .ps_box-longedit, .ps_box-group');
+        const block = (e.block && node.closest(e.block)) || node.closest('.ps_box-grid-flex') || node.closest('#alertmsg, .ps_box-htmlarea, .ps_box-longedit, .ps_box-group');
         if (!block || block.closest('#PT_SIDE') || block.querySelector(CONTROLS)) continue;
         blocks.add(block);
       }
@@ -220,7 +280,9 @@
 
   // A view that replaced something offers it back, once its blocks are marked.
   function addToggle(el, key, blocks) {
-    if (!blocks.length || !el.classList.contains('edr-view') || el.querySelector('.edr-orig-toggle')) return;
+    // A dead end that has no EduRec message of its own offers the grid back instead.
+    const own = el.classList.contains('edr-view') || (el.classList.contains('edr-dead') && !el.querySelector('.edr-dead-orig'));
+    if (!blocks.length || !own || el.querySelector('.edr-orig-toggle')) return;
     (el.querySelector('.edr-view-foot') || el.appendChild(h('footer', { class: 'edr-view-foot' }))).append(origToggle(key));
   }
 
@@ -237,9 +299,9 @@
   }
 
   // Inserts the card just before the block that holds the anchor text.
-  function place(el, anchorText) {
+  function place(el, anchorText, outer) {
     const anchor = findAll(anchorText)[0];
-    const block = anchor && (anchor.closest('.ps_box-group, .ps_box-grid, table') || anchor.parentElement);
+    const block = anchor && ((outer && anchor.closest(outer)) || anchor.closest('.ps_box-group, .ps_box-grid, table') || anchor.parentElement);
     if (block && block.parentElement) block.parentElement.insertBefore(el, block);
     else (document.querySelector('form.PSForm') || document.body).append(el);
   }
@@ -291,12 +353,6 @@
           h('span', { class: 'edr-muted' }, m.classes.map((k) => k.type + ' ' + k.group).join(' · '))))));
   }
 
-  function sessionsCard(d) {
-    const codes = [...new Set(d.sessions.map((s) => s.code))];
-    return cardShell('Timetable' + (d.term ? ' · ' + d.term : ''),
-      h('p', { class: 'edr-muted' }, d.sessions.length + ' class meetings across ' + codes.length + (codes.length === 1 ? ' course' : ' courses') + '. Your Overview shows this week and what’s up next.'));
-  }
-
   function slotsCard(d) {
     return cardShell('Class times' + (d.term ? ' · ' + d.term : ''),
       h('ul', { class: 'edr-chips' }, d.slots.map((s) =>
@@ -318,14 +374,26 @@
   }
 
   function start() {
-    const rerun = EDR.debounce(run, 500);
+    // boot.js holds EduRec's content back until this first pass, so a replaced
+    // grid never paints; both happen in this task, before the next paint.
+    document.documentElement.removeAttribute('data-edr-pending');
     run();
+    // Observer callbacks run before paint: a page PeopleSoft just swapped in gets
+    // its view in the same frame, and a trailing pass catches content that
+    // arrives in later batches.
+    const rerun = EDR.debounce(run, 150);
+    let last = 0;
+    const isOurs = (n) => n.nodeType === 1 && n.classList.contains('edr-root');
     new MutationObserver((records) => {
       const ours = (r) => {
         const el = r.target.nodeType === 1 ? r.target : r.target.parentElement;
-        return el && el.closest('.edr-root');
+        if (el && el.closest('.edr-root')) return true;
+        const moved = [...r.addedNodes, ...r.removedNodes];
+        return r.type === 'childList' && moved.length > 0 && moved.every(isOurs);
       };
       if (records.every(ours)) return;
+      const now = performance.now();
+      if (now - last > 250) { last = now; run(); }
       rerun();
     }).observe(document.body, { childList: true, subtree: true, characterData: true });
   }

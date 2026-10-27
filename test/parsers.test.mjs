@@ -433,3 +433,245 @@ Available S/U Balance: 4`);
   assert.equal(parseSuHistory('Course Grades'), null);
   assert.equal(parseSuHistory('Courses Declared S/U\nAvailable S/U Balance:\n12').balance, 12);
 });
+
+// ---- Academic Records (text shaped like the live pages, values invented) ----
+
+const { parseProgramme, parseCourses, parseTransferCredit, parseMilestones, parseClassList } = globalThis.EDR.parsers;
+
+const PROGRAMME = `View Academic Programme
+[As of Today]
+2 rows
+Career
+Career Nbr
+Program
+Plan Type
+Plan
+Sub-Plan
+Undergraduate
+0
+Bachelor of Examples
+Honors
+Example Studies (Hons)
+Example Systems-TRK
+Undergraduate
+0
+Bachelor of Examples
+Special Plan
+Example Residential Prog
+Below table only reflect data if you have Program/Plan/Sub-Plan changes. If you don't find the data below, please refer to 'As of Today' table for your latest details.
+[Latest Program/Plan/Sub-Plan changes as of March 02, 2026]
+1 row
+Career
+Career Nbr
+Program
+Plan Type
+Plan
+Sub-Plan
+Undergraduate
+0
+Bachelor of Examples
+Honors
+Example Studies (Hons)`;
+
+test('parseProgramme reads both grids, with and without a sub-plan', () => {
+  const p = parseProgramme(PROGRAMME);
+  assert.deepEqual(p.current, [
+    { career: 'Undergraduate', program: 'Bachelor of Examples', type: 'Honors', plan: 'Example Studies (Hons)', subplan: 'Example Systems-TRK' },
+    { career: 'Undergraduate', program: 'Bachelor of Examples', type: 'Special Plan', plan: 'Example Residential Prog', subplan: '' }]);
+  assert.equal(p.latest.asOf, 'March 02, 2026');
+  assert.equal(p.latest.rows.length, 1);
+  assert.equal(p.latest.rows[0].subplan, '');
+  assert.equal(parseProgramme('Course Grades'), null);
+});
+
+const COURSES = `2025/2026 Semester 2 | Undergraduate | NUS
+Course Grades
+Course Code
+Description
+Units
+Grading Basis
+Status
+AB2101
+EXAMPLE DESIGN AND ARCHITECTURE
+4.00
+Graded
+Enrolled
+CD1201X
+EXAMPLE LANGUAGE 1
+4.00
+Satisfactory/Unsatisfactory
+Enrolled
+EF3001
+EXAMPLE SCIENCE
+2.00
+Graded
+Drop with ‘Withdrawn (W)’ Grade`;
+
+test('parseCourses reads the term key and every course row', () => {
+  const c = parseCourses(COURSES);
+  assert.equal(c.term, '2025/2026 Semester 2');
+  assert.equal(c.career, 'Undergraduate');
+  assert.equal(c.courses.length, 3);
+  assert.deepEqual(c.courses[1], { code: 'CD1201X', title: 'Example Language 1', units: 4, basis: 'Satisfactory/Unsatisfactory', status: 'Enrolled' });
+  assert.equal(c.courses[2].status, 'Drop with ‘Withdrawn (W)’ Grade');
+  // Exam results also says "Course Grades" but has no Grading Basis column.
+  assert.equal(parseCourses(RESULTS), null);
+});
+
+const TRANSFER = `Course Credits
+Model Nbr
+1
+Posted
+Institution
+NUS
+Credit Source Type
+External
+Career
+Undergraduate
+Source Institution
+Example State University
+Program
+Bachelor of Examples
+3 rows
+Transfer Term
+Incoming Course
+Units Taken
+Grade Input
+Status
+Equivalent Subject / Catlg Nbr
+Units
+Grade
+Notes
+2025/2026 Semester 1
+EXMP 3250
+3.00
+A
+Posted
+AB 3240
+4.000
+OVS
+2025/2026 Semester 1
+EXMP 6610
+3.00
+Posted
+AB 3230
+4.000
+OVS
+Approved by department
+2025/2026 Semester 1
+EXMP 2810
+Units Taken
+3.00
+B
+Posted
+CD 5242
+4.000
+Test Credits
+No test credits found.`;
+
+test('parseTransferCredit reads the source and rows with empty cells', () => {
+  const t = parseTransferCredit(TRANSFER);
+  assert.equal(t.models.length, 1);
+  const m = t.models[0];
+  assert.equal(m.source, 'Example State University');
+  assert.equal(m.status, 'Posted');
+  assert.deepEqual(m.courses[0], { term: '2025/2026 Semester 1', incoming: 'EXMP 3250', taken: 3, gradeIn: 'A', status: 'Posted', equiv: 'AB3240', units: 4, grade: 'OVS', notes: '' });
+  assert.equal(m.courses[1].gradeIn, '');
+  assert.equal(m.courses[1].notes, 'Approved by department');
+  // A cell label shown on a narrow screen is skipped; an empty grade stays empty.
+  assert.deepEqual([m.courses[2].taken, m.courses[2].grade, m.courses[2].equiv], [3, '', 'CD5242']);
+  assert.equal(t.noTests, true);
+  assert.equal(parseTransferCredit('Course Grades'), null);
+});
+
+const MILESTONE_HEAD = 'Milestone\nMilestone Level\nMilestone Complete\nHow Completed\nDate Attempted\nMilestone Grade\nDetails\nComments\nDummy Field\n';
+
+test('parseMilestones treats a grid of bare labels as no milestones', () => {
+  const empty = parseMilestones(MILESTONE_HEAD + 'Milestone\nMilestone Level\nMilestone Complete\nHow Completed\nDate Attempted\nMilestone Grade\nDetails\nComments');
+  assert.deepEqual(empty, { rows: [] });
+  const one = parseMilestones(MILESTONE_HEAD + 'Milestone\nExample Qualifying Exam\nMilestone Level\nMilestone Complete\nYes\nHow Completed\nExamination\nDate Attempted\n12/05/2026\nMilestone Grade\nPass\nDetails\nComments');
+  assert.deepEqual(one.rows, [{ name: 'Example Qualifying Exam', complete: 'Yes', how: 'Examination', date: '12/05/2026', grade: 'Pass' }]);
+  assert.equal(parseMilestones('Milestone'), null);
+});
+
+// The live By Class page: no term line, all dates, then all times, then all rooms.
+const BY_CLASS_LIVE = `By Class
+By Date
+Please note that there will be no classes on public holidays.
+The course instructor(s) will advise on make up classes, if any.
+AB 2101   Example Designs and Architectu
+Class
+Start/End Dates
+Days and Times
+Room
+18/08/2026 - 18/08/2026
+25/08/2026 - 25/08/2026
+08/09/2026 - 08/09/2026
+Days: Tuesday
+Times: 2:00PM to 3:00PM
+Days: Tuesday
+Times: 2:00PM to 3:00PM
+Days: Tuesday
+Times: 2:00PM to 3:00PM
+ROOM-1
+ROOM-1
+ROOM-2
+13/08/2026 - 13/08/2026
+20/08/2026 - 20/08/2026
+Days: Thursday
+Times: 10:00AM to 12:00PM
+Days: Thursday
+Times: 10:00AM to 12:00PM
+HALL-1
+HALL-1
+CD 1001   Example Science
+Class
+Start/End Dates
+Days and Times
+Room
+10/08/2026 - 10/08/2026
+Days: Monday
+Times: 6:00PM to 9:00PM
+HALL-2
+03/08/2026 - 05/12/2026
+Schedule: To be Announced
+To be Announced`;
+
+test('parseClassList groups each course’s meetings into weekly slots', () => {
+  const c = parseClassList(BY_CLASS_LIVE);
+  assert.equal(c.courses.length, 2);
+  const [a, b] = c.courses;
+  assert.equal(a.code, 'AB2101');
+  assert.equal(a.cut, true);
+  assert.deepEqual(a.slots, [
+    { day: 'Tuesday', start: '14:00', end: '15:00', room: 'ROOM-1', first: '2026-08-18', last: '2026-08-25', count: 2 },
+    { day: 'Tuesday', start: '14:00', end: '15:00', room: 'ROOM-2', first: '2026-09-08', last: '2026-09-08', count: 1 },
+    { day: 'Thursday', start: '10:00', end: '12:00', room: 'HALL-1', first: '2026-08-13', last: '2026-08-20', count: 2 }]);
+  assert.equal(a.tba, false);
+  assert.equal(b.slots.length, 1);
+  assert.equal(b.tba, true);
+  assert.equal(parseClassList(BY_DATE), null);
+});
+
+test('timetable parsers keep their output on the live, term-less layouts', () => {
+  const slots = parseSlots(BY_CLASS_LIVE);
+  assert.equal(slots.term, null);
+  assert.deepEqual(slots.slots, [
+    { code: 'AB2101', day: 'Tuesday', start: '14:00', end: '15:00' },
+    { code: 'AB2101', day: 'Thursday', start: '10:00', end: '12:00' },
+    { code: 'CD1001', day: 'Monday', start: '18:00', end: '21:00' }]);
+  const s = parseSessions(`By Class
+By Date
+From
+To
+Please note that there will be no classes on public holidays.
+Monday August 10
+6:00PM
+CD 1001 Lecture
+Room: HALL-2
+Status: Enrolled`);
+  assert.equal(s.term, null);
+  assert.equal(s.sessions.length, 1);
+  assert.deepEqual(Object.keys(s.sessions[0]), ['date', 'start', 'code', 'type', 'room', 'status']);
+  assert.equal(s.sessions[0].code, 'CD1001');
+});
