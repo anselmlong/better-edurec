@@ -965,11 +965,11 @@ html[data-edr-on] .edr-orig.is-shown { margin-top: 16px !important; }
 .edr-lede-num { font-size: 28px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 .edr-view-foot { padding: 14px var(--edr-inset) 16px; border-top: 1px solid var(--edr-line); display: flex; flex-direction: column; gap: 4px; }
 .edr-view-foot p { margin: 0; max-width: 72ch; font-size: 13px; line-height: 1.5; color: var(--edr-muted); }
-.edr-orig-toggle {
+.edr-orig-toggle, .edr-reveal {
   align-self: flex-start; min-height: 32px; margin-top: 4px; padding: 0; border: 0; background: none; cursor: pointer;
   font: 600 13px var(--edr-font); color: var(--edr-blue);
 }
-.edr-orig-toggle:hover { text-decoration: underline; text-underline-offset: 2px; }
+.edr-orig-toggle:hover, .edr-reveal:hover { text-decoration: underline; text-underline-offset: 2px; }
 
 /* Rows: aligned columns when the view is wide, stacked under 600px of its own width. */
 .edr-rows { list-style: none; margin: 0; padding: 0; }

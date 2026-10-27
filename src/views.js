@@ -270,7 +270,7 @@
   function masked(number) {
     const hidden = number.slice(0, 1) + '•'.repeat(Math.max(0, number.length - 5)) + number.slice(-4);
     const text = h('span', { class: 'edr-mono' }, hidden);
-    const toggle = h('button', { type: 'button', class: 'edr-orig-toggle edr-reveal', 'aria-pressed': 'false' }, 'Show');
+    const toggle = h('button', { type: 'button', class: 'edr-reveal', 'aria-pressed': 'false' }, 'Show');
     toggle.addEventListener('click', () => {
       const on = toggle.getAttribute('aria-pressed') !== 'true';
       text.textContent = on ? number : hidden;
