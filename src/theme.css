@@ -205,6 +205,8 @@ html[data-edr-on] .ps_apps_content .ps_box-grid-list { padding: 0 !important; }
 html[data-edr-on] .ps_box-grid-list,
 html[data-edr-on] .ps_box-grid-list .ps_box-grid,
 html[data-edr-on] .ps_box-grid-list .ps_grid-list { background: transparent !important; border: 0 !important; box-shadow: none !important; max-height: none !important; }
+/* A list's header bar is empty; painted, it reads as a white strip over the cards. */
+html[data-edr-on] .ps_box-grid-list > .ps_box-grid-header { background: transparent !important; padding: 0 !important; }
 html[data-edr-on] .ps_box-grid-list ul.ps_grid-body {
   display: grid !important; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;
   padding: 0 !important; margin: 0 !important; background: transparent !important;
@@ -921,16 +923,19 @@ html[data-edr-on] :is(.PSINACTIVETAB, .PSTABINACTIVE) { background: var(--edr-su
 .edr-coach-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .edr-coach-actions:empty { display: none; }
 .edr-coach.is-done .edr-coach-title { color: var(--edr-selected-ink); }
-/* The thing to click next: a steady accent border on its row or card, with a
-   small label. EduRec's own element, so overrides need !important. */
+/* The thing to click next: an accent border and tint drawn inside its row or
+   card, with a small label in its bottom corner (titles run along the top). Nothing sits outside the element,
+   because EduRec's list and grid containers clip overflow. EduRec's own
+   element, so overrides need !important. */
 html[data-edr-on] body .edr-coach-target.edr-coach-target.edr-coach-target {
-  position: relative !important; overflow: visible !important;
+  position: relative !important;
   border-color: var(--edr-blue) !important;
-  box-shadow: 0 0 0 1px var(--edr-blue), 0 0 0 5px color-mix(in srgb, var(--edr-blue) 14%, transparent) !important;
-  transition: box-shadow 200ms ease, border-color 200ms ease;
+  box-shadow: inset 0 0 0 1px var(--edr-blue) !important;
+  background-color: color-mix(in srgb, var(--edr-blue) 6%, var(--edr-surface)) !important;
+  transition: box-shadow 200ms ease, border-color 200ms ease, background-color 200ms ease;
 }
 html[data-edr-on] body .edr-coach-target.edr-coach-target[data-edr-hint]::after {
-  content: attr(data-edr-hint); position: absolute; top: -10px; right: 12px; z-index: 2; pointer-events: none;
+  content: attr(data-edr-hint); position: absolute; bottom: 8px; right: 8px; z-index: 2; pointer-events: none;
   padding: 2px 8px; border-radius: 999px; background: var(--edr-blue); color: #fff;
   font: 600 11px/16px var(--edr-font); letter-spacing: .01em; white-space: nowrap;
   animation: edr-pop 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
