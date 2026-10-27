@@ -378,11 +378,13 @@
     // grid never paints; both happen in this task, before the next paint.
     document.documentElement.removeAttribute('data-edr-pending');
     run();
-    // Observer callbacks run before paint: a page PeopleSoft just swapped in gets
-    // its view in the same frame, and a trailing pass catches content that
-    // arrives in later batches.
+    // One pass per frame, in requestAnimationFrame: it runs after every change
+    // in that frame and before the frame paints, so content PeopleSoft swaps in
+    // never shows before its view. The trailing pass covers background tabs,
+    // where frames don't run.
+    let frame = 0;
+    const soon = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; run(); }); };
     const rerun = EDR.debounce(run, 150);
-    let last = 0;
     const isOurs = (n) => n.nodeType === 1 && n.classList.contains('edr-root');
     new MutationObserver((records) => {
       const ours = (r) => {
@@ -392,8 +394,7 @@
         return r.type === 'childList' && moved.length > 0 && moved.every(isOurs);
       };
       if (records.every(ours)) return;
-      const now = performance.now();
-      if (now - last > 250) { last = now; run(); }
+      soon();
       rerun();
     }).observe(document.body, { childList: true, subtree: true, characterData: true });
   }
