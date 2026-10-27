@@ -10,6 +10,9 @@
     "https://myedurec.nus.edu.sg/*",
     "https://api.nusmods.com/*"
   ],
+  "background": {
+    "service_worker": "dev/reload.js"
+  },
   "action": {
     "default_title": "Better EduRec",
     "default_popup": "popup/popup.html",
