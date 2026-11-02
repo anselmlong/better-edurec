@@ -212,11 +212,13 @@
   const pageLink = (text, label) => { const a = [...document.querySelectorAll('#PT_MAIN a')].find((x) => x.textContent.trim() === text); return a ? { label, run: () => a.click() } : null; };
   const changeTerm = { label: 'Choose another term', run: () => { const a = document.getElementById('DERIVED_ACRD_FL_SSR_CHANGE_TERM'); if (a) a.click(); } };
   const openTile = (id, label) => ({ label, run: () => { top.location.href = EDR.routes.byId[id].path; } });
+  const openTimetable = { label: 'View your timetable', run: () => { top.location.href = EDR.routes.shortcutHref(EDR.routes.TIMETABLE_LINK); } };
 
   // match: EduRec's message (exact text or a pattern for its first line); anchor:
   // a plain substring of it, for the cheap page gate. when: other lines the page must
   // have, for a generic message. into: the box the panel goes in, when EduRec's message
-  // sits outside the page content.
+  // sits outside the page content. lines: how many lines the message spans, when EduRec
+  // splits it across bold text and links. hide: more of EduRec's text the panel replaces.
   const DEAD_ENDS = [
     { id: 'noexams', match: 'An exam schedule is not available for this term.', icon: 'calendar',
       title: 'No exam schedule for this term', body: 'EduRec has no exams listed for this term. Pick another term to see its schedule.',
@@ -246,7 +248,26 @@
     // Manage Student Financials: EduRec's generic error, in the side panel, with an empty page beside it.
     { id: 'finerror', match: 'An error has occurred that has stopped this transaction from continuing.', when: ['Financials'], into: '#PT_MAIN .ps_ag-targetcontent', icon: 'closed',
       title: 'Student financials didn’t open', body: 'EduRec stopped with an error before showing your bills and payments. Try again later; your financial aid disbursements still open.',
-      actions: () => [openTile('finances', 'Try again'), openTile('finaid', 'Financial aid')] }
+      actions: () => [openTile('finances', 'Try again'), openTile('finaid', 'Financial aid')] },
+    // Course registration outside its rounds: every page is a message.
+    { id: 'aboutcoursereg', anchor: 'Course Registration at Education Records System', match: /^Course Registration at Education Records System \(CourseReg@EduRec\)/, hide: ['CourseReg@EduRec'], icon: 'info',
+      title: 'How course registration works', body: 'CourseReg allocates courses by rules and priority: your curricular needs first, then your seniority in the programme, then your preferences. The schedule, guides and contacts are on the CourseReg website.',
+      actions: () => [pageLink('CourseReg Website', 'CourseReg website'), openPage('Select Courses', 'Select courses')].filter(Boolean) },
+    { id: 'courseregclosed', match: 'CourseReg is currently not available.', lines: 3, icon: 'closed',
+      title: 'Course registration is closed right now', body: 'Pages here open during each CourseReg round. The schedule of rounds is on the CourseReg website.',
+      actions: () => [pageLink('http://www.nus.edu.sg/CourseReg', 'CourseReg schedule'), openTimetable].filter(Boolean) },
+    { id: 'coursesout', match: 'Results of the', when: ['has been released at'], lines: 4, icon: 'calendar',
+      title: 'Course allocation results are out', body: 'The latest Select Courses round has been released. Your allocated courses show in your timetable.',
+      actions: () => [openTimetable] },
+    { id: 'tutorialsout', match: 'The outcome of', when: ['had been release'], lines: 5, icon: 'calendar',
+      title: 'Tutorial and lab results are out', body: 'The latest Select Tutorials/Labs round has been released. Your allocated classes show in your timetable.',
+      actions: () => [openTimetable] },
+    { id: 'gdonly', match: 'This function is not applicable to Undergraduate students.', icon: 'info',
+      title: 'Course requests are for graduate students', body: 'Undergraduates choose courses in Select Courses during each CourseReg round.',
+      actions: () => [openPage('Select Courses', 'Select courses')] },
+    { id: 'appeals', match: 'Students who have yet to secure', lines: 5, icon: 'info',
+      title: 'Ask the course host for a place', body: 'If you still need a full workload or a tutorial or lab, contact the department that hosts the course. Their contacts are on the CourseReg website’s Contact Us page.',
+      actions: () => [pageLink('Contact Us', 'Contact Us page')].filter(Boolean) }
   ];
 
   // Forms: one line on what the page does and the rules that matter before acting,
@@ -299,9 +320,9 @@
     ENHANCERS.push({
       key: 'dead-' + d.id, anchor: d.anchor || d.match, snapshot: false, block: d.block, into: d.into,
       test: (t) => t.split('\n').some((l) => matches(l.trim(), d.match)) && (d.when || []).every((w) => t.split('\n').some((l) => l.trim() === w)),
-      parse: (t) => ({ message: t.split('\n').map((l) => l.trim()).find((l) => matches(l, d.match)) }),
+      parse: (t) => { const ls = t.split('\n').map((l) => l.trim()).filter(Boolean); const i = ls.findIndex((l) => matches(l, d.match)); return { message: i < 0 ? null : ls.slice(i, i + (d.lines || 1)).join(' ') }; },
       useful: (x) => x && x.message,
-      hide: [d.match],
+      hide: [d.match].concat(d.hide || []),
       render: (x) => EDR.views.deadEnd({ ...d, actions: d.actions() }, x.message)
     });
   }

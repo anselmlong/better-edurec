@@ -341,6 +341,18 @@
   const cgrid = (label, cols, rows) => '<table class="PSLEVEL1GRIDWBO"><tr><td class="PSLEVEL1GRIDLABEL">' + label + '</td></tr><tr><td><table class="PSLEVEL1GRID"><tr>'
     + cols.map((c) => '<th class="PSLEVEL1GRIDCOLUMNHDR"><a>' + c + '</a></th>').join('') + '</tr>'
     + rows.map((r) => '<tr>' + r.map((c) => '<td class="PSLEVEL1GRIDODDROW">' + c + '</td>').join('') + '</tr>').join('') + '</table></td></tr></table>';
+  // Course registration (crawled 3 Nov 2026, outside a round; dates invented). Each page is one HTML area.
+  const CR_NAV = ['About CourseReg@EduRec', 'View My Classes@CourseReg', 'Select Courses', 'Submit Course Requests', 'Select Tutorials/Labs', 'Add/Swap Tutorials/Labs', 'Drop Classes', 'Submit Appeals/Inquiries'];
+  const cr = (sel, inner) => ({ url: '/psc/cs90prd_33/EMPLOYEE/SA/c/N_STUDENT_RECORDS.N_MRS_START_MD_FL.GBL?Action=U&MD=Y&GComp=N_MRS_START_NAV_FL', nav: CR_NAV, sel,
+    html: group('<div class="ps_box-htmlarea"><div class="ps-htmlarea">' + inner + '</div></div>', 'psc_layout psc_label-none') });
+  PAGES.aboutcoursereg = cr('About CourseReg@EduRec', '<p><u><b>CourseReg@EduRec</b></u></p><p>Course Registration at Education Records System (CourseReg@EduRec) is the University’s consolidated course registration platform for all NUS students belonging to the following categories:</p>'
+    + '<p>-   Undergraduate* (UG)</p><p>-   Graduate (GD)</p><p>CourseReg@EduRec employs a rules-driven, priority-based engine to allocate courses based on each student’s:</p><p>-   Curricular needs;</p><p>-   course preferences</p>'
+    + '<p>Visit <a href="#" target="_blank">CourseReg Website</a> for more information related to CourseReg.</p>');
+  PAGES.courseregclosed = cr('Drop Classes', '<b><p>CourseReg is currently not available.</p><p>For details of the CourseReg schedule, please refer to <a href="#" target="_blank">http://www.nus.edu.sg/CourseReg</a></p></b>');
+  PAGES.coursesout = cr('Select Courses', '<p><span>Results of the </span><b>Select Courses (Round 2)</b><span> has been released at </span><b>9AM, 2 Feb 2027.</b></p><p>Please visit CourseReg@EduRec via myEduRec > Academics > Course Registration > "View My Classes".</p>');
+  PAGES.tutorialsout = cr('Select Tutorials/Labs', '<p><span>The outcome of </span><b>Select Tutorials/Labs (Round 1)</b><span> had been release </span><span>at </span><b>9AM, 9 Feb 2027.</b></p><p>Please visit CourseReg@EduRec via myEduRec > Academics > Course Registration > "View My Classes".</p>');
+  PAGES.gdonly = cr('Submit Course Requests', '<p>This function is not applicable to Undergraduate students.</p>');
+  PAGES.appeals = cr('Submit Appeals/Inquiries', '<p><span>Students who have yet to secure </span><strong>full workload or required tutorials/labs for Semester 2, AY2026/2027</strong><span> may contact the course hosts directly for assistance by referring to </span><a href="#" target="_blank"><span>Contact Us</span></a><span> page from CourseReg website.</span></p>');
   // Financials (crawled 3 Nov 2026): Manage Student Financials fails with EduRec's generic error in the side panel.
   PAGES.finerror = { url: '/psc/cs90prd_54/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_SF_MD_STD_FIN_FL.GBL?GComp=N_SF_SS_STD_FIN_FL', title: 'Financials',
     side: '<div class="ps_box-grouplet">An error has occurred that has stopped this transaction from continuing.</div>',

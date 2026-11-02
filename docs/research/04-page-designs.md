@@ -142,3 +142,16 @@ Classic pages inside an iframe, with the page list in the parent page.
 |---|---|---|
 | Manage Student Financials | dead end | EduRec's generic error sits in the side panel, with an empty page beside it. Panel in the page area: "Student financials didn’t open": EduRec stopped with an error before showing bills and payments; try again later, and financial aid still opens. Actions: Try again (opens the tile again), Financial aid. Gated on the page's "Financials" title, since the error text is generic. |
 | View Financial Aid Disbursed | data | Existing financial aid card (total disbursed, count, latest, scholarship), unchanged. The Term From and Term To columns now size to their content, so the dropdown no longer runs into the Term To label. |
+
+## Course registration
+
+Outside a CourseReg round, every page is one message in an HTML area. Each becomes a panel; EduRec's message stays one click away. The forms used during a round have not been seen and are left alone.
+
+| Sub-page | Type | Design |
+|---|---|---|
+| About CourseReg@EduRec | info | "How course registration works": allocation by curricular needs, then seniority, then preferences; schedule, guides and contacts are on the CourseReg website. Actions: CourseReg website (EduRec's link), Select courses. |
+| View My Classes@CourseReg, Add/Swap Tutorials/Labs, Drop Classes (closed) | dead end | "Course registration is closed right now": pages open during each round; the schedule is on the CourseReg website. Actions: CourseReg schedule (EduRec's link), View your timetable. |
+| Select Courses (results released) | dead end | "Course allocation results are out": allocated courses show in your timetable. Action: View your timetable. |
+| Select Tutorials/Labs (results released) | dead end | "Tutorial and lab results are out", the same way. |
+| Submit Course Requests (undergraduate) | dead end | "Course requests are for graduate students": undergraduates use Select Courses. Action: Select courses. |
+| Submit Appeals/Inquiries | dead end | "Ask the course host for a place": contact the department hosting the course; contacts on the CourseReg website's Contact Us page. Action: Contact Us page (EduRec's link). |
