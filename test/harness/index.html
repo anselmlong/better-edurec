@@ -290,6 +290,21 @@
     + group('<a class="ps-link" href="#">Important Notes:</a><ul><li>Your updated citizenship or residency status will appear in the “Demographic Information” page within 3 working days.</li></ul>', 'psc_collapsible')
     + group(label('Student ID', 'A0000000X') + label('Official Name', 'EXAMPLE STUDENT NAME') + label('Gender', 'Female'))
     + group('<div class="ps_box-button"><a class="ps-button" href="#">Reset</a></div><div class="ps_box-button"><a class="ps-button" href="#">Save</a></div>'));
+  // Degree Progress: classic (non-Fluid) pages, tables throughout (crawled 3 Nov 2026, values invented).
+  const DEG_NAV = ['Information', 'View Graduation Audit Report', 'View What-if Report', 'Apply for Graduation (AFG)', 'View Graduation Status'];
+  const classic = (sel, title, body) => ({ url: PAGES.audit.url, nav: DEG_NAV, sel, html: '<table class="PABACKGROUNDINVISIBLE"><tr><td><div><span class="PALEVEL0PRIMARY">EXAMPLE STUDENT</span></div>'
+    + '<div><span class="PATRANSACTIONTITLE">' + title + '</span></div></td></tr></table>' + body });
+  const tbl = (inner, cls) => '<table' + (cls ? ' class="' + cls + '"' : '') + '><tr><td>' + inner + '</td></tr></table>';
+  const infoMsg = (...lines) => tbl(lines.map((l) => '<div><span class="PSTEXT">' + l + '</span></div>').join(''), 'SSSMSGINFOFRAME');
+  PAGES.whatif = classic('View What-if Report', 'What-If Report', tbl('<span class="PAPAGETITLE">What-if Report Selection</span>')
+    + tbl('<span class="PSLONGEDITBOX"><span>‘My What-If Report’</span> allows you to <u>simulate various</u> what-if scenarios with different set of academic program, major, second major or minor that you may be planning to take.'
+      + '<br><br>Click the Create New Report button to set up your what-if scenario.</span>')
+    + tbl('<a class="SSSBUTTON_CONFIRMLINK" href="#">Create New Report</a>')
+    + '<table class="PSLEVEL1GRIDNBO"><tr><td class="PSLEVEL2GRIDLABEL">View a Saved What-if Report</td></tr><tr><td><span>Requested on</span> <a class="PSHYPERLINK" href="#">14/05/2026</a></td></tr></table>');
+  PAGES.whatifreport = classic('View What-if Report', 'What-If Report', PAGES.audit.lines.slice(2).map((l) => '<div>' + l + '</div>').join('')
+    .replace('<div>Graduation check outcome:</div>', '<div>What-If Statistics</div><div>Graduation check outcome:</div>'));
+  PAGES.afgclosed = classic('Apply for Graduation (AFG)', 'Apply for Graduation', infoMsg('Apply for Graduation is closed.', 'Please refer to the schedule in MyPortal@NUS.'));
+  PAGES.nograd = classic('View Graduation Status', 'View Graduation Status', infoMsg('Apply for Graduation application is withdrawn and/or not found. If you have submitted and did not withdraw your graduation application, please approach for your program/subject advisor at the Faculty/School for assistance.'));
   const key = new URLSearchParams(location.search).get('page') || 'home';
   const page = PAGES[key];
 

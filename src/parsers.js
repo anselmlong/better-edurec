@@ -17,7 +17,8 @@
   // lines, each labelled by the "Not Satisfied: <rule>" line above it.
   function parseAudit(text) {
     const ls = lines(text);
-    if (!ls.some((l) => /graduation audit report/i.test(l))) return null;
+    // A saved what-if report has the audit's layout under a "What-If Report" heading.
+    if (!ls.some((l) => /graduation audit report|^what-if report$/i.test(l))) return null;
     const outcomeM = /Graduation check outcome:?\s*(Not Satisfied|Satisfied)/i.exec(flat(text));
     const reqs = [];
     for (let i = 0; i < ls.length; i++) {

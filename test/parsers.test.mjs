@@ -40,6 +40,17 @@ test('parseAudit ignores pages that are not the audit', () => {
   assert.equal(parseAudit('Some other page\nUnits: 4.00 required, 0.00 taken, 4.00 needed'), null);
 });
 
+test('parseAudit reads a saved what-if report', () => {
+  const a = parseAudit(AUDIT.replace('My Graduation Audit Report', 'What-If Report\nWhat-If Statistics'));
+  assert.equal(a.outcome, 'Not Satisfied');
+  assert.deepEqual(a.overall, { required: 160, taken: 148, needed: 12 });
+});
+
+test('parseAudit finds no totals on the what-if selection page', () => {
+  const a = parseAudit('What-If Report\nWhat-if Report Selection\n‘My Graduation Audit Report’\nallows you to track your study progress\nCreate New Report');
+  assert.equal(a.overall, null);
+});
+
 const RESULTS = `
 2024/2025 Semester 1
 National University of Singapore

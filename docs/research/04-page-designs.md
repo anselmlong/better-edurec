@@ -102,3 +102,16 @@ These grids are where students edit their details: every row opens EduRec's edit
 | Emergency Contacts | data | Lede: how many contacts. Rows: name, phone, Edit; Add contact in the section head. |
 | Payment Address | data | Lede: the address in one line. Same rows as Addresses, with Add payment address. |
 | MyInfo Demographic Information | form | Intro: copy Singpass changes into EduRec (tick the box, then Retrieve MyInfo with Singpass). Points: a new citizenship or residency status shows within 3 working days if submitted before Instructional Week 3; a changed official name needs the preferred name updated under Names. The checkbox, fields, Reset and Save stay EduRec's. |
+
+## Degree Progress
+
+Every sub-page here is a classic (non-Fluid) PeopleSoft page inside an iframe, with the page list in the parent page. Dead-end actions open sub-pages through that parent page list. EduRec's messages sit in an info-frame table, which the dead-end panel replaces.
+
+| Sub-page | Type | Design |
+|---|---|---|
+| Information | — | Four one-line descriptions of the sub-pages; already short, left as it is. |
+| View Graduation Audit Report | data | Existing graduation progress card (units taken of required, outcome tag, a bar per unmet requirement), saved for the Overview. |
+| View What-if Report | form | Intro: see how your courses would count under a different programme, major, second major or minor; choose Create New Report or open a saved report. Point: a what-if report is a simulation, while the audit shows actual progress. Create New Report and the saved-report links stay EduRec's. |
+| Saved what-if report | data | The same card titled "What-if progress", with a line saying it is a simulation. Not saved for the Overview, so it never replaces the real audit. |
+| Apply for Graduation (AFG), closed | dead end | "Applying for graduation is closed": it opens during the application period (schedule on MyPortal@NUS). Actions: View graduation audit report, Graduation status. |
+| View Graduation Status, nothing found | dead end | After a term is picked: "No graduation application for this term": none was found or it was withdrawn; the programme or subject advisor can help. Actions: Choose another term (reopens the term picker), Apply for graduation. |

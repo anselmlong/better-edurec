@@ -17,7 +17,15 @@
       test: (t) => t.includes('My Graduation Audit Report'),
       parse: (t) => EDR.parsers.parseAudit(t),
       useful: (d) => d && d.overall,
-      render: auditCard
+      render: (d) => auditCard(d)
+    },
+    {
+      // A saved what-if report: a simulation, so nothing is saved for the Overview.
+      key: 'whatif', anchor: 'What-If Report', snapshot: false,
+      test: (t) => t.includes('What-If Statistics') && t.includes('Graduation check outcome'),
+      parse: (t) => EDR.parsers.parseAudit(t),
+      useful: (d) => d && d.overall,
+      render: (d) => auditCard(d, 'What-if progress', 'A simulation from your what-if scenario. Your graduation audit report shows your actual progress.')
     },
     {
       key: 'results', anchor: 'Course Grades',
@@ -162,7 +170,9 @@
 
   // Read-only ways out: EduRec's own page list, its term picker, its Back.
   const selectedPage = () => { const li = document.querySelector('ul.psa_list-linkmenu li.psc_selected'); return li ? li.textContent.trim() : null; };
-  const navLink = (label) => [...document.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label);
+  // Classic pages (Degree Progress) run in an iframe; their page list is in the parent page.
+  const navDocs = () => { try { return window.parent === window ? [document] : [document, window.parent.document]; } catch (e) { return [document]; } };
+  const navLink = (label) => navDocs().map((d) => [...d.querySelectorAll('ul.psa_list-linkmenu a')].find((a) => a.textContent.trim() === label)).find(Boolean);
   const openPage = (label, text) => ({ label: text, run: () => { const a = navLink(label); if (a) a.click(); } });
   // Personal Info's Edit and Add: the click goes to EduRec's own row or button,
   // found when it's pressed (PeopleSoft replaces them on every postback).
@@ -199,7 +209,14 @@
       actions: () => [openPage('View Courses', 'View your courses')] },
     { id: 'eponly', match: 'This letter is only for international students.', icon: 'info',
       title: 'The EP eligibility letter is for international students', body: 'EduRec only issues this letter to international students.',
-      actions: () => [openPage('View Student Status Letter', 'Student status letter')] }
+      actions: () => [openPage('View Student Status Letter', 'Student status letter')] },
+    // Degree Progress: classic pages, whose messages sit in an info-frame table.
+    { id: 'afgclosed', match: 'Apply for Graduation is closed.', block: 'table.SSSMSGINFOFRAME', icon: 'closed',
+      title: 'Applying for graduation is closed', body: 'It opens during the application period; the schedule is on MyPortal@NUS. Your graduation audit report shows what you still need.',
+      actions: () => [openPage('View Graduation Audit Report', 'View graduation audit report'), openPage('View Graduation Status', 'Graduation status')] },
+    { id: 'nograd', anchor: 'Apply for Graduation application is withdrawn', match: /^Apply for Graduation application is withdrawn and\/or not found\./, block: 'table.SSSMSGINFOFRAME', icon: 'info',
+      title: 'No graduation application for this term', body: 'EduRec found no application, or it was withdrawn. If you applied and didn’t withdraw, your programme or subject advisor at your faculty or school can help.',
+      actions: () => [openPage('View Graduation Status', 'Choose another term'), openPage('Apply for Graduation (AFG)', 'Apply for graduation')] }
   ];
 
   // Forms: one line on what the page does and the rules that matter before acting,
@@ -228,6 +245,9 @@
       lede: 'Copy changes you made through Singpass, such as a new citizenship or mailing address, into EduRec: tick the box, then choose Retrieve MyInfo with Singpass.',
       points: ['A new citizenship or residency status shows on Demographic Information within 3 working days if you submit before Instructional Week 3; otherwise from next semester.',
         'Changed your official name? Update your preferred name under Names too, so Outlook and Canvas show it.'] },
+    { id: 'whatif', when: ['What-if Report Selection', 'Create New Report'], before: '‘My What-If Report’',
+      lede: 'See how your courses would count under a different programme, major, second major or minor: choose Create New Report, or open a saved report below.',
+      points: ['A what-if report is a simulation. Your graduation audit report shows your actual progress.'] },
     { id: 'transcript', when: ['View All Requested Reports', 'Report Type'], before: 'View Report',
       lede: 'Generate an unofficial transcript: choose a report type for your programme, then Submit.' },
     { id: 'suletter', when: ['View S/U Original Grade Letter'], before: 'View S/U Original Grade Letter',
@@ -236,7 +256,7 @@
 
   for (const d of DEAD_ENDS) {
     ENHANCERS.push({
-      key: 'dead-' + d.id, anchor: d.anchor || d.match, snapshot: false,
+      key: 'dead-' + d.id, anchor: d.anchor || d.match, snapshot: false, block: d.block,
       test: (t) => t.split('\n').some((l) => matches(l.trim(), d.match)),
       parse: (t) => ({ message: t.split('\n').map((l) => l.trim()).find((l) => matches(l, d.match)) }),
       useful: (x) => x && x.message,
@@ -396,9 +416,10 @@
       ...body);
   }
 
-  function auditCard(a) {
+  function auditCard(a, title, note) {
     const { required, taken, needed } = a.overall;
-    return cardShell('Graduation progress',
+    return cardShell(title || 'Graduation progress',
+      note ? h('p', { class: 'edr-muted' }, note) : null,
       h('div', { class: 'edr-row' },
         h('p', { class: 'edr-big' }, String(taken), h('span', { class: 'edr-big-unit' }, 'of ' + required + ' units')),
         a.outcome ? h('span', { class: 'edr-tag ' + (a.outcome === 'Satisfied' ? 'is-ok' : 'is-warn') }, a.outcome) : null),
