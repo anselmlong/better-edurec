@@ -381,6 +381,20 @@
       })) }]);
   }
 
+  // ---- Global Education ----
+
+  function exchangeApps(d) {
+    const latest = d.apps[0];
+    return records('Exchange applications',
+      latest ? (d.apps.length === 1 ? '1 application' : d.apps.length + ' applications') + '. ' + latest.name + ': ' + latest.status.toLowerCase() + '.' : 'No exchange applications.',
+      [{ items: d.apps.map((a) => ({
+        main: a.name,
+        sub: [a.type, a.year + ', ' + a.period, 'Applied ' + a.applied, a.aid ? 'Applied for financial aid' : null].filter(Boolean).join(' · '),
+        tag: [a.status, /accepted|approved|nominated|confirmed/i.test(a.status) ? 'is-ok' : /rejected|withdrawn|cancel/i.test(a.status) ? 'is-quiet' : 'is-warn']
+      })) }],
+      'Rank, Possible Actions and Withdrawal stay in EduRec’s table below.');
+  }
+
   // ---- Dead ends and form intros ----
 
   // spec: { icon, title, body, actions: [{ label, run, primary }] }; message is
@@ -402,5 +416,5 @@
   }
 
   EDR.views = { examSchedule, results, suHistory, programme, courses, transferCredit, milestones, classesByDate, classesByClass,
-    demographic, names, contact, addresses, emergency, transcriptApps, deadEnd, intro };
+    demographic, names, contact, addresses, emergency, transcriptApps, exchangeApps, deadEnd, intro };
 })();

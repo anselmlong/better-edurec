@@ -56,6 +56,16 @@ test('parseTranscriptApps reads each official transcript application', () => {
   assert.equal(parseTranscriptApps('Apply Official Transcript\nNext'), null);
 });
 
+test('parseExchangeApps reads application rows and leaves out the application ID', () => {
+  const { parseExchangeApps } = globalThis.EDR.parsers;
+  const t = 'Global Education\nMy External Study Program Applications\nFind\n1 of 1\nRank\nExt. Study AY\nApplication ID\nExt. Study Type\nExt. Study\nStudy Period\nApplied On\n'
+    + 'Application Status\nApplied for Financial Aid?\nRequired Actions\nPossible Actions 1\nPossible Actions 2\nWithdrawal\n1\n2026/2027\nP00001-00001-X0000000X\nStudent Exchange\n'
+    + 'Example Faculty SEP Application 2026/2027\nNUS Sem 2\n3-Oct-2025\nExt Study Accepted by Host\nY\nNA\nNA\nNA\nMy Financial Aid Application\nFA Application ID\nExt. Study Academic Year\n2026/2027';
+  assert.deepEqual(parseExchangeApps(t).apps, [{ year: '2026/2027', type: 'Student Exchange', name: 'Example Faculty SEP Application 2026/2027',
+    period: 'NUS Sem 2', applied: '3 Oct 2025', status: 'Ext Study Accepted by Host', aid: true }]);
+  assert.equal(parseExchangeApps('Search Course Mappings'), null);
+});
+
 test('parseAudit reads a saved what-if report', () => {
   const a = parseAudit(AUDIT.replace('My Graduation Audit Report', 'What-If Report\nWhat-If Statistics'));
   assert.equal(a.outcome, 'Not Satisfied');

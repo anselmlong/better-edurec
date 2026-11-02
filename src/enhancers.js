@@ -139,6 +139,15 @@
       render: (d) => EDR.views.transcriptApps(d)
     },
     {
+      // Exchange applications. EduRec's grid holds the Rank dropdown and action
+      // links, so it stays; the summary goes above it.
+      key: 'exchange', anchor: 'My External Study Program Applications', snapshot: false, block: 'table.PSLEVEL1GRIDWBO',
+      test: (t) => t.includes('My External Study Program Applications'),
+      parse: (t) => EDR.parsers.parseExchangeApps(t),
+      useful: (d) => d && d.apps.length,
+      render: (d) => EDR.views.exchangeApps(d)
+    },
+    {
       key: 'classes', anchor: 'Class Type',
       test: (t) => t.includes('Class Type'),
       parse: (t) => EDR.parsers.parseMyClasses(t),
@@ -270,6 +279,9 @@
       points: ['Payment is non-refundable, and a hold on your record stops the transcript. Processing takes up to 4 working days.',
         'Graduating students get a complimentary official transcript after conferment, so there’s no need to apply for one.',
         'This semester’s grades appear on transcripts from the 11th calendar day after results are released.'] },
+    { id: 'mappings', when: ['Partner University to NUS Course Mappings', 'For specific search'], before: /^For specific search, please provide the search parameters/,
+      lede: 'See how partner university courses map to NUS courses: choose a faculty and a partner university with the lookup buttons, then Fetch Mappings.',
+      points: ['Typed values must match EduRec’s list exactly, so pick them from the lookups.'] },
     { id: 'transcript', when: ['View All Requested Reports', 'Report Type'], before: 'View Report',
       lede: 'Generate an unofficial transcript: choose a report type for your programme, then Submit.' },
     { id: 'suletter', when: ['View S/U Original Grade Letter'], before: 'View S/U Original Grade Letter',

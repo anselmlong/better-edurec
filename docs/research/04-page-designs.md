@@ -125,3 +125,13 @@ Every sub-page here is a classic (non-Fluid) PeopleSoft page inside an iframe, w
 | Apply Official Transcript | form | Intro: hardcopy or verifiable PDF at $5 each before GST; read the notes, then Next. Points: payment is non-refundable and a hold stops the transcript, up to 4 working days; graduating students get a complimentary transcript after conferment; this semester's grades show from the 11th calendar day after results. |
 | Check Application Status | data | Lede: how many applications, and the latest one's type and status. One row per application: type, then submitted date, requested items, any unpaid payment status, delivery or collection details and the application ID; status as a tag (Completed ok, others attention). The student's own phone and email lines are left out. |
 | View Student Life Transcript | dead end | "Student life transcripts have moved to NUSync": CCA records are on NUSync, and problems go to EduRec's NUSync address. Actions: Open NUSync (EduRec's own link), Unofficial transcript. |
+
+## Global Education
+
+Classic pages inside an iframe, with the page list in the parent page.
+
+| Sub-page | Type | Design |
+|---|---|---|
+| External Study Application | data | A summary above EduRec's grid. Lede: how many applications, and the latest one's name and status. One row per application: name, then type, academic year and period, applied date and financial aid; status as a tag (accepted ok, rejected or withdrawn quiet, others attention). The application ID is left out because it contains the student ID. Foot: Rank, Possible Actions and Withdrawal stay in EduRec's table below. |
+| Search Course Mappings | form | Intro: see how partner university courses map to NUS courses; choose a faculty and partner university with the lookups, then Fetch Mappings. Point: typed values must match EduRec's list exactly. |
+| Submit Course Mapping | form | A worksheet with Comments and Save; left as it is. |

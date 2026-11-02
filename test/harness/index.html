@@ -330,6 +330,21 @@
     .replace('<div>Graduation check outcome:</div>', '<div>What-If Statistics</div><div>Graduation check outcome:</div>'));
   PAGES.afgclosed = classic('Apply for Graduation (AFG)', 'Apply for Graduation', infoMsg('Apply for Graduation is closed.', 'Please refer to the schedule in MyPortal@NUS.'));
   PAGES.nograd = classic('View Graduation Status', 'View Graduation Status', infoMsg('Apply for Graduation application is withdrawn and/or not found. If you have submitted and did not withdraw your graduation application, please approach for your program/subject advisor at the Faculty/School for assistance.'));
+  // Global Education: classic pages in tables (crawled 3 Nov 2026, values invented).
+  const GE_NAV = ['External Study Application', 'Search Course Mappings', 'Submit Course Mapping'];
+  const ge = (sel, html) => ({ url: '/psc/cs90prd_23/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_AD_REG_NAVCOL_FL.GBL?Action=U&MD=Y&GMenu=SA_LEARNER_SERVICES&GComp=N_CC_GLB_EDU_FL', nav: GE_NAV, sel, html });
+  const cgrid = (label, cols, rows) => '<table class="PSLEVEL1GRIDWBO"><tr><td class="PSLEVEL1GRIDLABEL">' + label + '</td></tr><tr><td><table class="PSLEVEL1GRID"><tr>'
+    + cols.map((c) => '<th class="PSLEVEL1GRIDCOLUMNHDR"><a>' + c + '</a></th>').join('') + '</tr>'
+    + rows.map((r) => '<tr>' + r.map((c) => '<td class="PSLEVEL1GRIDODDROW">' + c + '</td>').join('') + '</tr>').join('') + '</table></td></tr></table>';
+  PAGES.exchange = ge('External Study Application', tbl('<span class="PAPAGETITLE">Global Education</span>')
+    + '<div class="alert"><strong>Note:</strong> Please read the information and instruction on the Programme/Financial Aid website before proceeding with the online application.</div>'
+    + cgrid('My External Study Program Applications', ['Rank', 'Ext. Study AY', 'Application ID', 'Ext. Study Type', 'Ext. Study', 'Study Period', 'Applied On', 'Application Status', 'Applied for Financial Aid?', 'Required Actions', 'Possible Actions 1', 'Possible Actions 2', 'Withdrawal'],
+      [['<select><option>1</option></select>', '2026/2027', '<a href="#">P00001-00001-X0000000X</a>', 'Student Exchange', '<a href="#">Example Faculty SEP Application 2026/2027</a>', 'NUS Sem 2', '3-Oct-2025', 'Ext Study Accepted by Host', 'N', 'NA', 'NA', 'NA', '']])
+    + cgrid('My Financial Aid Application', ['FA Application ID', 'Ext. Study Academic Year', 'FA Type', 'Application Status'], [['', '', '', '']]));
+  PAGES.mappings = ge('Search Course Mappings', tbl('<span class="PAPAGETITLE">Search Course Mappings</span>')
+    + tbl('<span class="PSTEXT">For specific search, please provide the search parameters below before clicking on \'Fetch Mappings\' button .</span>')
+    + tbl('<label>Faculty:</label> <input type="text"> <label>Partner University:</label> <input type="text"> <input type="button" value="Fetch Mappings">')
+    + cgrid('Partner University to NUS Course Mappings', ['Faculty', 'Partner University', 'PU Course 1', 'PU Course 1 Title', 'PU Crse1 Units', 'NUS Course 1', 'NUS Course 1 Title', 'NUS Crse1 Units', 'Pre Approved?'], [['', '', '', '', '', '', '', '', '']]));
   const key = new URLSearchParams(location.search).get('page') || 'home';
   const page = PAGES[key];
 

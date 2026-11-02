@@ -504,6 +504,26 @@
     return { apps };
   }
 
+  // Global Education "External Study Application": a classic grid, one row per
+  // application, each starting with its academic year. The application ID embeds
+  // the student ID, so it isn't kept.
+  function parseExchangeApps(text) {
+    const ls = lines(text);
+    const start = ls.indexOf('My External Study Program Applications');
+    if (start < 0) return null;
+    let end = ls.indexOf('My Financial Aid Application', start);
+    if (end < 0) end = ls.length;
+    const apps = [];
+    for (let i = start; i < end; i++) {
+      if (!/^\d{4}\/\d{4}$/.test(ls[i])) continue;
+      const [, type, name, period, applied, status, aid] = ls.slice(i + 1, i + 8);
+      if (!/^\d{1,2}-\w{3}-\d{4}$/.test(applied || '')) continue;
+      apps.push({ year: ls[i], type, name, period, applied: applied.replace(/-/g, ' '), status, aid: aid === 'Y' });
+      i += 7;
+    }
+    return { apps };
+  }
+
   // "View Milestones": a grid whose cells repeat their label ("Milestone", then
   // its value if any). A record with nothing filled in is an empty row.
   const MILESTONE_COLS = { 'Milestone': 'name', 'Milestone Level': 'level', 'Milestone Complete': 'complete', 'How Completed': 'how',
@@ -596,5 +616,5 @@
 
   EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName,
     parseExamSchedule, examWhen, parseSuHistory, parseProgramme, parseCourses, parseTransferCredit, parseMilestones, parseClassList,
-    parseDemographic, parseNames, parseContact, parseAddresses, parseEmergency, parseTranscriptApps };
+    parseDemographic, parseNames, parseContact, parseAddresses, parseEmergency, parseTranscriptApps, parseExchangeApps };
 })();
