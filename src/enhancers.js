@@ -130,6 +130,15 @@
       render: (d) => EDR.views.emergency(d, gridRow, addButton)
     },
     {
+      // Official transcript applications; replaces the scroll area of application blocks.
+      key: 'transcriptapps', anchor: 'Application ID:', snapshot: false, block: OUTER_SCROLL,
+      test: (t) => t.includes('Application ID:') && t.includes('Requested Items:'),
+      parse: (t) => EDR.parsers.parseTranscriptApps(t),
+      useful: (d) => d && d.apps.length,
+      hide: ['Application ID:'],
+      render: (d) => EDR.views.transcriptApps(d)
+    },
+    {
       key: 'classes', anchor: 'Class Type',
       test: (t) => t.includes('Class Type'),
       parse: (t) => EDR.parsers.parseMyClasses(t),
@@ -190,6 +199,8 @@
     ? { label: label[0] + label.slice(1).toLowerCase(), run: () => { const a = buttonFor(label); if (a) a.click(); } }
     : null);
   const photo = () => { const img = [...document.querySelectorAll('img[id^="EMPL_PHOTO"]')].find((i) => !i.closest('#PT_HEADER, .ps_apps_pageheader')); return img && img.src ? img.src : null; };
+  // A link EduRec puts in its own message, clicked as it is (it may open a new tab).
+  const pageLink = (text, label) => { const a = [...document.querySelectorAll('#PT_MAIN a')].find((x) => x.textContent.trim() === text); return a ? { label, run: () => a.click() } : null; };
   const changeTerm = { label: 'Choose another term', run: () => { const a = document.getElementById('DERIVED_ACRD_FL_SSR_CHANGE_TERM'); if (a) a.click(); } };
 
   // match: EduRec's message (exact text or a pattern for its first line); anchor:
@@ -216,7 +227,10 @@
       actions: () => [openPage('View Graduation Audit Report', 'View graduation audit report'), openPage('View Graduation Status', 'Graduation status')] },
     { id: 'nograd', anchor: 'Apply for Graduation application is withdrawn', match: /^Apply for Graduation application is withdrawn and\/or not found\./, block: 'table.SSSMSGINFOFRAME', icon: 'info',
       title: 'No graduation application for this term', body: 'EduRec found no application, or it was withdrawn. If you applied and didn’t withdraw, your programme or subject advisor at your faculty or school can help.',
-      actions: () => [openPage('View Graduation Status', 'Choose another term'), openPage('Apply for Graduation (AFG)', 'Apply for graduation')] }
+      actions: () => [openPage('View Graduation Status', 'Choose another term'), openPage('Apply for Graduation (AFG)', 'Apply for graduation')] },
+    { id: 'lifetranscript', anchor: 'self-generation of a Student Life Transcript', match: /^The function for self-generation of a Student Life Transcript/, icon: 'closed',
+      title: 'Student life transcripts have moved to NUSync', body: 'EduRec no longer generates them. Your CCA records are on NUSync; for problems with them, email nusync@nus.edu.sg.',
+      actions: () => [pageLink('NUSync', 'Open NUSync'), openPage('View Unofficial Transcript', 'Unofficial transcript')].filter(Boolean) }
   ];
 
   // Forms: one line on what the page does and the rules that matter before acting,
@@ -248,6 +262,14 @@
     { id: 'whatif', when: ['What-if Report Selection', 'Create New Report'], before: '‘My What-If Report’',
       lede: 'See how your courses would count under a different programme, major, second major or minor: choose Create New Report, or open a saved report below.',
       points: ['A what-if report is a simulation. Your graduation audit report shows your actual progress.'] },
+    { id: 'transcripthistory', when: ['Previous Requests', 'Request Number', 'View All Requested Reports'], before: 'Previous Requests',
+      lede: 'Your recent unofficial transcript requests: tick one, then choose View Report.',
+      points: ['Requested transcripts stay available until the second Friday of each month.'] },
+    { id: 'officialtranscript', when: ['Apply Official Transcript', 'Transcript Information', 'Application Information'], before: 'Payment for successful application is',
+      lede: 'Apply for an official transcript, as a hardcopy or a verifiable PDF, at $5 each before GST: read the notes below, then choose Next.',
+      points: ['Payment is non-refundable, and a hold on your record stops the transcript. Processing takes up to 4 working days.',
+        'Graduating students get a complimentary official transcript after conferment, so there’s no need to apply for one.',
+        'This semester’s grades appear on transcripts from the 11th calendar day after results are released.'] },
     { id: 'transcript', when: ['View All Requested Reports', 'Report Type'], before: 'View Report',
       lede: 'Generate an unofficial transcript: choose a report type for your programme, then Submit.' },
     { id: 'suletter', when: ['View S/U Original Grade Letter'], before: 'View S/U Original Grade Letter',

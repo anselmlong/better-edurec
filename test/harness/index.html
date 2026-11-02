@@ -290,6 +290,31 @@
     + group('<a class="ps-link" href="#">Important Notes:</a><ul><li>Your updated citizenship or residency status will appear in the “Demographic Information” page within 3 working days.</li></ul>', 'psc_collapsible')
     + group(label('Student ID', 'A0000000X') + label('Official Name', 'EXAMPLE STUDENT NAME') + label('Gender', 'Female'))
     + group('<div class="ps_box-button"><a class="ps-button" href="#">Reset</a></div><div class="ps_box-button"><a class="ps-button" href="#">Save</a></div>'));
+  // Transcripts (crawled 3 Nov 2026, values invented).
+  const TS_NAV = ['View Unofficial Transcript', 'Apply Official Transcript', 'Check Application Status', 'View Student Life Transcript'];
+  const ts = (sel, html) => ({ url: '/psc/cs90prd_14/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_AD_REG_NAVCOL_FL.GBL?Action=U&MD=Y&GMenu=SA_LEARNER_SERVICES&GComp=N_SS_TSCRPTGRP_FL', nav: TS_NAV, sel, html: '<div class="ps_box-group ps_apps_content">' + html + '</div>' });
+  const htmlarea = (inner) => '<div class="ps_box-htmlarea"><div class="ps-htmlarea">' + inner + '</div></div>';
+  const btnBox = (t) => '<div class="ps_box-button"><a class="ps-button" href="#">' + t + '</a></div>';
+  const radios = group('<div class="ps_box-radio"><input type="radio" id="r1"><label for="r1">View Report</label></div><div class="ps_box-radio"><input type="radio" id="r2" checked><label for="r2">View All Requested Reports</label></div>');
+  PAGES.transcripthistory = ts('View Unofficial Transcript', radios + group('<h1 class="ps_pagetitle"><span class="ps-text">Previous Requests</span></h1>', 'ps_box-title')
+    + group(btnBox('View Report') + btnBox('Delete'))
+    + group('<div class="ps_box-grid-flex"><h2 class="ps_grid-title"><span class="ps-text">Previous Requests</span></h2><table class="ps_grid-flex"><thead><tr><th></th><th>Request Date</th><th>Request Number</th><th>Description</th></tr></thead><tbody>'
+      + [['12/05/2026', '1000002'], ['30/04/2026', '1000001']].map(([d, n]) => '<tr class="ps_grid-row"><td><input type="checkbox"></td><td>' + d + '</td><td>' + n + '</td><td>Undergraduate Unofficial</td></tr>').join('') + '</tbody></table></div>')
+    + group('<span class="ps-text">Note: The transcript(s) will remain retrievable until the 2nd Friday of each month.</span>'));
+  PAGES.officialtranscript = ts('Apply Official Transcript', group('<h1 class="ps_pagetitle"><span class="ps-text">Apply Official Transcript</span></h1>', 'ps_box-title') + group(val('EXAMPLE STUDENT NAME'))
+    + group(htmlarea('<p>Payment for successful application is <strong>non-refundable</strong>.  Please read the following carefully before you apply.</p><p><strong>Application Information</strong></p>'
+      + '<ol><li>Hardcopy Transcript: $5.00 per copy, excluding mailing cost</li><li>This transcript request will take up to 4 working days to process.</li></ol><p><strong>Transcript Information</strong></p><ol><li>Example note.</li></ol>'))
+    + group(btnBox('Next')));
+  const otaApp = (id, date, type, pay, status, items, delivery) => group(['Application ID:', id, 'Date Submitted:', date, 'Request Type:', type, 'Payment Status:', pay, 'Application Status:', status].map((t, i) => i % 2 ? val(t) : '<div class="ps_box-text"><span class="ps-text">' + t + '</span></div>').join('')
+    + '<div class="ps_box-text"><span class="ps-text">Requested Items:</span></div>' + htmlarea('<ul>' + items.map((x) => '<li>' + x + '</li>').join('') + '</ul>')
+    + '<div class="ps_box-text"><span class="ps-text">Delivery/Courier:</span></div>' + htmlarea('<ul>' + delivery.map((x) => '<li>' + x + '</li>').join('') + '</ul>'), 'psc_layout');
+  PAGES.transcriptapps = ts('Check Application Status', group('<h1 class="ps_pagetitle"><span class="ps-text">Status Check</span></h1>', 'ps_box-title')
+    + '<div class="ps_box-scrollarea"><div class="ps_box-scrollarea-row">'
+    + otaApp('EXAMPLE0002', '2/Nov/2026 4:10:00 PM', 'Verifiable PDF (vPDF) Transcript', 'Success', 'In Progress', ['Bachelor of Examples'], ['Email: example@example.com'])
+    + otaApp('EXAMPLE0001', '14/Mar/2026 09:05:11 AM', 'Hardcopy Transcript', 'Success', 'Completed', ['Bachelor of Examples'], ['Number of copies: 1 per programme', 'Collection Centre: Example Office – by Appointment', 'Tel: 60000000', 'Your document(s) have been collected on 20/Mar/2026.'])
+    + '</div></div>');
+  PAGES.lifetranscript = ts('View Student Life Transcript', group('<h1 class="ps_pagetitle"><span class="ps-text">View Student Life Transcript</span></h1>', 'ps_box-title') + group(val('EXAMPLE STUDENT NAME'))
+    + group(htmlarea('<p>Dear Student,</p><p>The function for self-generation of a Student Life Transcript on EduRec has been disabled.</p><p>As we work on a new platform, you may retrieve and review your CCA records via <a href="#nusync" target="_blank">NUSync</a>.</p><p>Should you encounter any issues updating your CCA records in NUSync, you may write to <a href="#mail">nusync@nus.edu.sg</a>.</p>')));
   // Degree Progress: classic (non-Fluid) pages, tables throughout (crawled 3 Nov 2026, values invented).
   const DEG_NAV = ['Information', 'View Graduation Audit Report', 'View What-if Report', 'Apply for Graduation (AFG)', 'View Graduation Status'];
   const classic = (sel, title, body) => ({ url: PAGES.audit.url, nav: DEG_NAV, sel, html: '<table class="PABACKGROUNDINVISIBLE"><tr><td><div><span class="PALEVEL0PRIMARY">EXAMPLE STUDENT</span></div>'

@@ -40,6 +40,22 @@ test('parseAudit ignores pages that are not the audit', () => {
   assert.equal(parseAudit('Some other page\nUnits: 4.00 required, 0.00 taken, 4.00 needed'), null);
 });
 
+test('parseTranscriptApps reads each official transcript application', () => {
+  const { parseTranscriptApps } = globalThis.EDR.parsers;
+  const t = 'Check Application Status\nStatus Check\nApplication ID:\nEXAMPLE0001\nDate Submitted:\n14/Mar/2026 09:05:11 AM\nRequest Type:\nHardcopy Transcript\n'
+    + 'Payment Status:\nSuccess\nApplication Status:\nCompleted\nRequested Items:\nBachelor of Examples\nDelivery/Courier:\nNumber of copies: 1 per programme\n'
+    + 'Your document(s) have been collected on 20/Mar/2026.\n'
+    + 'Application ID:\nEXAMPLE0002\nDate Submitted:\n2/Nov/2026 4:10:00 PM\nRequest Type:\nVerifiable PDF (vPDF) Transcript\nPayment Status:\nPending\n'
+    + 'Application Status:\nIn Progress\nRequested Items:\nBachelor of Examples\nMaster of Examples\nDelivery/Courier:\nSupplementary Panel\nRelated Information';
+  const { apps } = parseTranscriptApps(t);
+  assert.equal(apps.length, 2);
+  assert.deepEqual(apps[0], { id: 'EXAMPLE0001', submitted: '14 Mar 2026', type: 'Hardcopy Transcript', payment: 'Success', status: 'Completed',
+    items: ['Bachelor of Examples'], delivery: ['Number of copies: 1 per programme', 'Your document(s) have been collected on 20/Mar/2026.'] });
+  assert.deepEqual(apps[1].items, ['Bachelor of Examples', 'Master of Examples']);
+  assert.deepEqual(apps[1].delivery, []);
+  assert.equal(parseTranscriptApps('Apply Official Transcript\nNext'), null);
+});
+
 test('parseAudit reads a saved what-if report', () => {
   const a = parseAudit(AUDIT.replace('My Graduation Audit Report', 'What-If Report\nWhat-If Statistics'));
   assert.equal(a.outcome, 'Not Satisfied');

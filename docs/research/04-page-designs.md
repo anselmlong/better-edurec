@@ -115,3 +115,13 @@ Every sub-page here is a classic (non-Fluid) PeopleSoft page inside an iframe, w
 | Saved what-if report | data | The same card titled "What-if progress", with a line saying it is a simulation. Not saved for the Overview, so it never replaces the real audit. |
 | Apply for Graduation (AFG), closed | dead end | "Applying for graduation is closed": it opens during the application period (schedule on MyPortal@NUS). Actions: View graduation audit report, Graduation status. |
 | View Graduation Status, nothing found | dead end | After a term is picked: "No graduation application for this term": none was found or it was withdrawn; the programme or subject advisor can help. Actions: Choose another term (reopens the term picker), Apply for graduation. |
+
+## Transcripts
+
+| Sub-page | Type | Design |
+|---|---|---|
+| View Unofficial Transcript, New Request | form | Existing intro: choose a report type for your programme, then Submit. |
+| View Unofficial Transcript, View All Requested Reports | form | Intro: your recent requests; tick one, then choose View Report. Point: requested transcripts stay available until the second Friday of each month. The grid's checkboxes, View Report and Delete stay EduRec's. |
+| Apply Official Transcript | form | Intro: hardcopy or verifiable PDF at $5 each before GST; read the notes, then Next. Points: payment is non-refundable and a hold stops the transcript, up to 4 working days; graduating students get a complimentary transcript after conferment; this semester's grades show from the 11th calendar day after results. |
+| Check Application Status | data | Lede: how many applications, and the latest one's type and status. One row per application: type, then submitted date, requested items, any unpaid payment status, delivery or collection details and the application ID; status as a tag (Completed ok, others attention). The student's own phone and email lines are left out. |
+| View Student Life Transcript | dead end | "Student life transcripts have moved to NUSync": CCA records are on NUSync, and problems go to EduRec's NUSync address. Actions: Open NUSync (EduRec's own link), Unofficial transcript. |

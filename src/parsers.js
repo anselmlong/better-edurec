@@ -477,6 +477,33 @@
     return { contacts: chunks(cells, 2).filter(([, p]) => /\d/.test(p)).map(([name, phone]) => ({ name, phone })) };
   }
 
+  // Transcripts "Check Application Status": one block of labelled values per
+  // official transcript application; items and delivery details run one per line.
+  const OTA_FIELDS = { 'Application ID:': 'id', 'Date Submitted:': 'submitted', 'Request Type:': 'type', 'Payment Status:': 'payment',
+    'Application Status:': 'status', 'Requested Items:': 'items', 'Delivery/Courier:': 'delivery' };
+  function parseTranscriptApps(text) {
+    const ls = lines(text);
+    if (!ls.includes('Application ID:') || !ls.includes('Application Status:')) return null;
+    const apps = [];
+    let cur = null;
+    let field = null;
+    for (const l of ls) {
+      // The page's side panel follows the last application.
+      if (l === 'Supplementary Panel' || l === 'Related Information') break;
+      if (l in OTA_FIELDS) {
+        field = OTA_FIELDS[l];
+        if (field === 'id') { cur = { items: [], delivery: [] }; apps.push(cur); }
+        continue;
+      }
+      if (!cur || !field) continue;
+      if (field === 'items' || field === 'delivery') cur[field].push(l);
+      else if (cur[field] == null) cur[field] = l;
+    }
+    // "14/Mar/2026 09:05:11 AM" → "14 Mar 2026"
+    for (const a of apps) if (a.submitted) a.submitted = a.submitted.replace(/^(\d{1,2})\/(\w{3})\/(\d{4}).*$/, '$1 $2 $3');
+    return { apps };
+  }
+
   // "View Milestones": a grid whose cells repeat their label ("Milestone", then
   // its value if any). A record with nothing filled in is an empty row.
   const MILESTONE_COLS = { 'Milestone': 'name', 'Milestone Level': 'level', 'Milestone Complete': 'complete', 'How Completed': 'how',
@@ -569,5 +596,5 @@
 
   EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName,
     parseExamSchedule, examWhen, parseSuHistory, parseProgramme, parseCourses, parseTransferCredit, parseMilestones, parseClassList,
-    parseDemographic, parseNames, parseContact, parseAddresses, parseEmergency };
+    parseDemographic, parseNames, parseContact, parseAddresses, parseEmergency, parseTranscriptApps };
 })();

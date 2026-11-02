@@ -315,7 +315,7 @@
               h('div', { class: 'edr-exam-main' },
                 h('p', { class: 'edr-exam-course' }, r.main),
                 r.sub ? h('p', { class: 'edr-muted' }, r.sub) : null),
-              h('span', { class: 'edr-tags' }, r.tag ? tag(r.tag) : null, r.edit ? btn('Edit', r.edit, 'edr-rec-edit') : null))))
+              h('span', { class: 'edr-tags' }, r.tag ? tag(...[].concat(r.tag)) : null, r.edit ? btn('Edit', r.edit, 'edr-rec-edit') : null))))
           : h('p', { class: 'edr-rec-empty edr-muted' }, s.empty || 'None on record.')]),
       foot(...notes));
   }
@@ -362,6 +362,25 @@
       [{ add: add('Add Contact'), empty: 'No emergency contacts.', items: e.contacts.map((c, i) => ({ main: c.name, sub: c.phone, edit: edit('Emergency Contacts', i) })) }]);
   }
 
+  // ---- Transcripts ----
+
+  // Contact lines repeat the student's own phone and email; they add nothing here.
+  const CONTACT = /^(Tel|Email):/i;
+  // "Verifiable PDF (vPDF) Transcript" → "Verifiable PDF (vPDF) transcript"
+  const kind = (t) => String(t || 'Transcript').replace(/ Transcript$/, ' transcript');
+  function transcriptApps(d) {
+    const latest = d.apps[0];
+    const ok = (s) => /^(Completed|Success)$/i.test(s);
+    return records('Transcript applications',
+      latest ? (d.apps.length === 1 ? '1 application' : d.apps.length + ' applications') + '. Latest: ' + kind(latest.type) + ', ' + latest.status.toLowerCase() + '.' : 'No transcript applications.',
+      [{ items: d.apps.map((a) => ({
+        main: kind(a.type),
+        sub: [a.submitted && 'Submitted ' + a.submitted, a.items.join(', '), !ok(a.payment) && a.payment && 'Payment: ' + a.payment.toLowerCase(),
+          ...a.delivery.filter((l) => !CONTACT.test(l)), 'Application ' + a.id].filter(Boolean).join(' · '),
+        tag: [a.status, /^Completed$/i.test(a.status) ? 'is-ok' : 'is-warn']
+      })) }]);
+  }
+
   // ---- Dead ends and form intros ----
 
   // spec: { icon, title, body, actions: [{ label, run, primary }] }; message is
@@ -383,5 +402,5 @@
   }
 
   EDR.views = { examSchedule, results, suHistory, programme, courses, transferCredit, milestones, classesByDate, classesByClass,
-    demographic, names, contact, addresses, emergency, deadEnd, intro };
+    demographic, names, contact, addresses, emergency, transcriptApps, deadEnd, intro };
 })();
