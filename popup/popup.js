@@ -21,6 +21,10 @@
   for (const t of EDR.themes.THEMES) themeSel.append(new Option(t.label + (t.dark ? ' (dark)' : ''), t.id));
   themeSel.value = prefs.theme || EDR.themes.DEFAULT;
   themeSel.addEventListener('change', () => savePrefs({ theme: themeSel.value }));
+  const fontSel = document.getElementById('font');
+  for (const f of EDR.themes.FONTS) fontSel.append(new Option(f.label, f.id));
+  fontSel.value = EDR.themes.fontOf(prefs.font) ? prefs.font : 'theme';
+  fontSel.addEventListener('change', () => savePrefs({ font: fontSel.value }));
   const reprompt = document.getElementById('reprompt');
   reprompt.disabled = !prefs.setupDismissed;
   reprompt.addEventListener('click', () => { savePrefs({ setupDismissed: false }); reprompt.disabled = true; });

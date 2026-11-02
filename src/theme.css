@@ -788,6 +788,18 @@ html[data-edr-theme="terminal"] .edr-h1::after {
 @keyframes edr-blink { 50% { opacity: 0; } }
 html[data-edr-theme="terminal"] .edr-root { letter-spacing: 0; }
 
+/* Comic: inked panels with a hard drop shadow. */
+html[data-edr-theme="comic"] :is(.edr-card, .edr-setup) { border-width: 2px; box-shadow: 4px 4px 0 var(--edr-ink); }
+/* Retro 95: raised bevels. */
+html[data-edr-theme="retro95"] :is(.edr-card, .edr-setup) {
+  border: 2px solid; border-color: #FFFFFF #404040 #404040 #FFFFFF; box-shadow: inset -1px -1px 0 #808080;
+}
+/* Broadsheet: a double rule under the page title. */
+html[data-edr-theme="broadsheet"] .edr-h1 { border-bottom: 3px double var(--edr-ink); padding-bottom: 6px; }
+/* High contrast: heavier card edges and a focus ring that can't be missed. */
+html[data-edr-theme="contrast"] :is(.edr-card, .edr-setup) { border-width: 2px; }
+html[data-edr-on][data-edr-theme="contrast"] :focus-visible { outline: 3px solid #0000CC !important; outline-offset: 2px !important; }
+
 /* Printing EduRec pages (e.g. the audit's printer-friendly view): no shell. */
 @media print {
   .edr-shell, .edr-menu-toggle, .edr-coach, .edr-toast, .edr-pal-overlay, .edr-help-overlay, .edr-side-toggle { display: none !important; }

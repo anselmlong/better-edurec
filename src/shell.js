@@ -196,6 +196,11 @@
     EDR.store.setPrefs({ theme: id });
   }
 
+  function setFont(id) {
+    EDR.themes.applyFont(id);
+    EDR.store.setPrefs({ font: id });
+  }
+
   function commands() {
     const t = EDR.themes;
     return [
@@ -203,6 +208,7 @@
       { label: 'Open Overview', hint: 'Command', keys: 'overview home dashboard', href: EDR.routes.HOME + '#overview' },
       { label: 'Pick a theme', hint: 'Command', keys: 'theme themes colour color picker', run: () => openPalette({ mode: 'theme' }) },
       ...t.THEMES.map((th) => ({ label: 'Theme: ' + th.label, hint: 'Command', keys: 'theme ' + th.id + ' ' + th.label.toLowerCase(), run: () => setTheme(th.id) })),
+      ...t.FONTS.map((f) => ({ label: 'Font: ' + f.label, hint: 'Command', keys: 'font typeface ' + f.id + ' ' + f.label.toLowerCase(), run: () => setFont(f.id) })),
       { label: 'Toggle sidebar', hint: 'Command', keys: 'sidebar collapse expand nav rail', run: toggleNav },
       { label: 'Toggle page list', hint: 'Command', keys: 'pages page list side panel', run: () => { if (document.getElementById('PT_SIDE')) toggleSide(); } },
       { label: 'Keyboard shortcuts', hint: 'Command', keys: 'help keys keyboard shortcuts vim', run: openHelp },
@@ -419,5 +425,5 @@
     if (innerWidth < 900) EDR.flag('nav-open', true);
   }
 
-  EDR.shell = { mount, mountRestoreButton, openPalette, openHelp, revealNav, followDeepLink, ensureSideToggle, toggleNav, toggleSide, setTheme };
+  EDR.shell = { mount, mountRestoreButton, openPalette, openHelp, revealNav, followDeepLink, ensureSideToggle, toggleNav, toggleSide, setTheme, setFont };
 })();

@@ -17,6 +17,10 @@
   const SANS = '"Public Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   const MONO = '"IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
   const ROUNDED = 'ui-rounded, "SF Pro Rounded", "Nunito", "Quicksand", system-ui, sans-serif';
+  const COMIC = '"Comic Sans MS", "Comic Neue", "Chalkboard SE", "Comic Relief", cursive';
+  const SERIF = '"Iowan Old Style", "Charter", "Georgia", "Times New Roman", serif';
+  const RETRO = '"Tahoma", "Verdana", "MS Sans Serif", "Segoe UI", sans-serif';
+  const READABLE = '"Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Verdana", system-ui, sans-serif';
 
   const dark = (t) => ({ 'brand-hover': 'rgba(255, 255, 255, .08)', 'shadow-rgb': '0 0 0', ...t });
 
@@ -127,11 +131,91 @@
       blue: '#7DCFFF', 'blue-ink': '#A5DEFF', warn: '#E0AF68', 'warn-bg': '#3A3226', orange: '#FF9E64',
       'brand-bg': '#16161E', 'brand-ink': '#C0CAF5', 'brand-sub': '#9AA5CE',
       'inverse-bg': '#C0CAF5', 'inverse-ink': '#1A1B26', 'inverse-muted': '#3B4261', 'inverse-line': 'rgba(26, 27, 38, .25)',
-      selection: '#33467C' }) }
+      selection: '#33467C' }) },
+
+    { id: 'comic', label: 'Comic', dark: false, font: COMIC, radius: '14px', radiusSm: '10px', tokens: {
+      bg: '#FFF6D6', surface: '#FFFDF5', 'surface-2': '#FFF1C2', 'surface-3': '#FFE89A',
+      ink: '#111111', 'ink-2': '#2B2B2B', muted: '#5A4B2E', line: '#111111', 'line-2': '#E9D9A6', 'line-strong': '#111111',
+      navy: '#D7261E', 'navy-ink': '#B01E17', 'on-primary': '#FFFFFF', 'selected-ink': '#0B3FA8', tint: '#D9E6FF',
+      blue: '#0B4FC4', 'blue-ink': '#083C96', warn: '#A33A00', 'warn-bg': '#FFE3C7', orange: '#FFB800',
+      'brand-bg': '#0B4FC4', 'brand-ink': '#FFFFFF', 'brand-sub': '#FFE89A', 'brand-hover': 'rgba(255, 255, 255, .18)',
+      'inverse-bg': '#111111', 'inverse-ink': '#FFF6D6', 'inverse-muted': '#E9D9A6', 'inverse-line': 'rgba(255, 246, 214, .3)',
+      selection: '#FFE066', 'shadow-rgb': '17 17 17' } },
+
+    { id: 'kopi', label: 'Kopi', dark: false, tokens: {
+      bg: '#F5EEE3', surface: '#FFFBF5', 'surface-2': '#F3E9DA', 'surface-3': '#EADCC6',
+      ink: '#2B1A10', 'ink-2': '#45301F', muted: '#6E5641', line: '#E2D3BC', 'line-2': '#EFE5D6', 'line-strong': '#CDB89A',
+      navy: '#5B3A22', 'navy-ink': '#4A2F1B', 'on-primary': '#FFFFFF', 'selected-ink': '#4A2F1B', tint: '#EADCC6',
+      blue: '#3E6B2C', 'blue-ink': '#2F5421', warn: '#9A3412', 'warn-bg': '#FBE5D6', orange: '#C9822B',
+      'brand-bg': '#3B2416', 'brand-ink': '#FFF4E3', 'brand-sub': '#D9C2A2', 'brand-hover': 'rgba(255, 244, 227, .12)',
+      'inverse-bg': '#2B1A10', 'inverse-ink': '#FFF4E3', 'inverse-muted': '#D9C2A2', 'inverse-line': 'rgba(255, 244, 227, .25)',
+      selection: '#E6CFA8', 'shadow-rgb': '59 36 22' } },
+
+    { id: 'retro95', label: 'Retro 95', dark: false, font: RETRO, radius: '0px', radiusSm: '0px', tokens: {
+      bg: '#C0C0C0', surface: '#DFDFDF', 'surface-2': '#D4D0C8', 'surface-3': '#C8C8C8',
+      ink: '#000000', 'ink-2': '#1A1A1A', muted: '#3A3A3A', line: '#808080', 'line-2': '#A0A0A0', 'line-strong': '#404040',
+      navy: '#000080', 'navy-ink': '#000066', 'on-primary': '#FFFFFF', 'selected-ink': '#FFFFFF', tint: '#000080',
+      blue: '#000080', 'blue-ink': '#000066', warn: '#800000', 'warn-bg': '#FFFFE1', orange: '#808000',
+      'brand-bg': '#000080', 'brand-ink': '#FFFFFF', 'brand-sub': '#C0C0C0', 'brand-hover': 'rgba(255, 255, 255, .16)',
+      'inverse-bg': '#000000', 'inverse-ink': '#FFFFFF', 'inverse-muted': '#C0C0C0', 'inverse-line': 'rgba(255, 255, 255, .3)',
+      selection: '#000080', 'shadow-rgb': '0 0 0' } },
+
+    { id: 'broadsheet', label: 'Broadsheet', dark: false, font: SERIF, radius: '2px', radiusSm: '2px', tokens: {
+      bg: '#F2EFE6', surface: '#FBF9F3', 'surface-2': '#F0ECE1', 'surface-3': '#E7E2D4',
+      ink: '#111111', 'ink-2': '#2A2A2A', muted: '#555049', line: '#CFC8B6', 'line-2': '#E6E1D3', 'line-strong': '#111111',
+      navy: '#111111', 'navy-ink': '#000000', 'on-primary': '#FBF9F3', 'selected-ink': '#7A1212', tint: '#EFE3D3',
+      blue: '#7A1212', 'blue-ink': '#5E0E0E', warn: '#7A1212', 'warn-bg': '#F3E1DA', orange: '#A0522D',
+      'brand-bg': '#111111', 'brand-ink': '#FBF9F3', 'brand-sub': '#CFC8B6', 'brand-hover': 'rgba(251, 249, 243, .12)',
+      'inverse-bg': '#111111', 'inverse-ink': '#FBF9F3', 'inverse-muted': '#CFC8B6', 'inverse-line': 'rgba(251, 249, 243, .25)',
+      selection: '#E8DCC0', 'shadow-rgb': '17 17 17' } },
+
+    { id: 'matcha', label: 'Matcha', dark: false, font: ROUNDED, radius: '12px', radiusSm: '8px', tokens: {
+      bg: '#F1F4EA', surface: '#FCFDF8', 'surface-2': '#EEF2E3', 'surface-3': '#E3EAD2',
+      ink: '#1F2A17', 'ink-2': '#33412A', muted: '#5A6650', line: '#D6DEC4', 'line-2': '#E8EDDC', 'line-strong': '#BCC8A3',
+      navy: '#4A6B2A', 'navy-ink': '#3B5621', 'on-primary': '#FFFFFF', 'selected-ink': '#33491C', tint: '#DDE8C8',
+      blue: '#3F6B2E', 'blue-ink': '#2F5222', warn: '#8A4B0F', 'warn-bg': '#F6E7D2', orange: '#C08A3E',
+      'brand-bg': '#3B5621', 'brand-ink': '#FCFDF8', 'brand-sub': '#CFE0B4', 'brand-hover': 'rgba(252, 253, 248, .14)',
+      'inverse-bg': '#1F2A17', 'inverse-ink': '#FCFDF8', 'inverse-muted': '#CFE0B4', 'inverse-line': 'rgba(252, 253, 248, .25)',
+      selection: '#D3E4B5', 'shadow-rgb': '31 42 23' } },
+
+    { id: 'vaporwave', label: 'Vaporwave', dark: true, radius: '12px', radiusSm: '8px', tokens: dark({
+      bg: '#1B1033', surface: '#241544', 'surface-2': '#2C1A52', 'surface-3': '#341F5E',
+      ink: '#FDEBFF', 'ink-2': '#E9CCF5', muted: '#C3A3DB', line: '#3E2768', 'line-2': '#2F1C56', 'line-strong': '#55358A',
+      navy: '#FF71CE', 'navy-ink': '#FF93DA', 'on-primary': '#1B1033', 'selected-ink': '#01CDFE', tint: '#33205C',
+      blue: '#05FFA1', 'blue-ink': '#7DFFCB', warn: '#FFB86B', 'warn-bg': '#3D2340', orange: '#FFFB96',
+      'brand-bg': '#120A24', 'brand-ink': '#FDEBFF', 'brand-sub': '#C3A3DB', 'brand-hover': 'rgba(255, 113, 206, .14)',
+      'inverse-bg': '#FDEBFF', 'inverse-ink': '#1B1033', 'inverse-muted': '#55358A', 'inverse-line': 'rgba(27, 16, 51, .25)',
+      selection: '#6B2C7A' }) },
+
+    { id: 'contrast', label: 'High contrast', dark: false, radius: '4px', radiusSm: '4px', tokens: {
+      bg: '#FFFFFF', surface: '#FFFFFF', 'surface-2': '#F2F2F2', 'surface-3': '#E6E6E6',
+      ink: '#000000', 'ink-2': '#000000', muted: '#333333', line: '#000000', 'line-2': '#595959', 'line-strong': '#000000',
+      navy: '#000000', 'navy-ink': '#000000', 'on-primary': '#FFFFFF', 'selected-ink': '#000000', tint: '#FFE600',
+      blue: '#0000CC', 'blue-ink': '#000099', warn: '#9E0000', 'warn-bg': '#FFFFFF', orange: '#C2410C',
+      'brand-bg': '#000000', 'brand-ink': '#FFFFFF', 'brand-sub': '#FFFFFF', 'brand-hover': 'rgba(255, 255, 255, .2)',
+      'inverse-bg': '#000000', 'inverse-ink': '#FFFFFF', 'inverse-muted': '#FFFFFF', 'inverse-line': 'rgba(255, 255, 255, .5)',
+      selection: '#FFE600', 'shadow-rgb': '0 0 0' } }
   ];
 
   const byId = Object.fromEntries(THEMES.map((t) => [t.id, t]));
   const DEFAULT = 'campus';
+
+  // A font choice that works with any theme. 'theme' keeps the theme's own font.
+  const FONTS = [
+    { id: 'theme', label: 'Theme default' },
+    { id: 'system', label: 'System', stack: SANS },
+    { id: 'rounded', label: 'Rounded', stack: ROUNDED },
+    { id: 'mono', label: 'Mono', stack: MONO },
+    { id: 'serif', label: 'Serif', stack: SERIF },
+    { id: 'comic', label: 'Comic', stack: COMIC },
+    { id: 'readable', label: 'Atkinson Hyperlegible', stack: READABLE }
+  ];
+  const fontById = Object.fromEntries(FONTS.map((f) => [f.id, f]));
+  const fontOf = (id) => (fontById[id] && fontById[id].stack ? fontById[id] : null);
+
+  // [data-edr-theme] lifts it above every theme rule, whichever stylesheet comes last
+  // (boot.js's cached rule is appended after the full sheet).
+  const fontRule = (f) => 'html[data-edr-on][data-edr-theme][data-edr-font="' + f.id + '"] { --edr-font: ' + f.stack + '; }';
 
   function rule(t) {
     const decl = TOKENS.map((k) => '--edr-' + k + ': ' + t.tokens[k] + ';');
@@ -143,11 +227,11 @@
 
   // One stylesheet for all themes, keyed by html[data-edr-theme].
   function css() {
-    return THEMES.map(rule).join('\n');
+    return THEMES.map(rule).concat(FONTS.filter((f) => f.stack).map(fontRule)).join('\n');
   }
 
-  // Just one theme's rule, cached for the next page's first paint (boot.js).
-  const cssFor = (id) => rule(byId[id] || byId[DEFAULT]);
+  // Just one theme's rule (and font's), cached for the next page's first paint (boot.js).
+  const cssFor = (id, font) => [rule(byId[id] || byId[DEFAULT])].concat(fontOf(font) ? fontRule(fontOf(font)) : []).join('\n');
 
   function apply(id) {
     const theme = byId[id] || byId[DEFAULT];
@@ -163,10 +247,16 @@
     return theme;
   }
 
+  function applyFont(id) {
+    if (typeof document === 'undefined') return;
+    if (fontOf(id)) document.documentElement.setAttribute('data-edr-font', id);
+    else document.documentElement.removeAttribute('data-edr-font');
+  }
+
   function next(id, step) {
     const i = THEMES.findIndex((t) => t.id === id);
     return THEMES[(i + (step || 1) + THEMES.length) % THEMES.length].id;
   }
 
-  EDR.themes = { THEMES, TOKENS, byId, DEFAULT, css, cssFor, apply, next };
+  EDR.themes = { THEMES, TOKENS, FONTS, byId, fontOf, DEFAULT, css, cssFor, apply, applyFont, next };
 })();

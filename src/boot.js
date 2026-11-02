@@ -9,7 +9,7 @@
   const KEY = 'edr:boot';
   const root = document.documentElement;
   const isTop = (() => { try { return window.top === window; } catch (e) { return false; } })();
-  const ATTRS = ['on', 'top', 'home', 'collapsed', 'side-collapsed', 'dark', 'theme', 'pending'];
+  const ATTRS = ['on', 'top', 'home', 'collapsed', 'side-collapsed', 'dark', 'theme', 'font', 'pending'];
 
   function read() {
     try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; }
@@ -44,6 +44,7 @@
   root.setAttribute('data-edr-pending', '');
   setTimeout(() => root.removeAttribute('data-edr-pending'), 2000);
   if (state.theme) root.setAttribute('data-edr-theme', state.theme);
+  if (state.font) root.setAttribute('data-edr-font', state.font);
   if (state.dark) root.setAttribute('data-edr-dark', '');
   if (isTop) {
     root.setAttribute('data-edr-top', '');
