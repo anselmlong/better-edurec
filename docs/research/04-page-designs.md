@@ -135,3 +135,10 @@ Classic pages inside an iframe, with the page list in the parent page.
 | External Study Application | data | A summary above EduRec's grid. Lede: how many applications, and the latest one's name and status. One row per application: name, then type, academic year and period, applied date and financial aid; status as a tag (accepted ok, rejected or withdrawn quiet, others attention). The application ID is left out because it contains the student ID. Foot: Rank, Possible Actions and Withdrawal stay in EduRec's table below. |
 | Search Course Mappings | form | Intro: see how partner university courses map to NUS courses; choose a faculty and partner university with the lookups, then Fetch Mappings. Point: typed values must match EduRec's list exactly. |
 | Submit Course Mapping | form | A worksheet with Comments and Save; left as it is. |
+
+## Financials
+
+| Sub-page | Type | Design |
+|---|---|---|
+| Manage Student Financials | dead end | EduRec's generic error sits in the side panel, with an empty page beside it. Panel in the page area: "Student financials didn’t open": EduRec stopped with an error before showing bills and payments; try again later, and financial aid still opens. Actions: Try again (opens the tile again), Financial aid. Gated on the page's "Financials" title, since the error text is generic. |
+| View Financial Aid Disbursed | data | Existing financial aid card (total disbursed, count, latest, scholarship), unchanged. The Term From and Term To columns now size to their content, so the dropdown no longer runs into the Term To label. |

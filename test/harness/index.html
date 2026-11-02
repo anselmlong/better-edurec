@@ -8,6 +8,10 @@
 <style>
   .fake { font: 13px Arial, sans-serif; padding: 16px; }
   .fake .ps_header { background: #fff; padding: 12px; }
+  .fake .psc_float-left { float: left; }
+  .fake .psc_width-20pct { width: 20%; }
+  .fake .psc_label-halignleft > .ps_box-label { display: inline-block; margin-right: 8px; }
+  .fake .ps-dropdown { width: 200px; }
   .fake .tile { display: inline-block; width: 160px; height: 120px; margin: 4px; background: #f0a060; color: #fff; padding: 8px; }
 </style>
 </head>
@@ -103,8 +107,9 @@
     <h1 id="PANEL_TITLE"><span class="ps-text">View Financial Aid Disbursed</span></h1>
     <div class="ps_box-group psc_layout">
       <div class="ps_box-checkbox"><input class="ps-checkbox" type="checkbox" id="fat" checked><label class="ps-label" for="fat">All Terms</label></div>
-      <div class="ps_box-dropdown"><div class="ps_box-label"><label class="ps-label" for="tf">Term From</label></div><div class="ps_box-control"><select id="tf" class="ps-dropdown"><option>2025/2026 Semester 1</option></select></div></div>
-      <div class="ps_box-dropdown"><div class="ps_box-label"><label class="ps-label" for="tt">Term To</label></div><div class="ps_box-control"><select id="tt" class="ps-dropdown"><option>2026/2027 Semester 1</option></select></div></div>
+      <div class="ps_box-group psc_layout psc_width-20pct psc_float-left"><div class="ps_box-dropdown psc_label-halignleft"><div class="ps_box-label"><label class="ps-label" for="tf">Term From</label></div><div class="ps_box-control"><select id="tf" class="ps-dropdown"><option>2025/2026 Semester 1</option></select></div></div></div>
+      <div class="ps_box-group psc_layout psc_width-20pct psc_float-left"><div class="ps_box-dropdown psc_label-halignleft"><div class="ps_box-label"><label class="ps-label" for="tt">Term To</label></div><div class="ps_box-control"><select id="tt" class="ps-dropdown"><option>2026/2027 Semester 1</option></select></div></div></div>
+      <div style="clear:both"></div>
       <div class="ps_box-button psc_primary"><a class="ps-button" href="#">GO</a></div>
     </div>
     <div class="ps_box-grid-flex"><div class="ps_box-grid-header"><span class="ps_grid-title">Disbursements</span></div><div class="ps_box-gridc"><table class="ps_grid-flex">
@@ -336,6 +341,10 @@
   const cgrid = (label, cols, rows) => '<table class="PSLEVEL1GRIDWBO"><tr><td class="PSLEVEL1GRIDLABEL">' + label + '</td></tr><tr><td><table class="PSLEVEL1GRID"><tr>'
     + cols.map((c) => '<th class="PSLEVEL1GRIDCOLUMNHDR"><a>' + c + '</a></th>').join('') + '</tr>'
     + rows.map((r) => '<tr>' + r.map((c) => '<td class="PSLEVEL1GRIDODDROW">' + c + '</td>').join('') + '</tr>').join('') + '</table></td></tr></table>';
+  // Financials (crawled 3 Nov 2026): Manage Student Financials fails with EduRec's generic error in the side panel.
+  PAGES.finerror = { url: '/psc/cs90prd_54/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_SF_MD_STD_FIN_FL.GBL?GComp=N_SF_SS_STD_FIN_FL', title: 'Financials',
+    side: '<div class="ps_box-grouplet">An error has occurred that has stopped this transaction from continuing.</div>',
+    html: '<div id="divPAGECONTAINER_TGT" class="ps_box-group ps_ag-targetcontent"></div>' };
   PAGES.exchange = ge('External Study Application', tbl('<span class="PAPAGETITLE">Global Education</span>')
     + '<div class="alert"><strong>Note:</strong> Please read the information and instruction on the Programme/Financial Aid website before proceeding with the online application.</div>'
     + cgrid('My External Study Program Applications', ['Rank', 'Ext. Study AY', 'Application ID', 'Ext. Study Type', 'Ext. Study', 'Study Period', 'Applied On', 'Application Status', 'Applied for Financial Aid?', 'Required Actions', 'Possible Actions 1', 'Possible Actions 2', 'Withdrawal'],
@@ -370,7 +379,8 @@
     const side = document.createElement('div'); side.id = 'PT_SIDE'; side.style.cssText = 'width:260px;flex:none';
     const navItems = page.nav || ['View Exam Results', 'View Exam Schedule'];
     const selected = page.sel || navItems[0];
-    side.innerHTML = '<ul class="psa_list-linkmenu">' + navItems.map((t) => '<li' + (t === selected ? ' class="psc_selected"' : '') + '><a class="ps-link"><span class="ps-text">' + t + '</span></a></li>').join('') + '</ul>';
+    side.innerHTML = page.side || '<ul class="psa_list-linkmenu">' + navItems.map((t) => '<li' + (t === selected ? ' class="psc_selected"' : '') + '><a class="ps-link"><span class="ps-text">' + t + '</span></a></li>').join('') + '</ul>';
+    if (page.title) { const t = document.createElement('span'); t.className = 'ps_pagetitle'; t.textContent = page.title; header.append(t); }
     const content = document.createElement('div'); content.id = 'PT_CONTENT'; content.style.flex = '1';
     // EduRec puts each page's lines inside a grid box, which the restyle draws as a card.
     const main = document.createElement('div'); main.id = 'PT_MAIN';

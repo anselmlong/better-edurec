@@ -211,9 +211,12 @@
   // A link EduRec puts in its own message, clicked as it is (it may open a new tab).
   const pageLink = (text, label) => { const a = [...document.querySelectorAll('#PT_MAIN a')].find((x) => x.textContent.trim() === text); return a ? { label, run: () => a.click() } : null; };
   const changeTerm = { label: 'Choose another term', run: () => { const a = document.getElementById('DERIVED_ACRD_FL_SSR_CHANGE_TERM'); if (a) a.click(); } };
+  const openTile = (id, label) => ({ label, run: () => { top.location.href = EDR.routes.byId[id].path; } });
 
   // match: EduRec's message (exact text or a pattern for its first line); anchor:
-  // a plain substring of it, for the cheap page gate.
+  // a plain substring of it, for the cheap page gate. when: other lines the page must
+  // have, for a generic message. into: the box the panel goes in, when EduRec's message
+  // sits outside the page content.
   const DEAD_ENDS = [
     { id: 'noexams', match: 'An exam schedule is not available for this term.', icon: 'calendar',
       title: 'No exam schedule for this term', body: 'EduRec has no exams listed for this term. Pick another term to see its schedule.',
@@ -239,7 +242,11 @@
       actions: () => [openPage('View Graduation Status', 'Choose another term'), openPage('Apply for Graduation (AFG)', 'Apply for graduation')] },
     { id: 'lifetranscript', anchor: 'self-generation of a Student Life Transcript', match: /^The function for self-generation of a Student Life Transcript/, icon: 'closed',
       title: 'Student life transcripts have moved to NUSync', body: 'EduRec no longer generates them. Your CCA records are on NUSync; for problems with them, email nusync@nus.edu.sg.',
-      actions: () => [pageLink('NUSync', 'Open NUSync'), openPage('View Unofficial Transcript', 'Unofficial transcript')].filter(Boolean) }
+      actions: () => [pageLink('NUSync', 'Open NUSync'), openPage('View Unofficial Transcript', 'Unofficial transcript')].filter(Boolean) },
+    // Manage Student Financials: EduRec's generic error, in the side panel, with an empty page beside it.
+    { id: 'finerror', match: 'An error has occurred that has stopped this transaction from continuing.', when: ['Financials'], into: '#PT_MAIN .ps_ag-targetcontent', icon: 'closed',
+      title: 'Student financials didn’t open', body: 'EduRec stopped with an error before showing your bills and payments. Try again later; your financial aid disbursements still open.',
+      actions: () => [openTile('finances', 'Try again'), openTile('finaid', 'Financial aid')] }
   ];
 
   // Forms: one line on what the page does and the rules that matter before acting,
@@ -290,8 +297,8 @@
 
   for (const d of DEAD_ENDS) {
     ENHANCERS.push({
-      key: 'dead-' + d.id, anchor: d.anchor || d.match, snapshot: false, block: d.block,
-      test: (t) => t.split('\n').some((l) => matches(l.trim(), d.match)),
+      key: 'dead-' + d.id, anchor: d.anchor || d.match, snapshot: false, block: d.block, into: d.into,
+      test: (t) => t.split('\n').some((l) => matches(l.trim(), d.match)) && (d.when || []).every((w) => t.split('\n').some((l) => l.trim() === w)),
       parse: (t) => ({ message: t.split('\n').map((l) => l.trim()).find((l) => matches(l, d.match)) }),
       useful: (x) => x && x.message,
       hide: [d.match],
@@ -365,7 +372,9 @@
     if (existing) existing.replaceWith(el);
     else {
       el.classList.add('is-new');
-      if (blocks.length) ((e.block && blocks.find((b) => b.matches(e.block))) || blocks[0]).before(el);
+      const into = e.into && document.querySelector(e.into);
+      if (into) into.prepend(el);
+      else if (blocks.length) ((e.block && blocks.find((b) => b.matches(e.block))) || blocks[0]).before(el);
       else place(el, e.place || e.anchor, e.block);
     }
     if (snapshot) EDR.store.saveSnapshot(e.key, data).then((changed) => { if (changed) markSaved(el); }).catch(() => {});

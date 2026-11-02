@@ -269,6 +269,8 @@ html[data-edr-on] body :is(input, select, textarea):not(.edr-root *)[aria-invali
 html[data-edr-on] body input:is([type="checkbox"], [type="radio"]):not(.edr-root *) { width: 18px; height: 18px; margin: 0 8px 0 0; vertical-align: -4px; cursor: pointer; }
 html[data-edr-on] body :is(input[type="checkbox"], input[type="radio"]):not(.edr-root *) + :is(label, .ps-label) { margin-right: 18px; color: var(--edr-ink) !important; font-size: 14px !important; cursor: pointer; }
 html[data-edr-on] .ps_apps_content :is(.ps_box-edit, .ps_box-dropdown, .ps_box-longedit, .ps_box-date) > .ps_box-label { margin-bottom: 6px; }
+/* A field in a fixed-width column (Term From/To) fits its column instead of running into the next one. */
+html[data-edr-on] #PT_MAIN .psc_float-left:has(> :is(.ps_box-dropdown, .ps_box-date)) { width: auto !important; max-width: 100%; margin-right: 24px; }
 html[data-edr-on] .ps_apps_content :is(.ps_box-edit, .ps_box-dropdown, .ps_box-longedit, .ps_box-date, .ps_box-radio, .ps_box-checkbox) { margin-bottom: 16px; }
 
 /* Buttons in page content and dialogs: one size, one weight, real states. */
