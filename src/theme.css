@@ -271,6 +271,8 @@ html[data-edr-on] body :is(input[type="checkbox"], input[type="radio"]):not(.edr
 html[data-edr-on] .ps_apps_content :is(.ps_box-edit, .ps_box-dropdown, .ps_box-longedit, .ps_box-date) > .ps_box-label { margin-bottom: 6px; }
 /* A field in a fixed-width column (Term From/To) fits its column instead of running into the next one. */
 html[data-edr-on] #PT_MAIN .psc_float-left:has(> :is(.ps_box-dropdown, .ps_box-date)) { width: auto !important; max-width: 100%; margin-right: 24px; }
+/* A quarter-width column of instructions (MyInfo) is too narrow beside the sidebars: it takes the full line. */
+html[data-edr-on] #PT_MAIN .psc_float-left.psc_width-25pct:has(> .ps_box-htmlarea) { float: none; width: auto !important; max-width: 72ch; }
 html[data-edr-on] .ps_apps_content :is(.ps_box-edit, .ps_box-dropdown, .ps_box-longedit, .ps_box-date, .ps_box-radio, .ps_box-checkbox) { margin-bottom: 16px; }
 
 /* Buttons in page content and dialogs: one size, one weight, real states. */
@@ -329,7 +331,9 @@ html[data-edr-on] :is(.PSLEVEL1GRIDNAVIGATIONBAR, .PSLEVEL2GRIDNAVIGATIONBAR, .P
   border: 0 !important; border-bottom: 1px solid var(--edr-line) !important;
   font-size: 13px !important; font-weight: 600 !important; color: var(--edr-ink) !important; font-variant-numeric: tabular-nums;
 }
-html[data-edr-on] :is(.PSLEVEL1GRIDCOLUMNHDR, .PSLEVEL2GRIDCOLUMNHDR, .PSLEVEL1SSGRIDCOLUMNHDR) { padding: 8px 12px !important; text-align: left !important; font-size: 13px !important; }
+html[data-edr-on] :is(th, td):is(.PSLEVEL1GRIDCOLUMNHDR, .PSLEVEL2GRIDCOLUMNHDR, .PSLEVEL1SSGRIDCOLUMNHDR) { padding: 8px 12px !important; text-align: left !important; font-size: 13px !important; }
+/* The heading link inside the cell carries the same class; as a wrapped inline box its padding and background covered the line above. */
+html[data-edr-on] :is(.PSLEVEL1GRIDCOLUMNHDR, .PSLEVEL2GRIDCOLUMNHDR, .PSLEVEL1SSGRIDCOLUMNHDR) :is(.PSLEVEL1GRIDCOLUMNHDR, .PSLEVEL2GRIDCOLUMNHDR, .PSLEVEL1SSGRIDCOLUMNHDR) { padding: 0 !important; background: none !important; line-height: 1.35 !important; }
 html[data-edr-on] :is(.PSLEVEL1GRIDODDROW, .PSLEVEL1GRIDEVENROW, .PSLEVEL2GRIDODDROW, .PSLEVEL2GRIDEVENROW) {
   padding: 9px 12px !important; font-size: 14px !important; border-bottom: 1px solid var(--edr-line-2) !important;
 }
@@ -1098,7 +1102,7 @@ html[data-edr-on] .edr-orig.is-shown { margin-top: 16px !important; }
 .edr-dead-orig p { margin: 6px 0 0; max-width: 72ch; line-height: 1.5; color: var(--edr-ink-2); }
 
 /* Form intro: one line on the task, the rules that matter, then EduRec's form. */
-.edr-task { margin: 0 0 20px; max-width: 72ch; display: flex; flex-direction: column; gap: 8px; }
+.edr-task { margin: 0 0 20px; max-width: min(72ch, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 8px; }
 .edr-task-lede { margin: 0; font-size: 16px; line-height: 1.5; font-weight: 500; color: var(--edr-ink); text-wrap: pretty; }
 .edr-task-points { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.5; color: var(--edr-ink-2); }
 .edr-task-points li::marker { color: var(--edr-muted); }
