@@ -614,7 +614,17 @@
     return courses.length ? { courses } : null;
   }
 
-  EDR.parsers = { parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName,
+  // Check Application Outcome: is EduRec's grid empty? Its one empty row shows only a row number.
+  // The column labels appear twice (header and sort links), so the rows start after the last one.
+  function parsePlanOutcome(text) {
+    const ls = lines(text);
+    const start = ls.indexOf('Request Outcome');
+    const head = ls.lastIndexOf('Application Status');
+    if (start < 0 || head < start) return null;
+    return { empty: ls.slice(head + 1).every((l) => /^\d+$/.test(l)) };
+  }
+
+  EDR.parsers = { parsePlanOutcome, parseAudit, parseResults, parseMyClasses, parseFinAid, parseSessions, parseSlots, mergeSchedule, to24, titleCase, aidName,
     parseExamSchedule, examWhen, parseSuHistory, parseProgramme, parseCourses, parseTransferCredit, parseMilestones, parseClassList,
     parseDemographic, parseNames, parseContact, parseAddresses, parseEmergency, parseTranscriptApps, parseExchangeApps };
 })();

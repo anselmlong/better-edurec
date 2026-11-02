@@ -11,7 +11,8 @@
     calendar: 'M4 6h16v14H4zM4 10h16M9 3v4M15 3v4',
     closed: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM5.6 5.6l12.8 12.8',
     bell: 'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0',
-    info: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM12 11v6M12 7.5v.5'
+    info: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM12 11v6M12 7.5v.5',
+    done: 'M5 12.5l4.5 4.5L19 7.5'
   };
 
   const pad = (n) => String(n).padStart(2, '0');

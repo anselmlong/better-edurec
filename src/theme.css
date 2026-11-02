@@ -273,6 +273,9 @@ html[data-edr-on] .ps_apps_content :is(.ps_box-edit, .ps_box-dropdown, .ps_box-l
 html[data-edr-on] #PT_MAIN .psc_float-left:has(> :is(.ps_box-dropdown, .ps_box-date)) { width: auto !important; max-width: 100%; margin-right: 24px; }
 /* A quarter-width column of instructions (MyInfo) is too narrow beside the sidebars: it takes the full line. */
 html[data-edr-on] #PT_MAIN .psc_float-left.psc_width-25pct:has(> .ps_box-htmlarea) { float: none; width: auto !important; max-width: 72ch; }
+/* A card placed in one of EduRec's flex rows (DCR's carousel) takes its own line instead of a narrow column. */
+html[data-edr-on] .psc_carousel:has(> .edr-root) { flex-wrap: wrap; }
+html[data-edr-on] .psc_carousel > .edr-root { flex: 0 0 100%; }
 html[data-edr-on] .ps_apps_content :is(.ps_box-edit, .ps_box-dropdown, .ps_box-longedit, .ps_box-date, .ps_box-radio, .ps_box-checkbox) { margin-bottom: 16px; }
 
 /* Buttons in page content and dialogs: one size, one weight, real states. */

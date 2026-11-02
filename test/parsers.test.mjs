@@ -829,3 +829,12 @@ test('parseEmergency reads contacts and phones', () => {
   const { parseEmergency } = globalThis.EDR.parsers;
   assert.deepEqual(parseEmergency(PI_HEAD + 'Emergency Contacts\nContact\nPhone\nPrimary\nEXAMPLE PARENT NAME\n65 90000001').contacts, [{ name: 'EXAMPLE PARENT NAME', phone: '65 90000001' }]);
 });
+
+test('parsePlanOutcome tells an empty outcome grid from one with applications', () => {
+  const { parsePlanOutcome } = globalThis.EDR.parsers;
+  const HEAD = 'Declare Academic Plan\nApply for Restricted Plan\nCheck Application Outcome\nRequest Outcome\n1 row\n'
+    + 'Career\nTerm\nType\nApplication ID\nApplication Status\n'.repeat(2);
+  assert.deepEqual(parsePlanOutcome(HEAD + '1'), { empty: true });
+  assert.deepEqual(parsePlanOutcome(HEAD + '1\nUndergraduate\n2026/2027 Semester 1\nRestricted Plan\n0000001\nApproved'), { empty: false });
+  assert.equal(parsePlanOutcome('Declare Academic Plan\nSelect A Career'), null);
+});

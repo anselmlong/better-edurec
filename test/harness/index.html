@@ -87,7 +87,7 @@
       <div class="ps_box-button"><span class="ps-button-wrapper"><a class="ps-button" href="#">Cancel</a></span></div>
       <input type="button" class="ps-button" value="GO">
     </div>
-    <div id="alertmsg" class="ps_alert">You are not eligible for commencement registration !</div>` };
+    <div id="alertmsg" class="ps_alert">Please choose a report type before you continue.</div>` };
   PAGES.classic = { url: '/psc/cs90prd_11/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SAA_SS_DPR_ADB.GBL', html: `
     <div class="PAPAGETITLE">Academic Advisement Report</div>
     <span class="PSEDITBOXLABEL">Report Date</span> <span class="PSEDITBOX_DISPONLY">20/10/2026</span>
@@ -353,6 +353,27 @@
   PAGES.tutorialsout = cr('Select Tutorials/Labs', '<p><span>The outcome of </span><b>Select Tutorials/Labs (Round 1)</b><span> had been release </span><span>at </span><b>9AM, 9 Feb 2027.</b></p><p>Please visit CourseReg@EduRec via myEduRec > Academics > Course Registration > "View My Classes".</p>');
   PAGES.gdonly = cr('Submit Course Requests', '<p>This function is not applicable to Undergraduate students.</p>');
   PAGES.appeals = cr('Submit Appeals/Inquiries', '<p><span>Students who have yet to secure </span><strong>full workload or required tutorials/labs for Semester 2, AY2026/2027</strong><span> may contact the course hosts directly for assistance by referring to </span><a href="#" target="_blank"><span>Contact Us</span></a><span> page from CourseReg website.</span></p>');
+  // Documents & requests tiles (crawled 3 Nov 2026, values invented).
+  const doc = (nav, sel, html) => ({ url: '/psc/cs90prd_42/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_AD_REG_NAVCOL_FL.GBL?Action=U&MD=Y', nav, sel, html });
+  const ha = (inner, cls) => group('<div class="ps_box-htmlarea"><div class="ps-htmlarea">' + inner + '</div></div>', 'psc_layout' + (cls ? ' ' + cls : ''));
+  const REG_NAV = ['Information', 'QET/DET Registration', 'Authorisation Requirements', 'Declaration of Transfer Option'];
+  const PLAN_NAV = ['Declare Academic Plan', 'Apply for Restricted Plan', 'Check Application Outcome'];
+  PAGES.qet = doc(REG_NAV, 'QET/DET Registration', '<h1 class="ps_pagetitle"><span class="ps-text">QET/DET Registration</span></h1>'
+    + ha('<p>If you have been notified to sit for the QET/DET but unable to register for the test, please immediately:</p><p>- Email qet@nus.edu.sg (for QET)</p><p>- Contact your Faculty Administrator (for DET)</p>'));
+  PAGES.authclosed = doc(REG_NAV, 'Authorisation Requirements', '<h1 class="ps_pagetitle"><span class="ps-text">Authorisation Requirements</span></h1>' + ha('<span>The online Authorisation Requirements period has closed.</span>'));
+  PAGES.transferclosed = doc(REG_NAV, 'Declaration of Transfer Option', '<h1 class="ps_pagetitle"><span class="ps-text">Declaration of Transfer Option</span></h1>'
+    + ha('<p>The Declaration of Transfer Option exercise for current NUS undergraduate students transferring to new programme is now <b>closed</b>.</p><p>If you have any questions, please submit your enquiry to <a href="#" target="_blank">NUS FAQ Portal</a>.</p>'));
+  PAGES.plandone = doc(PLAN_NAV, 'Apply for Restricted Plan', group(ha('<b>You have completed your Academic Plan Declaration for Academic Year 2027,Semester 1.</b>') + '<div class="ps_box-button"><a class="ps-button" href="#">Back</a></div>', 'psc_halign-center'));
+  PAGES.planoutcome = doc(PLAN_NAV, 'Check Application Outcome', '<h2 class="ps_header-group"><span class="ps-text">Request Outcome</span></h2><div class="ps_box-grid-flex"><div class="ps_box-grid-header"><span>1 row</span></div><table class="ps_grid-flex">'
+    + '<tr class="ps_grid-head-row">' + ['Career', 'Term', 'Type', 'Application ID', 'Application Status'].map((c) => '<th class="ps_grid-col"><a class="ps-link"><span class="ps_grid-col-label">' + c + '</span><span class="psc_hidden">' + c + '</span></a></th>').join('')
+    + '</tr><tr class="ps_grid-row"><td class="ps_grid-cell"><span class="ps_box-value">1</span></td><td class="ps_grid-cell"></td></tr></table></div>');
+  PAGES.dyocclosed = doc(['DYOC (Group)'], 'DYOC (Group)', '<h1 class="ps_pagetitle"><span class="ps-text">DYOC (Group)</span></h1>' + ha('<span>Application period is not Open</span>'));
+  PAGES.rdonly = doc(['View RD Records', 'Update RD Records', 'Update Previous Term Records'], 'View RD Records', ha('<b>The Requirement Designation function is available for students who are reading Double Degree Programmes.</b>'));
+  PAGES.commencement = doc(['Commencement Registration'], 'Commencement Registration', ha('<span class="ps_box-value">You are not eligible for commencement registration !</span>', 'psc_strong'));
+  PAGES.fieldworkclosed = doc(['Information', 'Fieldwork Log Sheet'], 'Fieldwork Log Sheet', ha('<p><b>There are no open sessions as this time.</b></p><p>For more information, please contact Administrator.</p>'));
+  PAGES.rcworkshop = doc(['Information', 'Book Session', 'My Confirmed Session', 'Drop Session'], 'Information', ha('<p><u>THE1001/RC1000A A Culture of Respect and Consent - For R&amp;C workshop registration</u></p>'
+    + '<p>All workshop sessions will be conducted physically. Late-comers will not be entertained.</p><p>Booking for workshop sessions for AY2026/27, Sem 2 will commence on 4 January 2027, from 10.00 a.m. onwards.</p>'
+    + '<p>Important. Completion Deadline for AY2026/27, Sem 2: 22 January 2027.</p>'));
   // Financials (crawled 3 Nov 2026): Manage Student Financials fails with EduRec's generic error in the side panel.
   PAGES.finerror = { url: '/psc/cs90prd_54/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.N_SF_MD_STD_FIN_FL.GBL?GComp=N_SF_SS_STD_FIN_FL', title: 'Financials',
     side: '<div class="ps_box-grouplet">An error has occurred that has stopped this transaction from continuing.</div>',

@@ -267,8 +267,46 @@
       actions: () => [openPage('Select Courses', 'Select courses')] },
     { id: 'appeals', match: 'Students who have yet to secure', lines: 5, icon: 'info',
       title: 'Ask the course host for a place', body: 'If you still need a full workload or a tutorial or lab, contact the department that hosts the course. Their contacts are on the CourseReg website’s Contact Us page.',
-      actions: () => [pageLink('Contact Us', 'Contact Us page')].filter(Boolean) }
+      actions: () => [pageLink('Contact Us', 'Contact Us page')].filter(Boolean) },
+    // Documents & requests: exercises that are closed or not for this student.
+    { id: 'qet', anchor: 'If you have been notified to sit for the QET/DET', match: /^If you have been notified to sit for the QET\/DET/, lines: 3, icon: 'info',
+      title: 'No QET or DET to register for', body: 'If you were told to sit the QET or DET but can’t register here, email qet@nus.edu.sg for the QET, or contact your faculty administrator for the DET.',
+      actions: () => [openPage('Information', 'Registration information')] },
+    { id: 'authclosed', match: 'The online Authorisation Requirements period has closed.', icon: 'closed',
+      title: 'Authorisation requirements are closed', body: 'The online period for authorisation requirements has ended.',
+      actions: () => [openPage('Information', 'Registration information')] },
+    { id: 'transferclosed', anchor: 'The Declaration of Transfer Option exercise', match: /^The Declaration of Transfer Option exercise/, lines: 3, icon: 'closed',
+      title: 'Declaring a transfer option is closed', body: 'The exercise for undergraduates transferring to a new programme has ended. Questions go to the NUS FAQ Portal.',
+      actions: () => [pageLink('NUS FAQ Portal', 'NUS FAQ Portal')].filter(Boolean) },
+    { id: 'plandone', anchor: 'You have completed your Academic Plan Declaration', match: /^You have completed your Academic Plan Declaration/, icon: 'done',
+      title: 'Your academic plan declaration is done', body: 'You’ve already declared your plan for this term, so there’s nothing to apply for here now.',
+      actions: () => [openPage('Check Application Outcome', 'Check application outcome')] },
+    { id: 'dyocclosed', match: 'Application period is not Open', icon: 'closed',
+      title: 'DYOC applications are closed', body: 'Group applications for Design Your Own Course open during the application period.',
+      actions: () => [] },
+    { id: 'rdonly', match: 'The Requirement Designation function is available for students who are reading Double Degree Programmes.', icon: 'info',
+      title: 'Requirement designation is for double degree students', body: 'It lets double degree students choose which degree a course counts towards. Your programme doesn’t need it.',
+      actions: () => [] },
+    { id: 'commencement', match: 'You are not eligible for commencement registration !', icon: 'info',
+      title: 'Commencement registration isn’t open to you', body: 'It opens to graduating students before their commencement ceremony.',
+      actions: () => [openTile('degree', 'Degree progress')] },
+    { id: 'fieldworkclosed', match: 'There are no open sessions as this time.', lines: 2, icon: 'closed',
+      title: 'No fieldwork to log right now', body: 'The log sheet opens while you have a fieldwork period. Your fieldwork administrator can help if you expected one.',
+      actions: () => [openPage('Information', 'About fieldwork logs')] }
   ];
+
+  // Check Application Outcome with nothing in it: say so instead of an empty grid.
+  ENHANCERS.push({
+    key: 'planoutcome', anchor: 'Request Outcome', snapshot: false, block: '.ps_box-grid-flex',
+    test: (t) => t.includes('Application Status'),
+    parse: (t) => EDR.parsers.parsePlanOutcome(t),
+    useful: (x) => x && x.empty,
+    // Only the grid: "Request Outcome" sits in a group that holds the whole page.
+    hide: [/^\d+ rows?$/],
+    render: () => EDR.views.deadEnd({ icon: 'info', title: 'No restricted plan applications',
+      body: 'You haven’t applied for a restricted plan, so there’s no outcome to show.',
+      actions: [openPage('Apply for Restricted Plan', 'Apply for a restricted plan')] })
+  });
 
   // Forms: one line on what the page does and the rules that matter before acting,
   // taken from EduRec's own instructions. `before` is text in the block the intro sits above.
@@ -310,6 +348,11 @@
     { id: 'mappings', when: ['Partner University to NUS Course Mappings', 'For specific search'], before: /^For specific search, please provide the search parameters/,
       lede: 'See how partner university courses map to NUS courses: choose a faculty and a partner university with the lookup buttons, then Fetch Mappings.',
       points: ['Typed values must match EduRec’s list exactly, so pick them from the lookups.'] },
+    { id: 'rcworkshop', when: ['A Culture of Respect and Consent', 'Completion Deadline'], before: /^THE1001\/RC1000A A Culture of Respect and Consent/,
+      lede: 'Book your Respect and Consent (R&C) workshop: it’s compulsory. Book a session under Book Session, then check it under My Confirmed Session.',
+      points: ['Sessions are in person and latecomers are turned away. Booking is first come, first served; a session that doesn’t show is full.',
+        'If you live on campus, book a session for your own residence.',
+        'Missing the completion deadline below blocks key services such as course registration.'] },
     { id: 'transcript', when: ['View All Requested Reports', 'Report Type'], before: 'View Report',
       lede: 'Generate an unofficial transcript: choose a report type for your programme, then Submit.' },
     { id: 'suletter', when: ['View S/U Original Grade Letter'], before: 'View S/U Original Grade Letter',

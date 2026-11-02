@@ -155,3 +155,24 @@ Outside a CourseReg round, every page is one message in an HTML area. Each becom
 | Select Tutorials/Labs (results released) | dead end | "Tutorial and lab results are out", the same way. |
 | Submit Course Requests (undergraduate) | dead end | "Course requests are for graduate students": undergraduates use Select Courses. Action: Select courses. |
 | Submit Appeals/Inquiries | dead end | "Ask the course host for a place": contact the department hosting the course; contacts on the CourseReg website's Contact Us page. Action: Contact Us page (EduRec's link). |
+
+## Documents & requests
+
+Eight small tiles. Most pages are closed exercises or not for this student, so they become panels; EduRec's message stays one click away.
+
+| Tile, sub-page | Type | Design |
+|---|---|---|
+| Registration & declarations, Information | info | Long notes; the existing "Show all" collapse. |
+| QET/DET Registration | dead end | "No QET or DET to register for": if told to sit one but can't register, email qet@nus.edu.sg (QET) or contact the faculty administrator (DET). Action: Registration information. |
+| Authorisation Requirements | dead end | "Authorisation requirements are closed". Action: Registration information. |
+| Declaration of Transfer Option | dead end | "Declaring a transfer option is closed"; questions go to the NUS FAQ Portal. Action: NUS FAQ Portal (EduRec's link). |
+| Plan declaration, Declare Academic Plan | — | EduRec's own popup ("period is not open") with only OK; left alone. |
+| Apply for Restricted Plan (declared) | dead end | "Your academic plan declaration is done" (check icon). Action: Check application outcome. EduRec's Back button stays. |
+| Check Application Outcome (empty) | empty state | "No restricted plan applications" in place of the empty grid (`parsePlanOutcome`). Action: Apply for a restricted plan. |
+| Design Your Own Course, DYOC (Group) | dead end | "DYOC applications are closed": they open during the application period. |
+| Requirement Designation (all pages) | dead end | "Requirement designation is for double degree students": it picks which degree a course counts towards. |
+| Commencement Registration | dead end | "Commencement registration isn't open to you": it opens to graduating students. Action: Degree progress. |
+| Workshop booking (DCR), Information | form | Intro: book the compulsory R&C workshop under Book Session, check it under My Confirmed Session. Points: in person, latecomers turned away, first come first served; on-campus residents book their residence's session; missing the deadline blocks course registration. Book Session, My Confirmed Session and Drop Session are left as EduRec's (Drop Session never clicked). |
+| Fieldwork log, Information | info | Existing "Show all". |
+| Fieldwork Log Sheet (no sessions) | dead end | "No fieldwork to log right now": the log sheet opens during a fieldwork period. Action: About fieldwork logs. |
+| User Guides & Useful Links | info | Link lists already styled as cards; left alone. |
