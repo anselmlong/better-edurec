@@ -12,6 +12,7 @@
     classic: 'M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4',
     out: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10',
     theme: 'M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3A4.7 4.7 0 0 0 21 9.7C21 5.9 17 3 12 3zM7.5 12.5h.01M9 8h.01M14 7h.01M17 10.5h.01',
+    font: 'M4 19l5-14h1l5 14M6 14h7M15.5 12.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM18 12v7',
     keys: 'M3 7h18v11H3zM7 11h.01M11 11h.01M15 11h.01M8 15h8',
     help: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01'
   };
@@ -72,6 +73,7 @@
         nav,
         h('div', { class: 'edr-shell-foot' },
           footBtn(I.theme, 'Theme', () => openPalette({ mode: 'theme' })),
+          footBtn(I.font, 'Font', () => openPalette({ mode: 'font' })),
           footBtn(I.keys, 'Keyboard shortcuts', openHelp),
           footBtn(I.classic, 'Classic view', classicView),
           faqHref ? footBtn(I.help, 'FAQ & disclaimer', null, faqHref) : null,
@@ -197,9 +199,16 @@
   }
 
   function setFont(id) {
-    EDR.themes.applyFont(id);
+    if (currentFont() !== id) EDR.paintTheme(() => EDR.themes.applyFont(id));
     EDR.store.setPrefs({ font: id });
   }
+  const currentFont = () => document.documentElement.getAttribute('data-edr-font') || 'theme';
+
+  // The theme and font palettes preview the highlighted choice and revert on Esc.
+  const PICKERS = {
+    theme: { current: () => document.documentElement.getAttribute('data-edr-theme'), show: (id) => EDR.themes.apply(id), keep: setTheme },
+    font: { current: currentFont, show: (id) => EDR.themes.applyFont(id), keep: setFont }
+  };
 
   function commands() {
     const t = EDR.themes;
@@ -207,6 +216,7 @@
       { label: 'Fill in Overview', hint: 'Command', keys: 'setup overview guide collect fill', href: EDR.routes.HOME + '#overview' },
       { label: 'Open Overview', hint: 'Command', keys: 'overview home dashboard', href: EDR.routes.HOME + '#overview' },
       { label: 'Pick a theme', hint: 'Command', keys: 'theme themes colour color picker', run: () => openPalette({ mode: 'theme' }) },
+      { label: 'Pick a font', hint: 'Command', keys: 'font fonts typeface picker', run: () => openPalette({ mode: 'font' }) },
       ...t.THEMES.map((th) => ({ label: 'Theme: ' + th.label, hint: 'Command', keys: 'theme ' + th.id + ' ' + th.label.toLowerCase(), run: () => setTheme(th.id) })),
       ...t.FONTS.map((f) => ({ label: 'Font: ' + f.label, hint: 'Command', keys: 'font typeface ' + f.id + ' ' + f.label.toLowerCase(), run: () => setFont(f.id) })),
       { label: 'Toggle sidebar', hint: 'Command', keys: 'sidebar collapse expand nav rail', run: toggleNav },
@@ -237,7 +247,13 @@
       placeholder: 'Theme',
       items: (q) => EDR.themes.THEMES
         .filter((th) => !q.trim() || th.label.toLowerCase().includes(q.trim().toLowerCase()))
-        .map((th) => ({ label: th.label, hint: th.dark ? 'Dark' : 'Light', theme: th.id, swatch: [th.tokens.bg, th.tokens.surface, th.tokens.navy, th.tokens.ink] }))
+        .map((th) => ({ label: th.label, hint: th.dark ? 'Dark' : 'Light', pick: th.id, swatch: [th.tokens.bg, th.tokens.surface, th.tokens.navy, th.tokens.ink] }))
+    },
+    font: {
+      placeholder: 'Font',
+      items: (q) => EDR.themes.FONTS
+        .filter((f) => !q.trim() || f.label.toLowerCase().includes(q.trim().toLowerCase()))
+        .map((f) => ({ label: f.label, hint: f.stack ? 'Aa Bb 123' : 'Per theme', pick: f.id, font: f.stack }))
     }
   };
 
@@ -249,7 +265,8 @@
     const spec = MODES[mode];
     const index = EDR.routes.searchIndex();
     const returnFocus = document.activeElement;
-    const originalTheme = document.documentElement.getAttribute('data-edr-theme');
+    const picker = PICKERS[mode];
+    const original = picker && picker.current();
     let results = [];
     let active = 0;
     let picked = false;
@@ -265,19 +282,19 @@
     const overlay = h('div', { class: 'edr-root edr-pal-overlay', onmousedown: (e) => { if (e.target === overlay) close(); } },
       h('div', { class: 'edr-pal', role: 'dialog', 'aria-modal': 'true', 'aria-label': spec.placeholder },
         h('div', { class: 'edr-pal-head' },
-          spec.prefix ? h('span', { class: 'edr-pal-prefix', 'aria-hidden': 'true' }, spec.prefix) : EDR.icon(mode === 'theme' ? I.theme : I.search, 18),
+          spec.prefix ? h('span', { class: 'edr-pal-prefix', 'aria-hidden': 'true' }, spec.prefix) : EDR.icon(I[mode] || I.search, 18),
           input, kbd('Esc')),
         list,
         h('div', { class: 'edr-pal-foot' },
           h('span', null, kbd('↑'), kbd('↓'), ' move'),
-          h('span', null, kbd('Enter'), mode === 'theme' ? ' keep' : ' open'),
-          mode === 'theme' ? h('span', null, kbd('Esc'), ' revert') : h('span', null, kbd('?'), ' all shortcuts'))));
+          h('span', null, kbd('Enter'), picker ? ' keep' : ' open'),
+          picker ? h('span', null, kbd('Esc'), ' revert') : h('span', null, kbd('?'), ' all shortcuts'))));
 
-    // Each highlighted theme fades in as a preview.
+    // Each highlighted theme or font fades in as a preview.
     function preview() {
       const r = results[active];
-      if (mode !== 'theme' || !r || document.documentElement.getAttribute('data-edr-theme') === r.theme) return;
-      EDR.paintTheme(() => EDR.themes.apply(r.theme));
+      if (!picker || !r || picker.current() === r.pick) return;
+      EDR.paintTheme(() => picker.show(r.pick));
     }
 
     function render() {
@@ -291,8 +308,8 @@
             onclick: (e) => { if (!r.href) { e.preventDefault(); pick(r); } }
           },
             r.swatch ? h('span', { class: 'edr-swatch', 'aria-hidden': 'true' }, r.swatch.map((c) => h('span', { style: { background: c } }))) : null,
-            h('span', { class: 'edr-pal-label' }, r.label),
-            h('span', { class: 'edr-pal-hint' }, r.theme === originalTheme ? 'Current' : r.hint)))
+            h('span', { class: 'edr-pal-label', style: r.font ? { fontFamily: r.font } : null }, r.label),
+            h('span', { class: 'edr-pal-hint', style: r.font ? { fontFamily: r.font } : null }, picker && r.pick === original ? 'Current' : r.hint)))
       ) : [h('li', { class: 'edr-pal-empty' }, 'Nothing matches “' + input.value.trim() + '”.')]));
       if (results.length) {
         input.setAttribute('aria-activedescendant', 'edr-opt-' + active);
@@ -305,14 +322,14 @@
     function pick(r) {
       if (!r) return;
       picked = true;
-      if (r.theme) { setTheme(r.theme); close(); return; }
+      if (picker) { picker.keep(r.pick); close(); return; }
       close();
       if (r.run) r.run();
       else if (r.href) { rememberDeepLink(r.href); location.href = r.href; }
     }
 
     function close(silent) {
-      if (mode === 'theme' && !picked && document.documentElement.getAttribute('data-edr-theme') !== originalTheme) EDR.paintTheme(() => EDR.themes.apply(originalTheme));
+      if (picker && !picked && picker.current() !== original) EDR.paintTheme(() => picker.show(original));
       overlay.remove();
       palette = null;
       if (!silent && returnFocus && returnFocus.focus) returnFocus.focus();
@@ -331,8 +348,8 @@
 
     document.documentElement.append(overlay);
     palette = { input, close };
-    if (mode === 'theme') active = Math.max(0, EDR.themes.THEMES.findIndex((th) => th.id === originalTheme));
     render();
+    if (picker) { active = Math.max(0, results.findIndex((r) => r.pick === original)); render(); }
     input.focus();
   }
 

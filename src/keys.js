@@ -23,6 +23,7 @@
     { seq: ['['], action: 'toggleNav', group: 'View', label: 'Collapse or expand the sidebar' },
     { seq: [']'], action: 'toggleSide', group: 'View', label: 'Hide or show EduRec’s page list' },
     { seq: ['t'], action: 'themes', group: 'View', label: 'Pick a theme' },
+    { seq: ['f'], action: 'fonts', group: 'View', label: 'Pick a font' },
     { seq: ['?'], action: 'help', group: 'View', label: 'Show this cheat sheet' }
   ];
 
@@ -108,6 +109,7 @@
     toggleNav: () => EDR.shell.toggleNav(),
     toggleSide: () => { if (document.getElementById('PT_SIDE')) EDR.shell.toggleSide(); },
     themes: () => EDR.shell.openPalette({ mode: 'theme' }),
+    fonts: () => EDR.shell.openPalette({ mode: 'font' }),
     help: () => EDR.shell.openHelp()
   };
 
