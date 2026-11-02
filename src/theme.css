@@ -514,10 +514,9 @@ html[data-edr-on] ul.psa_list-linkmenu.edr-has-glide > li:not(.psc_selected):hov
 html[data-edr-on] ul.psa_list-linkmenu.edr-has-glide > li:not(.psc_selected):hover .ps-link { color: var(--edr-ink) !important; }
 html[data-edr-theme="terminal"] .edr-glide { border-radius: 0; }
 
-/* Theme changes paint in as a growing circle (EDR.paintTheme). */
+/* Theme changes cross-fade (EDR.paintTheme). */
 html.edr-painting::view-transition-old(root),
-html.edr-painting::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-html.edr-painting::view-transition-new(root) { z-index: 2; }
+html.edr-painting::view-transition-new(root) { animation-duration: 320ms; animation-timing-function: ease; }
 .edr-nav-item.is-active { background: var(--edr-tint); color: var(--edr-selected-ink) !important; font-weight: 600; }
 .edr-shell-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 12px; border-top: 1px solid var(--edr-line); }
 .edr-link-btn {

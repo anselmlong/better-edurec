@@ -82,27 +82,15 @@
     return { sync: moveTo, hide, el: pill };
   };
 
-  // Paints a theme change in as a circle growing from the control that chose it,
-  // using a view transition. Falls back to an instant swap.
+  // Cross-fades a theme change with a view transition (timing in theme.css).
+  // Falls back to an instant swap.
   let themeTransition = null;
-  EDR.paintTheme = function paintTheme(apply, origin) {
+  EDR.paintTheme = function paintTheme(apply) {
     if (!document.startViewTransition || reducedMotion() || document.hidden) { apply(); return; }
     if (themeTransition) themeTransition.skipTransition();
-    let x = innerWidth / 2;
-    let y = innerHeight / 2;
-    if (origin && origin.getBoundingClientRect) {
-      const r = origin.getBoundingClientRect();
-      x = r.left + r.width / 2; y = r.top + r.height / 2;
-    }
-    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
     document.documentElement.classList.add('edr-painting');
     const t = document.startViewTransition(apply);
     themeTransition = t;
-    t.ready.then(() => {
-      document.documentElement.animate(
-        { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + radius + 'px at ' + x + 'px ' + y + 'px)'] },
-        { duration: 460, easing: EASE_OUT, pseudoElement: '::view-transition-new(root)' });
-    }).catch(() => {});
     t.finished.finally(() => {
       if (themeTransition === t) themeTransition = null;
       document.documentElement.classList.remove('edr-painting');

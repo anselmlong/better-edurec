@@ -191,8 +191,8 @@
 
   // ---- Palette: search, ':' commands, and the theme picker share one component ----
 
-  function setTheme(id, origin) {
-    if (document.documentElement.getAttribute('data-edr-theme') !== id) EDR.paintTheme(() => EDR.themes.apply(id), origin);
+  function setTheme(id) {
+    if (document.documentElement.getAttribute('data-edr-theme') !== id) EDR.paintTheme(() => EDR.themes.apply(id));
     EDR.store.setPrefs({ theme: id });
   }
 
@@ -273,12 +273,11 @@
           h('span', null, kbd('Enter'), mode === 'theme' ? ' keep' : ' open'),
           mode === 'theme' ? h('span', null, kbd('Esc'), ' revert') : h('span', null, kbd('?'), ' all shortcuts'))));
 
-    // Each previewed theme paints in from its swatch.
+    // Each highlighted theme fades in as a preview.
     function preview() {
       const r = results[active];
       if (mode !== 'theme' || !r || document.documentElement.getAttribute('data-edr-theme') === r.theme) return;
-      const swatch = list.querySelector('#edr-opt-' + active + ' .edr-swatch');
-      EDR.paintTheme(() => EDR.themes.apply(r.theme), swatch);
+      EDR.paintTheme(() => EDR.themes.apply(r.theme));
     }
 
     function render() {
@@ -313,7 +312,7 @@
     }
 
     function close(silent) {
-      if (mode === 'theme' && !picked && document.documentElement.getAttribute('data-edr-theme') !== originalTheme) EDR.paintTheme(() => EDR.themes.apply(originalTheme), input);
+      if (mode === 'theme' && !picked && document.documentElement.getAttribute('data-edr-theme') !== originalTheme) EDR.paintTheme(() => EDR.themes.apply(originalTheme));
       overlay.remove();
       palette = null;
       if (!silent && returnFocus && returnFocus.focus) returnFocus.focus();
