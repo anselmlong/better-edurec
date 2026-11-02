@@ -48,7 +48,7 @@ test('generated stylesheet has one rule per theme, then one per font', () => {
   const rules = css().split('\n');
   assert.equal(rules.length, THEMES.length + FONTS.filter((f) => f.stack).length);
   assert.match(rules[0], /^html\[data-edr-on\]\[data-edr-theme="campus"\] \{ --edr-bg: #F4F6F9;/);
-  assert.match(rules.at(-1), /\[data-edr-theme\]\[data-edr-font="readable"\] \{ --edr-font: /);
+  assert.match(rules.at(-1), /\[data-edr-theme\]\[data-edr-font="comic"\] \{ --edr-font: /);
 });
 
 test('the boot cache carries the chosen font, and nothing for the theme default', () => {

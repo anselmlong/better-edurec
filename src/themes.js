@@ -20,7 +20,6 @@
   const COMIC = '"Comic Sans MS", "Comic Neue", "Chalkboard SE", "Comic Relief", cursive';
   const SERIF = '"Iowan Old Style", "Charter", "Georgia", "Times New Roman", serif';
   const RETRO = '"Tahoma", "Verdana", "MS Sans Serif", "Segoe UI", sans-serif';
-  const READABLE = '"Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Verdana", system-ui, sans-serif';
 
   const dark = (t) => ({ 'brand-hover': 'rgba(255, 255, 255, .08)', 'shadow-rgb': '0 0 0', ...t });
 
@@ -207,8 +206,7 @@
     { id: 'rounded', label: 'Rounded', stack: ROUNDED },
     { id: 'mono', label: 'Mono', stack: MONO },
     { id: 'serif', label: 'Serif', stack: SERIF },
-    { id: 'comic', label: 'Comic', stack: COMIC },
-    { id: 'readable', label: 'Atkinson Hyperlegible', stack: READABLE }
+    { id: 'comic', label: 'Comic', stack: COMIC }
   ];
   const fontById = Object.fromEntries(FONTS.map((f) => [f.id, f]));
   const fontOf = (id) => (fontById[id] && fontById[id].stack ? fontById[id] : null);
