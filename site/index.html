@@ -131,6 +131,11 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; background: var(-
 .shots figure { margin: 0; }
 .shots img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); box-shadow: var(--shadow); }
 .shots figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; }
+.films { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px; }
+.films figure { margin: 0; }
+.films video { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; border-radius: 10px; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--tint); }
+.films figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; }
+@media (max-width: 760px) { .films { grid-template-columns: 1fr; } }
 
 footer { border-top: 1px solid var(--line); padding: 32px 0 48px; font-size: 14px; color: var(--muted); }
 footer .wrap { display: flex; gap: 12px 32px; justify-content: space-between; flex-wrap: wrap; }
@@ -179,7 +184,7 @@ section[id] { scroll-margin-top: 60px; }
     <div class="wrap">
       <span class="eyebrow">Unofficial Chrome extension for NUS students</span>
       <h1>EduRec, without the hunting.</h1>
-      <p class="lead">Your GPA, degree progress and this week's timetable on one page. Search any EduRec page with <kbd>⌘</kbd><kbd>K</kbd>, move around with the keyboard, and pick from 12 themes.</p>
+      <p class="lead">Your GPA, degree progress and this week's timetable on one page. Search any EduRec page with <kbd>⌘</kbd><kbd>K</kbd>, move around with the keyboard, pick from 19 themes and change the font.</p>
       <div class="cta">
         <a class="btn btn-primary" href="https://chromewebstore.google.com/detail/better-edurec-unofficial/jmobagecfhcbemcgglibldglgmneogaf">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -227,8 +232,8 @@ section[id] { scroll-margin-top: 60px; }
         </div>
         <div class="feature">
           <div class="icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.5-.8 1.5-1.5 0-.9-.6-1.2-.6-2 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4c0-5-4-9-9-9Z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="11" cy="7.5" r="1.2"/><circle cx="15.5" cy="8.5" r="1.2"/></svg></div>
-          <h3>12 themes</h3>
-          <p>Campus, Dark, Nord, Dracula, Catppuccin and more. Every one passes WCAG AA contrast for body text.</p>
+          <h3>19 themes, plus fonts</h3>
+          <p>Campus, Kopi, Comic, Vaporwave, Retro 95, High contrast and more. Press <kbd>t</kbd> for themes, <kbd>f</kbd> for fonts. Every theme passes WCAG AA contrast.</p>
         </div>
       </div>
     </div>
@@ -263,12 +268,17 @@ npm test</pre>
 
   <section class="gallery" aria-label="Screenshots">
     <div class="wrap">
-      <div class="section-head"><h2>On real EduRec</h2></div>
+      <div class="section-head"><h2>See it in action</h2></div>
+      <div class="films">
+        <figure><video muted loop playsinline preload="metadata" poster="media/search.jpg" aria-label="Pressing Command K, typing exam and opening Exam results"><source src="media/search.webm" type="video/webm"><source src="media/search.mp4" type="video/mp4"></video><figcaption>Any page in a few keystrokes: <kbd>⌘</kbd><kbd>K</kbd>, type, Enter</figcaption></figure>
+        <figure><video muted loop playsinline preload="metadata" poster="media/themes.jpg" aria-label="The Overview page cycling through eight themes"><source src="media/themes.webm" type="video/webm"><source src="media/themes.mp4" type="video/mp4"></video><figcaption>Pick a theme that feels like yours</figcaption></figure>
+      </div>
       <div class="shots">
         <figure><img src="docs/store/screenshot-overview.png" alt="Overview page with GPA, degree progress and timetable" width="1280" height="800" loading="lazy"><figcaption>The Overview</figcaption></figure>
-        <figure><img src="docs/store/screenshot-timetable.png" alt="Weekly timetable" width="1280" height="800" loading="lazy"><figcaption>This week's timetable</figcaption></figure>
-        <figure><img src="docs/store/screenshot-themes.png" alt="Theme picker" width="1280" height="800" loading="lazy"><figcaption>Theme picker</figcaption></figure>
+        <figure><img src="docs/store/screenshot-search.png" alt="Search palette with results for exam" width="1280" height="800" loading="lazy"><figcaption>Search every page</figcaption></figure>
+        <figure><img src="docs/store/screenshot-picker.png" alt="Theme picker previewing Vaporwave" width="1280" height="800" loading="lazy"><figcaption>Theme picker</figcaption></figure>
       </div>
+      <p class="hint">Screenshots use invented data.</p>
     </div>
   </section>
 </main>
@@ -295,6 +305,14 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
   try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; } catch { b.textContent = 'Press ⌘C'; }
   setTimeout(() => { b.textContent = 'Copy'; }, 1600);
 }));
+</script>
+<script>
+(() => {
+  const vids = document.querySelectorAll('.films video');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause()), { threshold: 0.25 });
+  vids.forEach((v) => io.observe(v));
+})();
 </script>
 </body>
 </html>

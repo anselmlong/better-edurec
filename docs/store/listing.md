@@ -37,8 +37,11 @@ Unofficial, read-only redesign of NUS EduRec: a clean sidebar, search, live time
 
 **Screenshots** (1280×800, made from the test harness with invented data — never use real EduRec screenshots, they contain personal data):
 - `docs/store/screenshot-overview.png`
-- `docs/store/screenshot-timetable.png`
+- `docs/store/screenshot-search.png`
+- `docs/store/screenshot-picker.png`
 - `docs/store/screenshot-themes.png`
+
+**Promo video:** the store takes a YouTube URL only. The loops in `site/media/` (search, themes) can be uploaded to YouTube for it.
 
 **Homepage URL:** https://github.com/anselmlong/better-edurec
 
