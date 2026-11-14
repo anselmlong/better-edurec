@@ -616,7 +616,7 @@ html[data-edr-on] .edr-root .edr-pal-input, html[data-edr-on] .edr-root .edr-pal
   transition: background-color 90ms ease;
 }
 .edr-pal-item.is-active { background: var(--edr-tint); }
-.edr-pal-item.is-active .edr-pal-label { color: var(--edr-selected-ink); }
+.edr-pal-item.is-active :is(.edr-pal-label, .edr-pal-hint) { color: var(--edr-selected-ink); }
 .edr-pal-label { font-weight: 600; font-size: 15px; }
 .edr-pal-hint { font-size: 13px; color: var(--edr-muted); }
 .edr-pal-empty { padding: 28px 24px; text-align: center; color: var(--edr-muted); font-size: 14px; }
