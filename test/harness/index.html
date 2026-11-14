@@ -12,6 +12,7 @@
   .fake .psc_width-20pct { width: 20%; }
   .fake .psc_label-halignleft > .ps_box-label { display: inline-block; margin-right: 8px; }
   .fake .ps-dropdown { width: 200px; }
+  #PT_SIDE ul { list-style: none; padding-left: 0; } /* PeopleSoft's own CSS drops the bullets */
   .fake .tile { display: inline-block; width: 160px; height: 120px; margin: 4px; background: #f0a060; color: #fff; padding: 8px; }
 </style>
 </head>
@@ -149,6 +150,13 @@
     + grid('', ['', '*E-Exam Tool Description'], [['1', 'EXAMTOOL_ONE - Example Online Assessment']])
     + '<div class="ps_box-group">' + '<div>Note: The Exam Seat Number and Exam Venue will only be available nearer the start of the examinations.</div><div>Information shown on this page is generated on 27 Oct 2026 03:52 PM</div></div>'
     + '</div>' };
+  // View Financial Aid Disbursed as EduRec draws it: a term filter, then the disbursements grid.
+  PAGES.finaid = { url: PAGES.finaid.url, nav: ['View Financial Aid Disbursed'], html: '<h1 id="PANEL_TITLE"><span class="ps-text">View Financial Aid Disbursed</span></h1>'
+    + '<div class="ps_box-group psc_layout"><div class="ps_box-checkbox"><input class="ps-checkbox" type="checkbox" id="fa-all" checked><label class="ps-label" for="fa-all">All Terms</label></div>'
+    + '<div class="ps_box-button psc_primary"><a class="ps-button" href="#">GO</a></div></div>'
+    + grid('', ['', 'FA Code', 'FA Type', 'Item Type', 'Term', 'Posted Date', 'Amount'], [
+      ['1', 'Example Merit Award', 'Third Party Contracts', 'Example Merit Award', '2025/2026 Semester 2', '13/01/2026', '3850.00'],
+      ['2', 'Example Merit Award', 'Third Party Contracts', 'Example Merit Award', '2026/2027 Semester 1', '11/08/2026', '3850.00']]) };
   PAGES.examsempty = { url: PAGES.results.url, html: termHead('2027/2028 Semester 1') + '<div class="ps_apps_content">' + note('An exam schedule is not available for this term.') + '</div>' };
   PAGES.suhistory = { url: PAGES.results.url, html: '<div class="ps_apps_content">'
     + '<div class="ps_box-longedit psc_label-none"><div class="ps_box-value"><div>Instructions:</div><div>The table below shows the course(s) that you had exercised the Satisfactory(S)/Unsatisfactory(U) option on for the past semesters/terms.</div></div></div>'
