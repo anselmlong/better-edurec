@@ -297,7 +297,8 @@
     }
 
     function render() {
-      results = spec.items(input.value, index).slice(0, 14);
+      // Search caps its rows; the theme and font pickers list every choice (the list scrolls).
+      results = picker ? spec.items(input.value, index) : spec.items(input.value, index).slice(0, 14);
       active = Math.min(active, Math.max(results.length - 1, 0));
       list.replaceChildren(...(results.length ? results.map((r, i) =>
         h('li', { role: 'option', id: 'edr-opt-' + i, 'aria-selected': i === active ? 'true' : 'false' },
