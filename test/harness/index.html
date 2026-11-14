@@ -13,6 +13,10 @@
   .fake .psc_label-halignleft > .ps_box-label { display: inline-block; margin-right: 8px; }
   .fake .ps-dropdown { width: 200px; }
   #PT_SIDE ul { list-style: none; padding-left: 0; } /* PeopleSoft's own CSS drops the bullets */
+  /* Stand-ins for PeopleSoft's classic stylesheet, which the harness doesn't load. */
+  .PALEVEL0PRIMARY { font-size: 12px; letter-spacing: .04em; opacity: .7; }
+  .PATRANSACTIONTITLE { display: block; font-size: 20px; font-weight: 700; margin: 4px 0 8px; }
+  .PSGROUPBOXWBO { margin: 8px 0 12px; font-weight: 600; }
   .fake .tile { display: inline-block; width: 160px; height: 120px; margin: 4px; background: #f0a060; color: #fff; padding: 8px; }
 </style>
 </head>
@@ -341,6 +345,15 @@
     + '<table class="PSLEVEL1GRIDNBO"><tr><td class="PSLEVEL2GRIDLABEL">View a Saved What-if Report</td></tr><tr><td><span>Requested on</span> <a class="PSHYPERLINK" href="#">14/05/2026</a></td></tr></table>');
   PAGES.whatifreport = classic('View What-if Report', 'What-If Report', PAGES.audit.lines.slice(2).map((l) => '<div>' + l + '</div>').join('')
     .replace('<div>Graduation check outcome:</div>', '<div>What-If Statistics</div><div>Graduation check outcome:</div>'));
+  // The audit as EduRec draws it: a classic report, one grid box per requirement (same text, same order).
+  const req = (name, ...ls) => '<table class="PSLEVEL1GRIDWBO"><tr><td class="PSLEVEL1GRIDLABEL">' + name + '</td></tr>'
+    + ls.map((l) => '<tr><td class="PSLEVEL1GRIDODDROW"><span class="PSTEXT">' + l + '</span></td></tr>').join('') + '</table>';
+  PAGES.audit = classic('View Graduation Audit Report', 'My Graduation Audit Report', tbl('<span class="PSTEXT">NUS | Undergraduate</span>')
+    + tbl('<span class="PSTEXT">Graduation check outcome:</span> <span class="PSTEXT">Not Satisfied</span>', 'PSGROUPBOXWBO')
+    + req('CS Breadth & Depth', 'Not Satisfied:   Pass 32 Units of level-3000+ CS courses.', 'Units: 32.00 required, 28.00 taken, 4.00 needed')
+    + req('UE Requirements', 'Not Satisfied:   Pass 40 Units of Unrestricted Elective Courses.', 'Units: 40.00 required, 28.00 taken, 12.00 needed',
+      'Pass 40 UTs of UEs.', 'Not Satisfied:   >', 'Units: 40.00 required, 28.00 taken, 12.00 needed')
+    + req('Overall Requirements', 'Not Satisfied:   >', 'Overall UT Requirement', 'Not Satisfied:   Verify overall minimum 160 Units for the degree.', 'Units: 160.00 required, 144.00 taken, 16.00 needed'));
   PAGES.afgclosed = classic('Apply for Graduation (AFG)', 'Apply for Graduation', infoMsg('Apply for Graduation is closed.', 'Please refer to the schedule in MyPortal@NUS.'));
   PAGES.nograd = classic('View Graduation Status', 'View Graduation Status', infoMsg('Apply for Graduation application is withdrawn and/or not found. If you have submitted and did not withdraw your graduation application, please approach for your program/subject advisor at the Faculty/School for assistance.'));
   // Global Education: classic pages in tables (crawled 3 Nov 2026, values invented).
@@ -353,6 +366,14 @@
   const CR_NAV = ['About CourseReg@EduRec', 'View My Classes@CourseReg', 'Select Courses', 'Submit Course Requests', 'Select Tutorials/Labs', 'Add/Swap Tutorials/Labs', 'Drop Classes', 'Submit Appeals/Inquiries'];
   const cr = (sel, inner) => ({ url: '/psc/cs90prd_33/EMPLOYEE/SA/c/N_STUDENT_RECORDS.N_MRS_START_MD_FL.GBL?Action=U&MD=Y&GComp=N_MRS_START_NAV_FL', nav: CR_NAV, sel,
     html: group('<div class="ps_box-htmlarea"><div class="ps-htmlarea">' + inner + '</div></div>', 'psc_layout psc_label-none') });
+  // View My Classes: a heading and a class grid per course.
+  const CLASS_COLS = ['Class', 'Class Type', 'Session', 'Units', 'Status'];
+  const course = (head, rows) => group(grid('', CLASS_COLS, rows).replace('<table class="ps_grid-flex">',
+    '<table class="ps_grid-flex"><caption class="ps_grid-title" style="text-align:left;font-weight:600;padding:12px 0 8px">' + head + '</caption>'));
+  PAGES.classes = cr('View My Classes@CourseReg', '');
+  PAGES.classes.html = '<div class="ps_box-group ps_apps_pageheader"><div>Undergraduate</div><div>2026/2027 Semester 1</div></div>' + '<div class="ps_apps_content">'
+    + course('CS3223 Database Systems Implementation', [['L - L1 - 13001', 'Lecture', 'Regular', '4.00', 'Enrolled'], ['T - T04 - 13002', 'Tutorial', 'Regular', '', 'Enrolled']])
+    + course('PH2202 Philosophy of Mind', [['L - L1 - 22001', 'Lecture', 'Regular', '4.00', 'Enrolled']]) + '</div>';
   PAGES.aboutcoursereg = cr('About CourseReg@EduRec', '<p><u><b>CourseReg@EduRec</b></u></p><p>Course Registration at Education Records System (CourseReg@EduRec) is the University’s consolidated course registration platform for all NUS students belonging to the following categories:</p>'
     + '<p>-   Undergraduate* (UG)</p><p>-   Graduate (GD)</p><p>CourseReg@EduRec employs a rules-driven, priority-based engine to allocate courses based on each student’s:</p><p>-   Curricular needs;</p><p>-   course preferences</p>'
     + '<p>Visit <a href="#" target="_blank">CourseReg Website</a> for more information related to CourseReg.</p>');
