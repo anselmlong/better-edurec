@@ -27,7 +27,7 @@ Unofficial, read-only redesign of NUS EduRec: a clean sidebar, search, live time
 > • Quick links straight to your unofficial transcript, exam results, exam schedule, course registration and S/U declarations
 > • An optional Overview: GPA, degree progress, what class is up next, and this week's timetable with a card per course. A short guided checklist fills it in.
 > • Open your timetable in NUSMods in one click
-> • 12 themes, including Dark, Monokai, Dracula, Nord, Terminal and Girlypop
+> • 19 themes, including Dark, Comic, Kopi, Retro 95, Vaporwave and High contrast, plus a font picker (Rounded, Mono, Serif, Comic) that works with any theme
 > • Vim-style keyboard controls (press ? for the list)
 > • Classic view switches back to EduRec as NUS ships it, any time
 >
