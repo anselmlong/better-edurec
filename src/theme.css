@@ -182,6 +182,8 @@ html[data-edr-on] .ps_box-grid-header { background: var(--edr-surface) !importan
 html[data-edr-on] .ps_grid-title,
 html[data-edr-on] .ps_grid-title .ps-text { font-size: 16px !important; font-weight: 700 !important; color: var(--edr-ink) !important; }
 html[data-edr-on] .psc_rowcount .ps-text { font-size: 13px !important; color: var(--edr-muted) !important; }
+/* The student's name above a page: EduRec's brown fails on dark and grey themes. */
+html[data-edr-on] [id^="DERIVED_NAME_PERSON_NAME"] { color: var(--edr-ink) !important; }
 html[data-edr-on] .ps_box-gridc, html[data-edr-on] .ps_box-gridc-right, html[data-edr-on] .ps_box-grid { overflow-x: auto; }
 html[data-edr-on] table.ps_grid-flex { width: 100% !important; border-collapse: collapse !important; background: var(--edr-surface) !important; }
 html[data-edr-on] .ps_grid-head-row th.ps_grid-col {
@@ -460,7 +462,6 @@ html[data-edr-collapsed] .edr-brand-mark svg rect:nth-child(2) { transform: scal
 .edr-brand-link:hover .edr-brand-mark { transform: translateY(-1px); }
 .edr-brand-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; white-space: nowrap; }
 .edr-brand-name { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
-.edr-brand-sub { font-size: 12px; color: var(--edr-brand-sub); }
 .edr-icon-btn {
   width: 36px; height: 36px; flex: none; display: inline-flex; align-items: center; justify-content: center;
   border: 0; border-radius: var(--edr-radius-sm); background: transparent; color: var(--edr-brand-sub); cursor: pointer;
