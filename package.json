@@ -1,6 +1,6 @@
 {
   "name": "better-edurec",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "description": "Unofficial, read-only redesign of NUS EduRec as a Chrome extension.",
   "scripts": {
