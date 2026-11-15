@@ -139,7 +139,7 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; background: var(-
 .update { margin-top: 16px; font-size: 14px; color: var(--muted); }
 
 /* Gallery */
-.gallery { padding: 80px 0; }
+.gallery { padding: 0 0 80px; }
 .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .shots figure { margin: 0; }
 .shots img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); box-shadow: var(--shadow); }
@@ -271,6 +271,22 @@ section[id] { scroll-margin-top: 60px; }
     </div>
   </section>
 
+  <section class="gallery" aria-label="Screenshots">
+    <div class="wrap">
+      <div class="section-head"><h2>See it in action</h2></div>
+      <div class="films">
+        <figure><video muted loop playsinline preload="metadata" poster="media/search.jpg" aria-label="Pressing Command K, typing exam and opening Exam results"><source src="media/search.webm" type="video/webm"><source src="media/search.mp4" type="video/mp4"></video><figcaption>Any page in a few keystrokes: <kbd>⌘</kbd><kbd>K</kbd>, type, Enter</figcaption></figure>
+        <figure><video muted loop playsinline preload="metadata" poster="media/themes.jpg" aria-label="The Overview page cycling through eight themes"><source src="media/themes.webm" type="video/webm"><source src="media/themes.mp4" type="video/mp4"></video><figcaption>Pick a theme that feels like yours</figcaption></figure>
+      </div>
+      <div class="shots">
+        <figure><img src="docs/store/screenshot-overview.png" alt="Overview page with GPA, degree progress and timetable" width="1280" height="800" loading="lazy"><figcaption>The Overview</figcaption></figure>
+        <figure><img src="docs/store/screenshot-search.png" alt="Search palette with results for exam" width="1280" height="800" loading="lazy"><figcaption>Search every page</figcaption></figure>
+        <figure><img src="docs/store/screenshot-picker.png" alt="Theme picker previewing Vaporwave" width="1280" height="800" loading="lazy"><figcaption>Theme picker</figcaption></figure>
+      </div>
+      <p class="hint">Screenshots use invented data.</p>
+    </div>
+  </section>
+
   <section class="install" id="install">
     <div class="wrap">
       <div class="section-head">
@@ -295,22 +311,6 @@ npm test</pre>
           <p class="update">The store version updates on its own. For a loaded folder, <code>git pull</code> and click the reload icon on the extension's card in <code>chrome://extensions</code>.</p>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="gallery" aria-label="Screenshots">
-    <div class="wrap">
-      <div class="section-head"><h2>See it in action</h2></div>
-      <div class="films">
-        <figure><video muted loop playsinline preload="metadata" poster="media/search.jpg" aria-label="Pressing Command K, typing exam and opening Exam results"><source src="media/search.webm" type="video/webm"><source src="media/search.mp4" type="video/mp4"></video><figcaption>Any page in a few keystrokes: <kbd>⌘</kbd><kbd>K</kbd>, type, Enter</figcaption></figure>
-        <figure><video muted loop playsinline preload="metadata" poster="media/themes.jpg" aria-label="The Overview page cycling through eight themes"><source src="media/themes.webm" type="video/webm"><source src="media/themes.mp4" type="video/mp4"></video><figcaption>Pick a theme that feels like yours</figcaption></figure>
-      </div>
-      <div class="shots">
-        <figure><img src="docs/store/screenshot-overview.png" alt="Overview page with GPA, degree progress and timetable" width="1280" height="800" loading="lazy"><figcaption>The Overview</figcaption></figure>
-        <figure><img src="docs/store/screenshot-search.png" alt="Search palette with results for exam" width="1280" height="800" loading="lazy"><figcaption>Search every page</figcaption></figure>
-        <figure><img src="docs/store/screenshot-picker.png" alt="Theme picker previewing Vaporwave" width="1280" height="800" loading="lazy"><figcaption>Theme picker</figcaption></figure>
-      </div>
-      <p class="hint">Screenshots use invented data.</p>
     </div>
   </section>
 </main>
