@@ -169,7 +169,10 @@
       ['2025/2026 Semester 2', 'CD2218', 'Example Platforms for Business', 'S', 'B', '4.00']])
     + note('Available S/U Balance: 12') + '</div>' };
   PAGES.suclosed = { url: PAGES.results.url, html: '<div class="ps_apps_content"><div class="ps_box-group psc_halign-center"><div class="ps_box-htmlarea"><div class="ps-htmlarea"><b>The S/U Declaration System is currently unavailable. Please refer to the University timeline on the opening and closing of the S/U Declaration Period.</b></div></div></div></div>' };
-  PAGES.specialcons = { url: PAGES.results.url, html: '<div class="ps_apps_content">'
+  // The Examinations page list as EduRec shows it.
+  const EXAM_NAV = ['Access Special Consideration', 'View Exam Schedule', 'Subscribe to SMS Notification', 'View Exam Results', 'Review Exam Results Request',
+    'Submit S/U Declarations', 'View Unofficial Transcript', 'S/U Original Grade Letter'];
+  PAGES.specialcons = { url: PAGES.results.url, nav: EXAM_NAV, sel: 'Access Special Consideration', html: '<div class="ps_apps_content">'
     + '<div class="ps_box-group"><div class="ps_box-longedit psc_label-none"><div class="ps_box-label"><span class="ps-label">Instructions:</span></div><div class="ps_box-value">'
     + P('1. The system does not allow amendments to be made once an application is submitted.') + P('2. For help with an application, contact your faculty office.') + P('3. The outcome is made known upon results release.') + '</div></div></div>'
     + '<div class="ps_box-group psc_halign-center"><div class="ps_box-button"><span class="ps-button-wrapper"><a class="ps-button" href="#">View History / Past Submission</a></span></div>'
